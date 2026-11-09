@@ -5,8 +5,8 @@ import { isAuthConfigured } from "@/lib/auth";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Workspace Admin",
-  description: "Administration workspace.",
+  title: "Code Atlas Admin",
+  description: "Administration for Code Atlas.",
 };
 export const dynamic = "force-dynamic";
 

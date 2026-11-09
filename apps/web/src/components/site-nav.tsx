@@ -27,7 +27,7 @@ export function SiteNav() {
 
   return (
     <GlobalNav
-      brand={<Link href="/">Workspace</Link>}
+      brand={<Link href="/">Code Atlas</Link>}
       items={items}
       activeItemId={activeItem?.id}
       linkComponent={NavLink}

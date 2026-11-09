@@ -5,8 +5,8 @@ import { isAuthConfigured } from "@/lib/auth";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Workspace",
-  description: "A minimal Turborepo starter.",
+  title: "Code Atlas",
+  description: "A JavaScript-first learning platform.",
 };
 export const dynamic = "force-dynamic";
 

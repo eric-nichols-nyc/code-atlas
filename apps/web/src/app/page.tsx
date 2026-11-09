@@ -20,7 +20,7 @@ export default async function HomePage() {
   return (
     <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col justify-center gap-8 px-6 py-16">
       <div className="flex items-center justify-between gap-4">
-        <Badge variant="secondary">Workspace / Web</Badge>
+        <Badge variant="secondary">Code Atlas / Web</Badge>
         {userId && <UserButton />}
       </div>
       <Card>

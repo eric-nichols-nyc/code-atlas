@@ -1,6 +1,6 @@
-# Learning Platform
+# Code Atlas
 
-A JavaScript-first learning platform being developed for the web and a future Electron desktop application. The project is organized as a pnpm/Turborepo monorepo with separate learner, administration, and API applications.
+Code Atlas is a JavaScript-first learning platform being developed for the web and a future Electron desktop application. The project is organized as a pnpm/Turborepo monorepo with separate learner, administration, and API applications.
 
 **Status: foundation implemented; learning features are being planned.** The current screens are starter pages. JavaScript lessons, a lesson player, MDX rendering, an editable code sandbox, and Electron packaging have not been implemented yet.
 
@@ -123,8 +123,8 @@ Generated dependencies, build products, browser reports, and local environment f
 If using nvm, run `nvm use` from the repository. If pnpm is missing, follow the [pnpm installation instructions](https://pnpm.io/installation) and select the pinned version.
 
 ```sh
-git clone https://github.com/eric-nichols-nyc/learning-platform.git
-cd learning-platform
+git clone https://github.com/eric-nichols-nyc/code-atlas.git
+cd code-atlas
 pnpm install --frozen-lockfile
 pnpm dev
 ```

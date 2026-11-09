@@ -14,7 +14,7 @@ export default function AdminHome() {
   return (
     <main className="mx-auto flex w-full max-w-xl flex-1 flex-col justify-center gap-6 px-6 py-16">
       <div>
-        <Badge variant="secondary">Workspace / Admin</Badge>
+        <Badge variant="secondary">Code Atlas / Admin</Badge>
       </div>
       <Card>
         <CardHeader>

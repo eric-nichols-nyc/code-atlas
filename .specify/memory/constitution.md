@@ -1,4 +1,4 @@
-# Learning Platform Constitution
+# Code Atlas Constitution
 
 ## Core Principles
 
@@ -132,4 +132,4 @@ clarifications. Preserve the original ratification date and update the amendment
 content changes. Runtime templates read this constitution directly; maintain the rules
 here as their source of truth.
 
-**Version**: 1.1.0 | **Ratified**: 2026-11-07 | **Last Amended**: 2026-11-07
+**Version**: 1.1.1 | **Ratified**: 2026-11-07 | **Last Amended**: 2026-11-09
