@@ -1,4 +1,5 @@
 import { ClerkProvider } from "@clerk/nextjs";
+import { ThemeProvider } from "@workspace/ui/components/theme-provider";
 import type { Metadata } from "next";
 import { SiteNav } from "@/components/site-nav";
 import { isAuthConfigured } from "@/lib/auth";
@@ -13,16 +14,27 @@ export const dynamic = "force-dynamic";
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const authConfigured = isAuthConfigured();
   const content = (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className="flex min-h-svh flex-col">
-        <SiteNav />
-        {children}
+        <ThemeProvider>
+          <SiteNav authConfigured={authConfigured} />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );
-  return isAuthConfigured() ? (
-    <ClerkProvider>{content}</ClerkProvider>
+  return authConfigured ? (
+    <ClerkProvider
+      signInUrl="/sign-in"
+      signUpUrl="/sign-up"
+      signInForceRedirectUrl="/dashboard"
+      signUpForceRedirectUrl="/dashboard"
+      afterSignOutUrl="/"
+    >
+      {content}
+    </ClerkProvider>
   ) : (
     content
   );

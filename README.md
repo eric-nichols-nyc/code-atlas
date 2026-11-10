@@ -1,126 +1,64 @@
 # Code Atlas
 
-Code Atlas is a JavaScript-first learning platform being developed for the web and a future Electron desktop application. The project is organized as a pnpm/Turborepo monorepo with separate learner, administration, and API applications.
+Code Atlas is a JavaScript-first learning and coding-practice platform built as a pnpm/Turborepo
+monorepo. It currently has a Next.js learner app and an Express API. Electron is planned.
 
-**Status: foundation implemented; learning features are being planned.** The current screens are starter pages. JavaScript lessons, a lesson player, MDX rendering, an editable code sandbox, and Electron packaging have not been implemented yet.
+**Current review slice: Sleep, a complete JavaScript practice problem.** Learners edit JavaScript,
+Run visible cases, and Submit against a server-selected test suite. Results come from isolated
+execution. Drafts and the latest result remain in memory while the problem is mounted; reloading
+or leaving the problem discards them. Account history and progress are not implemented.
 
 ## Contents
 
-- [Product direction and current status](#product-direction-and-current-status)
-- [Technology stack](#technology-stack)
-- [Repository structure](#repository-structure)
+- [Current experience](#current-experience)
 - [Quick start](#quick-start)
-- [Workspace commands](#workspace-commands)
-- [Environment configuration](#environment-configuration)
-- [Authentication and admin access](#authentication-and-admin-access)
-- [API](#api)
-- [Database and Neon](#database-and-neon)
-- [Shared UI and navigation](#shared-ui-and-navigation)
-- [Testing and quality checks](#testing-and-quality-checks)
-- [Bundle analysis](#bundle-analysis)
-- [Feature development with Spec Kit](#feature-development-with-spec-kit)
-- [Learning content and visualizations](#learning-content-and-visualizations)
-- [Desktop and deployment direction](#desktop-and-deployment-direction)
-- [Roadmap and open decisions](#roadmap-and-open-decisions)
+- [Environment and authentication](#environment-and-authentication)
+- [Commands](#commands)
+- [Where the code lives](#where-the-code-lives)
+- [Feature workflow](#feature-workflow)
+- [Authoring practice problems](#authoring-practice-problems)
+- [API and execution](#api-and-execution)
+- [Database](#database)
+- [Shared UI](#shared-ui)
+- [Verification](#verification)
+- [Deployment and future work](#deployment-and-future-work)
 - [Troubleshooting](#troubleshooting)
-- [Project references and license](#project-references-and-license)
 
-## Product direction and current status
+## Current experience
 
-The intended learning experience combines explanations, code examples, interactive visualizations, practice, and progress tracking. JavaScript is the first subject. Algorithm/interview practice and design-system learning are later subject areas.
+| Route                        | Behavior                                                                                         |
+| ---------------------------- | ------------------------------------------------------------------------------------------------ |
+| `/`                          | Public home page                                                                                 |
+| `/dashboard`                 | Protected subject picker; JavaScript is available, Algorithms and React JS are coming soon       |
+| `/javascript`                | Redirects to JavaScript Practice                                                                 |
+| `/javascript/practice`       | Searchable catalog with Recommended and topic categories; Sleep appears in Recommended and Async |
+| `/javascript/practice/sleep` | Protected coding workspace with real Run/Submit                                                  |
+| `/javascript/learn`          | Protected coming-soon page; Learn requirements are deferred                                      |
+| `/sign-in`, `/sign-up`       | Clerk catch-all authentication routes; completed authentication redirects to Dashboard           |
 
-| Area                 | Current state                                                                    |
-| -------------------- | -------------------------------------------------------------------------------- |
-| Monorepo             | pnpm workspaces and Turborepo task orchestration                                 |
-| Learner application  | Next.js App Router starter with home, dashboard, and sign-in/sign-up routes      |
-| Administration       | Separate Next.js starter with a protected dashboard and explicit admin allowlist |
-| API                  | Express application with health and authenticated identity endpoints             |
-| Shared UI            | shadcn primitives, theme tokens, and a generic responsive `GlobalNav`            |
-| Authentication       | Clerk integration scaffolding; real keys are supplied separately                 |
-| Persistence          | Prisma/Neon client package; schema has no business models or migrations yet      |
-| Development workflow | Biome, TypeScript, Vitest, Playwright, web bundle analysis, and Spec Kit         |
-| Curriculum           | Planned; no JavaScript lessons are included yet                                  |
-| Desktop              | Electron is a target, with no desktop app or installer included yet              |
+JavaScript catalog and Learn pages use centered Learn/Practice navigation, with Dashboard beside
+Code Atlas for returning to the subject picker. Individual problem pages use a focused workspace
+with Back to Practice and AI/Notes icons. Each icon opens its corresponding tab; clicking the active
+icon closes the tools panel. Legacy `/learn/javascript` URLs redirect to Practice.
 
-The active [constitution](.specify/memory/constitution.md) defines the project's architecture, learning-content, accessibility, security, and verification principles. Planned capabilities must remain clearly distinguished from delivered functionality.
+The workspace provides:
 
-## Technology stack
+- A continuous description with examples, constraints, individual hint accordions, and Solution last.
+- A local CodeMirror JavaScript editor with Reset code, theme, and disabled Share icons in its header.
+- Run and Submit below the editor; Testcase and Test Result beneath that.
+- Resizable description/editor/tools columns and an editor/results split. Closing tools releases space.
+- A narrow-screen reading layout with a tools drawer. Source, editor state, inputs, expanded help,
+  and results survive responsive changes.
+- Light, Dark, and System themes; the initial theme is dark and the preference persists in the browser.
 
-| Concern                     | Installed foundation                                    |
-| --------------------------- | ------------------------------------------------------- |
-| Runtime and package manager | Node.js 24 LTS; pnpm 11.25.0                            |
-| Workspace orchestration     | Turborepo 2                                             |
-| Frontends                   | Next.js 16, React 19, TypeScript                        |
-| Styling and components      | Tailwind CSS 4, shadcn/Radix primitives, Lucide icons   |
-| API                         | Express 5, Clerk Express SDK, CORS, Helmet              |
-| Authentication              | Clerk Next.js and Express SDKs                          |
-| Database                    | Prisma 7, Neon serverless adapter                       |
-| Formatting and lint         | Biome 2                                                 |
-| Tests                       | Vitest, Testing Library, Supertest, Playwright/Chromium |
-| Planning                    | GitHub Spec Kit 1.3.2 with Codex skills                 |
-
-Exact versions and executable scripts are defined in the package manifests and `pnpm-lock.yaml`. The internal package names currently use the `@workspace` scope.
-
-## Repository structure
-
-This tree describes directories that exist today. Future feature modules and the Electron app will be introduced by their implementation plans.
-
-```text
-.
-├── apps/
-│   ├── web/                         # Learner-facing Next.js application
-│   │   └── src/
-│   │       ├── app/                 # Routes, layouts, and global CSS
-│   │       ├── components/          # App adapters and composed components
-│   │       ├── lib/                 # App-specific helpers
-│   │       └── proxy.ts             # Clerk request initialization
-│   ├── admin/                       # Separate Next.js administration app
-│   │   └── src/                     # App routes, nav adapter, auth policy
-│   └── api/
-│       └── src/
-│           ├── app.ts               # Testable Express app and route boundaries
-│           ├── app.test.ts          # HTTP behavior and authorization-policy tests
-│           └── server.ts            # Environment configuration and server startup
-├── packages/
-│   ├── ui/
-│   │   └── src/
-│   │       ├── components/          # Shared primitives and GlobalNav
-│   │       ├── lib/                 # Shared class-name helper
-│   │       └── styles/              # Tailwind imports and semantic theme tokens
-│   └── db/
-│       ├── prisma/schema.prisma     # PostgreSQL schema; models added per feature
-│       ├── prisma.config.ts         # CLI and migration connection configuration
-│       └── src/index.ts             # Lazy server-side Prisma client
-├── tests/
-│   ├── e2e/                         # Cross-application Playwright smoke tests
-│   └── setup.ts                     # UI test setup and cleanup
-├── .agents/skills/speckit-*/         # Shared project-local Codex skills
-├── .specify/
-│   ├── memory/constitution.md       # Project principles
-│   ├── scripts/                     # Feature and template helpers
-│   ├── templates/                   # Spec Kit templates
-│   └── workflows/                   # Installed feature-development workflow
-├── AGENTS.md                        # Coding-agent project conventions
-├── ui-registry.md                   # Shared visual and interaction patterns
-├── biome.json                       # Formatting, import organization, and lint
-├── playwright.config.ts             # Production-server browser tests
-├── vitest.config.ts                 # Server and UI test projects
-├── pnpm-workspace.yaml              # Workspace membership and build permissions
-└── turbo.json                       # Task dependencies, outputs, and environment handling
-```
-
-Generated dependencies, build products, browser reports, and local environment files are ignored. Local research under `work/` and deliverables under `outputs/` are also excluded from Git.
+AI tutoring and saved notes are clearly labeled placeholders. The workspace has no visualization,
+Submissions view, Problems button, or Reset layout action. A judge result does not save progress.
 
 ## Quick start
 
-### Requirements
-
-- Node.js **24 LTS, version 24.11.0 or later in the 24.x series**, matching `.nvmrc`.
-- pnpm **11.25.0**, matching the `packageManager` field.
-- Git.
-- Python 3.11+ and [uv](https://docs.astral.sh/uv/) only if running the pinned Spec Kit CLI through `pnpm specify`.
-
-If using nvm, run `nvm use` from the repository. If pnpm is missing, follow the [pnpm installation instructions](https://pnpm.io/installation) and select the pinned version.
+Use Node.js **24 LTS, 24.11.0 or later in the 24.x series**, and **pnpm 11.25.0**, matching
+`.nvmrc` and `package.json`. Git is required. Python 3.11+ and `uv` are needed only for the optional
+Spec Kit CLI.
 
 ```sh
 git clone https://github.com/eric-nichols-nyc/code-atlas.git
@@ -129,287 +67,262 @@ pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-The dev command builds shared database code first and starts all three applications:
+| Service    | Local address                  |
+| ---------- | ------------------------------ |
+| Web        | <http://localhost:3000>        |
+| API health | <http://127.0.0.1:4000/health> |
 
-| Application | Address                        |
-| ----------- | ------------------------------ |
-| Web         | <http://localhost:3000>        |
-| Admin       | <http://localhost:3001>        |
-| API health  | <http://127.0.0.1:4000/health> |
+`pnpm dev` builds shared dependencies and starts web/API. Public pages, health, Prisma generation,
+and credential-free builds work without Clerk or Neon keys. Protected pages show setup information
+until Clerk is configured. Running and submitting code require a signed-in Clerk session and API.
 
-No Clerk or Neon credentials are required for the public starter pages, health endpoint, Prisma generation, or normal build. Authentication-dependent pages show setup information until Clerk is configured. Protected API requests fail closed.
-
-To run a single app while retaining its workspace build dependencies:
+To run one application with its shared build dependencies:
 
 ```sh
 pnpm exec turbo run dev --filter=@workspace/web
-pnpm exec turbo run dev --filter=@workspace/admin
 pnpm exec turbo run dev --filter=@workspace/api
 ```
 
-## Workspace commands
+## Environment and authentication
 
-Run these from the repository root.
+Copy the relevant example only if its local destination does not already exist. Keep real keys
+in ignored environment files; committed examples contain empty credential values.
 
-| Command                         | Purpose                                                                 |
-| ------------------------------- | ----------------------------------------------------------------------- |
-| `pnpm dev`                      | Start all development servers                                           |
-| `pnpm build`                    | Generate/build the database package and build all apps                  |
-| `pnpm start`                    | Start production servers after a completed build                        |
-| `pnpm lint`                     | Check formatting, imports, and lint with Biome                          |
-| `pnpm lint:fix`                 | Apply safe Biome fixes                                                  |
-| `pnpm format`                   | Format supported source and documentation                               |
-| `pnpm typecheck`                | Check root test/configuration types and workspace types                 |
-| `pnpm test`                     | Run all Vitest tests                                                    |
-| `pnpm test:watch`               | Run Vitest in watch mode                                                |
-| `pnpm test:coverage`            | Run Vitest with V8 coverage                                             |
-| `pnpm test:e2e`                 | Run Playwright against all three production servers                     |
-| `pnpm test:e2e:ui`              | Open the Playwright test UI                                             |
-| `pnpm analyze`                  | Build the web app with Webpack bundle analysis                          |
-| `pnpm db:generate`              | Generate the Prisma client without connecting to a database             |
-| `pnpm db:migrate --name <name>` | Create/apply a development migration after models and credentials exist |
-| `pnpm db:deploy`                | Apply committed migrations to the configured database                   |
-| `pnpm db:studio`                | Open Prisma Studio using configured credentials                         |
-| `pnpm specify version`          | Inspect the pinned Specify CLI version                                  |
-| `pnpm specify check`            | Check available coding-agent tools                                      |
+| Example                    | Local destination     | Purpose                                                                            |
+| -------------------------- | --------------------- | ---------------------------------------------------------------------------------- |
+| `apps/web/.env.example`    | `apps/web/.env.local` | Clerk keys/auth routes, optional server `API_URL`, optional future database access |
+| `apps/api/.env.example`    | `apps/api/.env`       | Clerk keys, port/host, allowed frontend origins, optional future database access   |
+| `packages/db/.env.example` | `packages/db/.env`    | Prisma CLI pooled/direct database connections when needed                          |
 
-## Environment configuration
+Use the same Clerk development application in web and API:
 
-Copy examples only when configuring the corresponding service. Keep existing local files if you already have them.
+1. Web: set `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY`; retain the example auth routes.
+2. API: set `CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY` from that same Clerk application.
+3. Keep API `CORS_ORIGINS` aligned with the frontend origin, normally `http://localhost:3000`.
+4. Web's server-only `API_URL` defaults to `http://127.0.0.1:4000`. Set it when the API runs elsewhere.
+5. Restart the affected servers after environment changes; rebuild after changing public frontend keys.
 
-| Example                    | Local file read by that process | Configuration                                                               |
-| -------------------------- | ------------------------------- | --------------------------------------------------------------------------- |
-| `apps/web/.env.example`    | `apps/web/.env.local`           | Public Clerk key, server secret, auth routes, optional runtime database URL |
-| `apps/admin/.env.example`  | `apps/admin/.env.local`         | Clerk keys/routes, admin user allowlist, optional runtime database URL      |
-| `apps/api/.env.example`    | `apps/api/.env`                 | API address, allowed origins, Clerk keys, optional runtime database URL     |
-| `packages/db/.env.example` | `packages/db/.env`              | Prisma CLI pooled/direct database connections                               |
+The Next.js proxy initializes Clerk. Protected pages and web API handlers verify their own sessions;
+Express verifies the forwarded token behind its `/v1` boundary. Sign-in/sign-up redirect to Dashboard,
+and sign-out returns home. No database or external judge key is required for Sleep.
 
-Next.js loads each frontend's environment files. API dev/start commands use Node's environment-file support. Prisma configuration loads its package-local `.env`. A database package environment file does **not** configure every application process.
+Next.js, the API, and Prisma load their own local environment files. A database package `.env` does
+not configure application processes. Only public configuration belongs in `NEXT_PUBLIC_` variables.
+Never expose server secrets in browser or future Electron bundles.
 
-All committed examples have empty credential values. Real environment files and Clerk local state are ignored. Supply deployment secrets through the hosting environment. Only explicitly public configuration belongs in `NEXT_PUBLIC_` variables.
+## Commands
 
-## Authentication and admin access
+Root `package.json` is the source of truth for scripts.
 
-Use the same Clerk application across web, admin, and API:
+| Command                                       | Purpose                                                                     |
+| --------------------------------------------- | --------------------------------------------------------------------------- |
+| `pnpm dev`                                    | Build shared dependencies and run web/API development servers               |
+| `pnpm build` / `pnpm start`                   | Build all workspaces / start production servers after building              |
+| `pnpm lint` / `pnpm lint:fix`                 | Biome checks / safe fixes                                                   |
+| `pnpm format`                                 | Format supported files                                                      |
+| `pnpm typecheck`                              | Root and workspace TypeScript checks                                        |
+| `pnpm test` / `pnpm test:watch`               | Build the shared problem package and run Vitest / watch                     |
+| `pnpm test:coverage`                          | Vitest coverage; build shared problem definitions first on a fresh checkout |
+| `pnpm test:e2e` / `pnpm test:e2e:ui`          | Credential-free production Playwright smoke tests / test UI                 |
+| `pnpm test:e2e:auth`                          | Optional authenticated suite with a dedicated Clerk development identity    |
+| `pnpm --filter @workspace/web content:check`  | Validate the current practice catalog and public definitions                |
+| `pnpm analyze`                                | Webpack bundle-analysis build for the web app                               |
+| `pnpm db:generate`                            | Generate Prisma Client without connecting to a database                     |
+| `pnpm db:migrate --name <name>`               | Create/apply a development migration once models and credentials exist      |
+| `pnpm db:deploy` / `pnpm db:studio`           | Apply committed migrations / open Prisma Studio                             |
+| `pnpm specify version` / `pnpm specify check` | Inspect the optional pinned Spec Kit CLI and available tools                |
 
-1. Set `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY` in each frontend's local environment.
-2. Keep the sign-in/sign-up route and redirect variables from the frontend examples.
-3. Set `CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY` in the API environment.
-4. Set `ADMIN_USER_IDS` in the admin environment to a comma-separated list of approved Clerk user IDs. An empty list denies all users.
-5. Keep API `CORS_ORIGINS` aligned with the frontend origins; the API also uses these values as Clerk authorized parties.
+## Where the code lives
 
-| App   | Routes and behavior                                                                                   |
-| ----- | ----------------------------------------------------------------------------------------------------- |
-| Web   | `/`, `/sign-in`, `/sign-up`, and a protected `/dashboard`                                             |
-| Admin | Public starter `/`, `/sign-in`, and `/dashboard` requiring a verified session and allowlisted user ID |
-| API   | Public `/health`; all `/v1` routes behind the shared authentication boundary                          |
+A short ownership map replaces a full directory tree. Keep feature details in their brief and code.
 
-The Next.js proxy initializes Clerk. Protected pages perform their own session and authorization checks before serving protected content. Any new protected Route Handler or Server Action must enforce its own access policy as well.
+| Location                                              | Owns                                                                       |
+| ----------------------------------------------------- | -------------------------------------------------------------------------- |
+| [Web routes](apps/web/src/app)                        | Next.js pages, layouts, and authenticated web API adapters                 |
+| [Web features](apps/web/src/features)                 | Catalog, dashboard, problem behavior/state, and adaptive workspace layout  |
+| [JavaScript content](apps/web/src/content/javascript) | Practice catalog, trusted problem MDX, and separate planned Learn metadata |
+| [API](apps/api/src)                                   | Express auth boundary, private test suites, and isolated execution         |
+| [Public problem package](packages/problems/src)       | Shared problem definitions and execution contracts                         |
+| [Shared UI](packages/ui/src)                          | shadcn primitives, generic navigation, icons, and theme                    |
+| [Database package](packages/db)                       | Prisma schema, generation, and lazy server-only client                     |
+| [Browser tests](tests)                                | Smoke and optional authenticated Playwright journeys                       |
+| [Feature briefs](docs/features)                       | Scope, acceptance checks, decisions, and verified outcomes                 |
 
-Restart development servers after environment changes. Production builds need public Clerk configuration at build time; runtime processes need the server secret. Rebuild after changing a public key. No Clerk application is provisioned by this repository.
+[AGENTS.md](AGENTS.md) contains agent conventions, [ui-registry.md](ui-registry.md) records UI
+patterns, and the [constitution](.specify/memory/constitution.md) defines durable project principles.
+Generated dependencies/builds, reports, credentials, and local `work/`/`outputs/` artifacts are ignored.
 
-See [Clerk for Next.js](https://clerk.com/docs/nextjs/getting-started/quickstart) and [Clerk for Express](https://clerk.com/docs/expressjs/getting-started/quickstart).
+## Feature workflow
 
-## API
+Use the project-local [feature-workflow skill](.agents/skills/feature-workflow/SKILL.md):
 
-The API listens on `127.0.0.1:4000` by default. Configure `HOST`, `PORT`, and `CORS_ORIGINS` in its environment.
+1. Write or update one short brief in `docs/features/`: outcome, included/deferred scope, observable
+   acceptance checks, implementation checklist, and open decisions.
+2. Build one complete working slice using existing feature folders and shared UI.
+3. Review it in the browser, then iterate directly from feedback while preserving the user's work.
+4. Run relevant checks and record actual verification results and limitations in the same brief.
 
-| Endpoint                | Access                 | Response                                                                                                     |
-| ----------------------- | ---------------------- | ------------------------------------------------------------------------------------------------------------ |
-| `GET /health`           | Public                 | `200` with `{"status":"ok","service":"api"}`                                                                 |
-| `GET /v1/me`            | Clerk session required | `200` with the verified `userId`; `503` before auth is configured; `401` when configured but unauthenticated |
-| Unknown public endpoint | Public                 | JSON `404`                                                                                                   |
+Small fixes and layout changes go straight to code. Expand the brief when execution, authentication,
+persistence, or another architecture decision needs detail. Spec Kit is installed but optional;
+use its formal workflow when requested. Existing `specs/` artifacts remain historical unless selected
+for further work. See the [JavaScript practice brief](docs/features/javascript-coding-problems.md).
 
-Authenticated browser clients send a token from Clerk's `getToken()` as `Authorization: Bearer <token>`. The API includes Helmet, an explicit browser-origin allowlist, and a 1 MB JSON request-body limit. Feature endpoints belong under `/v1`; administrative operations require additional authorization checks.
+## Authoring practice problems
 
-## Database and Neon
+Current content ownership is deliberate:
 
-The database package includes an empty PostgreSQL schema and Prisma's Neon adapter. No cloud database is provisioned, no feature tables are defined, and no migrations are present.
+- Public definitions, stable IDs/slugs, starter source, samples, constraints, hints, and explanatory
+  solutions: [packages/problems/src/index.ts](packages/problems/src/index.ts).
+- Trusted authored prose: [Sleep MDX](apps/web/src/content/javascript/practice/sleep/problem.mdx).
+  Learners never author executable MDX.
+- Listing metadata such as topic, recommendation, difficulty, and ordering:
+  [practice catalog](apps/web/src/content/javascript/practice/catalog.ts).
+- Hidden inputs and judging: [API execution](apps/api/src/execution). Hidden inputs and logs must
+  stay out of public definitions and browser payloads.
 
-When a feature needs persistence:
+`features/problems` owns the editable CodeMirror adapter, problem session, description, and results.
+`features/learning` currently owns the reusable adaptive layout and tools panel; its name does not
+make the current practice experience a guided Learn lesson.
 
-1. Set the pooled Neon `DATABASE_URL` and direct `DIRECT_URL` in `packages/db/.env` for CLI commands.
-2. Set `DATABASE_URL` in the server environment of each application using the database.
-3. Define models in `packages/db/prisma/schema.prisma`.
-4. Generate the client and create the development migration:
+Sleep is intentionally the only supported problem in this review slice. The route, content validator,
+and execution adapter currently select Sleep explicitly. Adding a second problem requires updating
+those integrations and its private judging contract as well as content; adding MDX alone is insufficient.
+Future Learn content is a separate feature. Reuse the shared workspace where its interaction fits.
+
+## API and execution
+
+| Endpoint                              | Access and behavior                                       |
+| ------------------------------------- | --------------------------------------------------------- |
+| `GET /health`                         | Public service health                                     |
+| `GET /v1/me`                          | Verified Clerk identity                                   |
+| `POST /v1/problems/:problemId/run`    | Authenticated execution against visible inputs            |
+| `POST /v1/problems/:problemId/submit` | Authenticated execution against the server-selected suite |
+
+The browser calls the same-origin web adapter at `/api/problems/:problemId/:action`. It checks the
+session, request origin, and input limits, then forwards a Clerk token to the API. Express checks
+identity again under `/v1`; missing auth configuration returns 503 and missing identity returns 401.
+
+The API runs QuickJS WebAssembly inside a disposable Node Worker. Guest memory, stack, CPU, timers,
+console output, concurrency, and wall time are bounded. Learner code has no Node module, filesystem,
+DOM, or network access. This is a single-file JavaScript adapter for Sleep, not a general Node runtime.
+
+Run uses editable visible cases; Submit ignores client-supplied cases and uses the full private suite.
+Test Result shows the latest real verdict. Editing relevant source/inputs marks a result stale;
+failures preserve the current code. There is no submission-history or account-persistence service.
+
+## Database
+
+Prisma 7 and the Neon adapter are installed. The schema has no business models or migrations;
+no cloud database is provisioned by this repository. Add persistence when a feature requires it.
+
+Configure pooled `DATABASE_URL` and optional direct `DIRECT_URL` in `packages/db/.env` for CLI use.
+Prisma prefers `DIRECT_URL` for migrations and otherwise uses `DATABASE_URL`. Each server app that
+uses the database also needs its own runtime `DATABASE_URL`.
+
+After defining models:
 
 ```sh
 pnpm db:generate
 pnpm db:migrate --name first_feature
 ```
 
-The CLI prefers `DIRECT_URL` and falls back to `DATABASE_URL`. Runtime code uses the pooled URL through `@prisma/adapter-neon`. Validate development migrations against a Neon development branch before production. Apply committed production migrations through `pnpm db:deploy`.
+Validate migrations against a Neon development branch before production and apply committed
+migrations with `pnpm db:deploy`. Import `getDb` from `@workspace/db` only in server code and call
+`getDb()` at request time after authentication/authorization. Importing the package does not connect;
+normal builds do not require database credentials.
 
-```ts
-import { getDb } from "@workspace/db";
+## Shared UI
 
-// Call in server code, after the required authentication and authorization.
-const db = getDb();
-```
-
-`getDb()` lazily creates one client per process and reports a clear configuration error when `DATABASE_URL` is absent. Importing the package does not open a database connection. Keep it out of browser code and future Electron renderer bundles. The schema's generated client and compiled output are produced by the workspace build.
-
-See the [Neon Prisma guide](https://neon.com/docs/guides/prisma).
-
-## Shared UI and navigation
-
-`@workspace/ui` exports source components and the shared Tailwind theme. Both Next.js apps compile this source directly. Current components include Button, Card, Badge, Input, Label, Field, Dialog, DropdownMenu, Separator, Skeleton, and GlobalNav.
+`packages/ui` exports source components and semantic Tailwind theme tokens. Web compiles the shared
+source directly. Use the existing Buttons, Accordion, Tabs, Sheet, resizable primitives, GlobalNav,
+and theme controls before adding alternatives. Routes and Clerk decisions remain in app-owned adapters.
 
 ```tsx
 import { Button } from "@workspace/ui/components/button";
-import { GlobalNav } from "@workspace/ui/components/global-nav";
 ```
-
-`GlobalNav` supports:
-
-- Consumer-owned branding, links, active item ID, and optional actions.
-- Native anchor links or a router-specific link adapter.
-- Configurable accessible navigation and mobile-menu labels.
-- Responsive disclosure, Escape-to-close, focus restoration, and closing after link selection.
-
-Each app's client-side `SiteNav` adapter owns its Next.js Link integration and pathname matching. The shared component owns presentation and interaction behavior. Its import boundary contains no Next.js route hooks or Clerk logic.
 
 Add official shadcn components in the shared package:
 
 ```sh
-pnpm dlx shadcn@latest add tabs --cwd packages/ui
+pnpm dlx shadcn@latest add <component> --cwd packages/ui
 ```
 
-Both app configurations route shared primitive imports to this package. Use the existing `@workspace/ui/lib/utils` helper for `cn` imports. Read [ui-registry.md](ui-registry.md) before extending visual patterns and update it when reusable conventions change. See [shadcn monorepo guidance](https://ui.shadcn.com/docs/monorepo).
+Use `@workspace/ui/lib/utils` for `cn` imports. Read and maintain [ui-registry.md](ui-registry.md)
+when changing reusable patterns. Normal builds use Turbopack; `pnpm analyze` uses Webpack and writes
+ignored reports under `apps/web/.next/analyze/`. Review bundle impact for substantial client additions.
 
-## Testing and quality checks
+## Verification
 
-A typical local verification sequence is:
+For feature changes, choose relevant tests and run the standard quality checks:
 
 ```sh
-pnpm install --frozen-lockfile
 pnpm lint
 pnpm typecheck
 pnpm test
 pnpm build
+```
+
+The web build includes content validation. Vitest covers contracts, real runner behavior, API policy,
+workspace interactions, catalog logic, and shared navigation. UI tests use jsdom/Testing Library;
+HTTP tests use Supertest. Documentation-only edits need formatting and link checks, not a full build.
+
+The production smoke suite needs a completed credential-free build and free ports **3000 and 4000**.
+Stop conflicting development servers before running it. Install Chromium once if needed:
+
+```sh
 pnpm exec playwright install chromium
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY= CLERK_SECRET_KEY= CLERK_PUBLISHABLE_KEY= DATABASE_URL= pnpm build
 pnpm test:e2e
 ```
 
-On a Linux CI image that also needs browser system libraries, use Playwright's `install --with-deps chromium` option. No CI workflow file is included yet.
+The smoke configuration clears credentials and starts its own web/API servers. It verifies public
+navigation, themes, mobile behavior, auth routes, health, and protected setup boundaries. It does not
+verify real sign-in, authenticated judging, or database access. Reports/traces are ignored; no CI
+workflow is included yet.
 
-Vitest is configured with server and UI projects. Tests cover API behavior, admin authorization policy, shared buttons, and navigation configuration/keyboard behavior. UI tests use jsdom and Testing Library; HTTP tests use Supertest.
+Authenticated automation is optional and remains unverified at the user's request. It requires Clerk
+**development** keys and `CLERK_TEST_USER_EMAIL` for a dedicated existing development learner without
+MFA/session tasks. The config reads ignored `.env.test.local` and web environment files. Keep the API
+running separately with matching Clerk keys; free port 3000 because the suite builds/starts its own web
+server. Run `pnpm test:e2e:auth` when that identity is ready. Manual signed-in browser review is recorded
+in the feature brief and does not count as authenticated automated coverage.
 
-Playwright starts its own production servers on ports **3000, 3001, and 4000**. Stop development servers using those ports first. The suite checks the shared dialog, active navigation, mobile keyboard behavior, admin setup, API health, and credentials-pending access boundaries. HTML reports are written to `playwright-report/`; traces are retained on first retry.
+## Deployment and future work
 
-The smoke suite explicitly clears Clerk and database credentials. Clerk identity verification is mocked in policy unit tests. These checks do not establish that live sign-in or real database queries work; those integrations require credentials and their own verification.
+Web and API are separate runtime targets. No hosted deployment or CI pipeline is configured.
+Supply public frontend configuration at build time and server secrets at runtime. The API defaults
+to `HOST=127.0.0.1` locally; configure an appropriate binding and allowed origins when deploying.
 
-## Bundle analysis
-
-```sh
-pnpm analyze
-```
-
-The web app uses `@next/bundle-analyzer` with an explicit Webpack analysis build. It produces static reports without opening a browser:
-
-- `apps/web/.next/analyze/client.html`
-- `apps/web/.next/analyze/nodejs.html`
-- An edge report when the analyzer emits one.
-
-Normal development and production builds use Turbopack. Generated reports are ignored by Git. Review analysis when adding significant client dependencies, and load specialized lesson tools on demand.
-
-## Feature development with Spec Kit
-
-Spec Kit 1.3.2 is installed with project-local Codex skills. The [constitution](.specify/memory/constitution.md) is the source of truth for project principles; [AGENTS.md](AGENTS.md) records practical coding-agent conventions.
-
-Use these skills in a coding-agent chat opened in this repository, one step at a time:
-
-```text
-$speckit-specify Describe the learner outcome and acceptance criteria.
-$speckit-clarify
-$speckit-plan Describe implementation boundaries and the technical approach.
-$speckit-tasks
-$speckit-analyze
-$speckit-implement
-$speckit-converge
-```
-
-Clarify and analyze are used when relevant. Constitution changes use `$speckit-constitution`. Small maintenance or presentation changes can use a proportionate workflow, as described in the constitution.
-
-Feature artifacts are created under `specs/` when a feature is specified. The installed workflow currently tracks its active feature with ignored checkout-local state; initialization does not create feature specs or branches. Optional Git workflow behavior is separate from feature state.
-
-`pnpm specify` runs the pinned official CLI through `uvx` and requires uv/Python for CLI maintenance. The generated skills, scripts, templates, and constitution are committed so other checkouts can use the same workflow. See the [Spec Kit documentation](https://github.com/github/spec-kit/tree/v1.3.2).
-
-## Learning content and visualizations
-
-The intended content boundary separates:
-
-| Information                                      | Proposed responsibility                                                           |
-| ------------------------------------------------ | --------------------------------------------------------------------------------- |
-| Lesson prose and theory                          | Trusted authored content; MDX is a proposed format                                |
-| Topic titles, difficulty, tags, and ordering     | Typed metadata with stable identifiers                                            |
-| Example code and prepared animation states       | Typed lesson/scenario data                                                        |
-| Playback, source highlighting, and visual panels | Reusable learning UI with topic-specific visualizers                              |
-| Editable-code interpretation                     | A separately specified parser/generator with explicit supported syntax and limits |
-| Progress, bookmarks, and saved answers           | Learner-owned state with a defined persistence policy                             |
-
-These are design directions, not installed features. MDX rendering, CodeMirror, Acorn, curriculum models, and lesson generators are not included in the current application.
-
-[VisualizeJS](https://visualizejs.com/) was studied as a reference for prepared visualizations, shared playback, and constrained AST-to-animation generation. Its [public source](https://github.com/tornike14/visualizejs) documents that architecture. This repository currently contains its own starter foundation, not imported VisualizeJS lesson code.
-
-A proposed first feature is one complete JavaScript learning journey with an Event Loop lesson: topic navigation, source/state panels, explanations, accessible playback, and theory. An editable sandbox can follow once the shared lesson model is verified.
-
-## Desktop and deployment direction
-
-Electron is planned. There is no `apps/desktop` workspace, local renderer bundle, installer, signing configuration, auto-updater, or offline synchronization implementation yet.
-
-Desktop specifications must decide whether the app loads a hosted experience or bundles an offline-capable renderer. Native integration belongs behind narrow, validated interfaces; database credentials and Clerk server secrets remain on the server. Browser verification does not establish packaged desktop behavior.
-
-For a local production-mode check:
+For local production mode:
 
 ```sh
 pnpm build
 pnpm start
 ```
 
-Hosted deployment is not automated in this repository. Web, admin, and API are separate runtime targets. Provide public frontend configuration during builds and server secrets at runtime. The API's default `HOST=127.0.0.1` is for local use; container deployments usually need an explicit network binding such as `0.0.0.0` and configured public frontend origins. Keep database generation/build output available to server consumers and apply migrations through a controlled release step once migrations exist.
+The next work is to finish reviewing Sleep, then add problems through the existing content and judge
+contracts. Learn, connected AI tutoring, editable/saved notes, submission history, progress, and future
+administration require their own feature scope. There is currently no admin app.
 
-## Roadmap and open decisions
-
-Proposed delivery order:
-
-1. Define the first JavaScript learning feature and its content contract.
-2. Build the lesson shell and one verified Event Loop visualization.
-3. Add more authored lessons through the shared topic/player interfaces.
-4. Add an editable sandbox with explicit language coverage and error behavior.
-5. Add account-backed progress and administration workflows as requirements settle.
-6. Deliver and verify the chosen Electron distribution model.
-
-Before dependent work, resolve the product decisions recorded in the constitution:
-
-- Personal-learning scope versus a multi-user product.
-- Online-only operation versus offline learning and synchronization.
-- Initial desktop operating systems and distribution/update strategy.
-- Repository-based curriculum authoring versus publishing from the admin app.
+Electron remains planned: no desktop workspace, renderer packaging, installer, signing, updater, or
+offline sync exists. Decide hosted versus bundled rendering, operating systems/distribution, and offline
+requirements before implementing it. Server secrets stay on the server; native access must use narrow,
+validated interfaces. Browser tests cannot establish packaged desktop behavior.
 
 ## Troubleshooting
 
-| Symptom                                     | What to check                                                             |
-| ------------------------------------------- | ------------------------------------------------------------------------- |
-| Unsupported Node or package-manager version | Run `nvm use` if available and use the pinned pnpm version                |
-| A dev server cannot bind its port           | Free ports 3000, 3001, and 4000; stop an existing dev/test server         |
-| Playwright reports a missing browser        | Run `pnpm exec playwright install chromium`                               |
-| Playwright refuses to start a server        | Stop local development servers, run `pnpm build`, and retry               |
-| A protected page shows setup information    | Supply both Clerk keys in that app's environment and restart              |
-| Admin access is denied after sign-in        | Check the exact Clerk user ID in the server-side `ADMIN_USER_IDS` list    |
-| API returns 503 for `/v1/me`                | Its Clerk configuration is incomplete                                     |
-| API returns 401 for `/v1/me`                | Send a valid Clerk session token and check the configured origins         |
-| Database access reports a missing URL       | Configure the consuming app's server environment, not only the DB package |
-| New Prisma models are unavailable           | Run client generation and rebuild the database package                    |
-| Newly installed skills are not visible      | Open the repository in a new coding-agent session                         |
+| Symptom                                | Check                                                                     |
+| -------------------------------------- | ------------------------------------------------------------------------- |
+| Unsupported runtime                    | Match `.nvmrc` and the pinned pnpm version                                |
+| Dev/test server cannot bind            | Check ports 3000/4000 and stop the conflicting process                    |
+| Protected page shows setup information | Configure both web Clerk keys and restart                                 |
+| Run/Submit is unavailable              | Check API health, matching Clerk keys, web `API_URL`, and allowed origins |
+| API returns 401                        | Verify the Clerk session token and authorized frontend origin             |
+| API returns 503                        | Check Clerk configuration or runner availability                          |
+| Database URL is missing                | Configure the consuming server app, not only the Prisma CLI environment   |
+| Playwright browser is missing          | Run `pnpm exec playwright install chromium`                               |
+| Smoke tests fail to start              | Build without credentials and free both production-test ports             |
 
-## Project references and license
-
-- [Project constitution](.specify/memory/constitution.md)
-- [Agent conventions](AGENTS.md)
-- [Shared UI patterns](ui-registry.md)
-- [Turborepo documentation](https://turborepo.com/docs)
-- [Next.js documentation](https://nextjs.org/docs)
-- [GitHub Spec Kit](https://github.com/github/spec-kit)
-
+Project guidance: [constitution](.specify/memory/constitution.md), [agent conventions](AGENTS.md),
+[UI registry](ui-registry.md), and [feature workflow](.agents/skills/feature-workflow/SKILL.md).
 A project license has not yet been selected.

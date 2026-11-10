@@ -5,26 +5,41 @@
   "type": "module",
   "scripts": {
     "dev": "next dev --port 3000",
-    "build": "next build",
+    "build": "pnpm content:check && next build",
     "start": "next start --port 3000",
     "typecheck": "next typegen && tsc --noEmit",
-    "analyze": "ANALYZE=true next build --webpack"
+    "analyze": "ANALYZE=true next build --webpack",
+    "content:check": "tsx scripts/validate-learning-content.ts"
   },
   "dependencies": {
     "@clerk/nextjs": "7.9.25",
-    "@workspace/ui": "workspace:*",
+    "@codemirror/autocomplete": "6.20.4",
+    "@codemirror/commands": "6.11.1",
+    "@codemirror/lang-javascript": "6.2.5",
+    "@codemirror/language": "6.13.1",
+    "@codemirror/state": "6.7.6",
+    "@codemirror/view": "6.43.15",
+    "@lezer/highlight": "1.2.5",
+    "@mdx-js/loader": "3.1.1",
+    "@mdx-js/react": "3.1.1",
+    "@next/mdx": "16.4.5",
     "@workspace/db": "workspace:*",
+    "@workspace/problems": "workspace:*",
+    "@workspace/ui": "workspace:*",
     "next": "16.4.5",
     "react": "19.3.1",
-    "react-dom": "19.3.1"
+    "react-dom": "19.3.1",
+    "server-only": "0.0.1"
   },
   "devDependencies": {
     "@next/bundle-analyzer": "16.4.5",
     "@tailwindcss/postcss": "^4.1.0",
+    "@types/mdx": "2.0.14",
     "@types/node": "^24.10.0",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
     "tailwindcss": "^4.1.0",
+    "tsx": "4.23.15",
     "typescript": "5.9.3"
   }
 }

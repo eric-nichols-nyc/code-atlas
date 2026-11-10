@@ -2,6 +2,8 @@ import { clerkMiddleware, getAuth } from "@clerk/express";
 import cors from "cors";
 import express, { type ErrorRequestHandler } from "express";
 import helmet from "helmet";
+import { executionRoutes } from "./execution/routes.js";
+import type { executeProblem } from "./execution/service.js";
 
 export type ApiConfig = {
   publishableKey?: string;
@@ -9,12 +11,12 @@ export type ApiConfig = {
   allowedOrigins?: string[];
 };
 
-export function createApp(config: ApiConfig = {}) {
+export function createApp(
+  config: ApiConfig = {},
+  services: { execute?: typeof executeProblem } = {},
+) {
   const app = express();
-  const allowedOrigins = config.allowedOrigins ?? [
-    "http://localhost:3000",
-    "http://localhost:3001",
-  ];
+  const allowedOrigins = config.allowedOrigins ?? ["http://localhost:3000"];
   app.disable("x-powered-by");
   app.use(helmet());
   app.use(cors({ origin: allowedOrigins }));
@@ -43,6 +45,8 @@ export function createApp(config: ApiConfig = {}) {
     }
     next();
   });
+
+  app.use("/v1/problems", executionRoutes(services.execute));
 
   app.get("/v1/me", (request, response) => {
     response.json({ userId: getAuth(request).userId });

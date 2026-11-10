@@ -26,13 +26,6 @@ export default defineConfig({
       timeout: 120000,
     },
     {
-      command: "pnpm --filter @workspace/admin start",
-      url: "http://127.0.0.1:3001",
-      env: noCredentials,
-      reuseExistingServer: false,
-      timeout: 120000,
-    },
-    {
       command: "pnpm --filter @workspace/api start",
       url: "http://127.0.0.1:4000/health",
       env: { ...noCredentials, PORT: "4000", HOST: "127.0.0.1" },

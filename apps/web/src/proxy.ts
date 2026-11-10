@@ -7,7 +7,10 @@ import {
 import { isAuthConfigured } from "@/lib/auth";
 
 // Protected resources verify auth themselves before accessing data.
-const authenticate = clerkMiddleware();
+const authenticate = clerkMiddleware({
+  signInUrl: "/sign-in",
+  signUpUrl: "/sign-up",
+});
 
 export default function proxy(request: NextRequest, event: NextFetchEvent) {
   if (!isAuthConfigured()) return NextResponse.next();
