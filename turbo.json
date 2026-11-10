@@ -14,13 +14,36 @@
         "ANALYZE"
       ]
     },
-    "dev": { "dependsOn": ["^build"], "cache": false, "persistent": true },
-    "start": { "cache": false, "persistent": true },
-    "typecheck": { "dependsOn": ["^build"], "outputs": [] },
-    "db:generate": { "cache": false },
-    "db:migrate": { "cache": false },
-    "db:deploy": { "cache": false },
-    "db:studio": { "cache": false, "persistent": true }
+    "dev": {
+      "dependsOn": ["^build"],
+      "cache": false,
+      "persistent": true
+    },
+    "start": {
+      "cache": false,
+      "persistent": true
+    },
+    "typecheck": {
+      "dependsOn": ["^build"],
+      "outputs": []
+    },
+    "@workspace/db#typecheck": {
+      "dependsOn": ["build"],
+      "outputs": []
+    },
+    "db:generate": {
+      "cache": false
+    },
+    "db:migrate": {
+      "cache": false
+    },
+    "db:deploy": {
+      "cache": false
+    },
+    "db:studio": {
+      "cache": false,
+      "persistent": true
+    }
   },
   "globalPassThroughEnv": [
     "CLERK_SECRET_KEY",
@@ -32,6 +55,8 @@
     "PORT",
     "HOST",
     "CORS_ORIGINS",
-    "CI"
+    "CI",
+    "CLERK_TEST_USER_EMAIL",
+    "API_URL"
   ]
 }

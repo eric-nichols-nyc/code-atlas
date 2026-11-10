@@ -8,4 +8,4 @@ Read `README.md` for startup and credential setup. Read `ui-registry.md` before 
 - Place reusable shadcn components in `packages/ui`. Both Next.js apps consume the same source and CSS theme.
 - Keep actual credentials in ignored environment files. Track only empty examples.
 
-For substantial feature work, use the installed `.agents/skills/speckit-*` workflow. The root package scripts are the source of truth for available checks; Playwright requires a completed build and free ports 3000, 3001, and 4000.
+For feature work, follow [feature-workflow](.agents/skills/feature-workflow/SKILL.md): one short brief, consistent feature folders, one working slice, browser review and relevant checks. Small fixes go directly to code. Spec Kit is optional when the user requests a formal workflow. The root package scripts are the source of truth for checks; production Playwright requires a completed build and free ports 3000 and 4000.

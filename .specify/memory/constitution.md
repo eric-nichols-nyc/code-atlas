@@ -4,132 +4,177 @@
 
 ### I. Build from an explicit feature specification
 
-Each substantial feature MUST define the learner or administrator outcome, acceptance
-scenarios, scope, dependencies, and unresolved assumptions before implementation. Use one
-specification per coherent feature. Record decisions from layout exploration and prototypes
-in the relevant specification before production implementation. Small maintenance and
-presentation changes MAY use a proportionate scope without a full feature workflow.
+Each substantial feature MUST define its user outcome, scope, acceptance checks, dependencies,
+and unresolved assumptions in one concise feature brief before implementation. Deliver one
+complete working slice for review before expanding content or capabilities. Record consequential
+layout and architecture decisions in that brief; ordinary layout, copy, and maintenance changes
+MAY go directly to code with proportionate verification.
+
+The default process MUST support direct iteration from browser feedback. A feature brief is a
+specification; generating a full Spec Kit document set is optional unless explicitly requested.
+Keep the brief current rather than adding a new document set for each revision.
 
 ### II. Keep application and package boundaries clear
 
-Apps MUST own their routes and runtime setup. Organize substantial functionality in
-feature folders that keep its components, state, helpers, and tests together. Keep route
-entry points focused on composition. Shared visual primitives belong in the UI package;
-Prisma schema and server database access belong in the database package. Extract another
-package when consumers need a stable shared interface, and document its dependencies.
+Apps MUST own routes, authentication boundaries, and runtime setup. Route entry points compose
+features; substantial features keep their components, state/hooks, helpers, and colocated tests
+in feature folders. Shared shadcn primitives and semantic theme tokens belong in `packages/ui`.
+Prisma schema and server database access belong in `packages/db`.
 
-Subjects MUST reuse common catalog, lesson, navigation, and progress capabilities through
-explicit interfaces. Topic-specific visualizers MAY supply specialized views and state.
-Electron lifecycle and native integration MUST remain separate from learning logic.
+Public problem contracts and definitions belong in `packages/problems` because web and API
+consume them. Hidden test inputs, judging policy, and execution workers MUST remain in the API.
+Trusted authored prose belongs in subject content folders, separate from rendering and execution.
+Extract additional packages only when real consumers need a stable shared interface.
+
+Subjects MUST reuse common catalog, workspace, and navigation capabilities through explicit
+interfaces. Add progress or other shared capabilities when required by a feature. Future Electron
+lifecycle and native integration MUST remain separate from learning and practice logic.
 
 ### III. Enforce identity and authorization on the server
 
-Each protected resource MUST verify its Clerk session and required authorization before
-reading or changing protected data. Admin resources MUST enforce the explicit admin policy;
-the initial allowlist denies access when empty. Missing credentials MUST deny protected
-operations while public pages remain usable. Keep secret keys and database credentials in
-server environments, outside version control and distributable desktop bundles.
+Every protected page, Route Handler, Server Action, and API resource MUST verify its own Clerk
+session and required authorization before accessing protected data or executing learner code.
+The Next.js proxy initializes Clerk; it does not replace resource-level authorization. Express
+feature endpoints MUST live under `/v1`, behind the shared authentication boundary. Web API
+adapters MUST validate requests and forward verified credentials to that boundary.
 
-Electron native capabilities MUST be exposed through narrow, validated interfaces with
-isolated, sandboxed rendering. A renderer MUST NOT receive unrestricted Node.js access.
+Future administrative resources MUST enforce server-side admin authorization with default denial.
+Public setup or navigation pages MUST NOT expose administrative data. Missing credentials MUST
+deny protected operations while public pages and credential-independent builds remain usable.
+Prisma imports MUST stay in server code; call `getDb()` at request time after authentication and
+required authorization. Keep real credentials in ignored environment files or deployment secrets;
+track only empty credential examples.
+
+Future Electron native capabilities MUST use narrow, validated interfaces with isolated,
+sandboxed rendering. Renderers MUST NOT receive unrestricted Node.js access or server secrets.
 
 ### IV. Validate behavior at the appropriate boundary
 
-Use Vitest for logic, generators, components, and HTTP behavior; use Playwright for learner
-and administrator journeys. Changed authentication, authorization, and persistence MUST
-cover relevant success and failure paths. Visualization checks MUST verify expected state,
-source-line references, and ordering. Interaction checks MUST cover relevant keyboard,
-focus, and narrow-layout behavior. Tests MUST demonstrate outcomes or protect contracts.
+Use Vitest for logic, components, and HTTP behavior; use Playwright for browser journeys.
+Tests MUST demonstrate user outcomes or protect meaningful contracts. Changes to authentication,
+authorization, persistence, or execution MUST cover relevant success and failure paths.
+Interaction checks MUST cover relevant keyboard, focus, and narrow-layout behavior. Future
+visualization checks MUST verify expected state, source references, and ordering.
 
-Before declaring a feature complete, run formatting/lint, type checks, relevant tests, and
-the build through the repository's scripts. Record checks blocked by credentials or
-infrastructure as unverified. Browser verification does not establish packaged Electron
-behavior; desktop features require checks against the desktop runtime.
+Before declaring a feature complete, run formatting/lint, type checks, relevant tests, and the
+build through repository scripts. Use proportionate checks for documentation and small
+presentation changes. Review changed UI in the browser while preserving the user's drafts and
+running work. Credential-free smoke tests, manual signed-in review, and authenticated automation
+MUST be reported separately. Record checks blocked by credentials or infrastructure as unverified;
+use a dedicated development identity for authenticated automation.
+
+Browser verification does not establish packaged Electron behavior. Desktop features require
+checks against the desktop runtime.
 
 ### V. Add persistence when a feature needs it
 
-Keep authored curriculum, topic metadata, examples, and visualization scenarios separate
-from learner progress, bookmarks, and saved work. Content MUST have stable identifiers and
-validated references. Keep prose separate from rendering and simulation logic, and select
-its storage format in the feature plan. MDX, when selected, is trusted authored content;
-untrusted submissions MUST use a defined data format rather than executable MDX.
+Keep authored content and catalog metadata separate from learner submissions, progress, bookmarks,
+and notes. Content MUST have stable identifiers and validated references. Use trusted MDX for
+current problem prose and typed definitions for executable contracts, samples, and metadata.
+Untrusted learner input MUST NOT be compiled as MDX or application code.
 
-Define Prisma models from feature requirements. Generate the client after schema changes,
+Distinguish in-memory problem state, browser preferences, and account-backed persistence in both
+UI copy and documentation. A successful Run or Submit is a judge result, not proof of saved
+progress. Do not claim drafts, submissions, or notes are saved to an account before persistence
+exists. A persistence feature MUST define ownership, recovery/failure behavior, and the meaning
+of saved or completed state.
+
+Define Prisma models from actual feature requirements. Generate the client after schema changes,
 review migrations, and validate them against a Neon development branch before production.
-Keep runtime and migration connections configurable. Builds and public starter routes MUST
-work before external credentials are supplied. A persistence feature MUST define data
-ownership, failure behavior, and the meaning of saved or completed state.
+Keep runtime and migration connections configurable. Builds and public starter routes MUST work
+before database credentials are supplied.
 
-### VI. Make visualization state explicit and execution boundaries honest
+### VI. Keep execution isolated and results honest
 
-Visualizations MUST model teaching steps with explanations, source references, and typed
-topic state. Prepared scenarios and generated scenarios MUST use a compatible playback
-contract so stepping, reset, backward navigation, and scrubbing remain deterministic.
-Document simplifying assumptions and verify supported behavior against authoritative
-language references or bounded reference cases.
+Run MUST evaluate the learner's current source against visible editable cases. Submit MUST use
+the complete server-selected suite, independent of client-provided expectations or hidden cases.
+Return real verdicts, bounded diagnostics, and explicit failures. Private test values and logs
+MUST NOT leak through public definitions, browser payloads, or hidden-case diagnostics.
 
-A code-to-visualization generator MUST declare supported syntax, input and processing
-limits, and structured errors. Describe simulated behavior accurately. Any full program
-execution capability MUST have a separate feature plan covering isolation and resource
-budgets. Learner code MUST NOT execute in privileged Electron or application processes.
+Learner code MUST execute inside a disposable isolated guest with explicit memory, stack, CPU,
+wall-time, input/output, and concurrency limits. It MUST NOT execute in privileged application
+or Electron processes or receive unrestricted host, filesystem, module, DOM, or network access.
+The current adapter is bounded single-file JavaScript in QuickJS WebAssembly inside a Node Worker.
+New languages, host capabilities, or execution adapters MUST document their isolation contract
+and resource budgets in the feature brief before implementation.
+
+Associate results with the source and inputs that produced them. Mark results stale after relevant
+edits, preserve current source on failures, and prevent overlapping UI executions. Prepared
+visualizations MUST NOT stand in for execution or judging. If added later, visualizations MUST
+have typed teaching state, explanations, source references, deterministic forward/backward/reset
+and scrubbing behavior, and documented assumptions. Prepared and generated scenarios MUST share
+a compatible playback contract. Generators MUST declare supported syntax, processing limits,
+and structured errors; verify supported behavior against authoritative references or bounded cases.
 
 ### VII. Share accessible interaction patterns across the platform
 
-Compose shared shadcn primitives, semantic theme tokens, and generic components such as
-GlobalNav. Product routes, branding, and authorization decisions belong in consumers.
-Record reusable visual conventions in the UI registry when patterns change.
+Compose shared shadcn primitives, semantic theme tokens, and generic components such as GlobalNav.
+Product routes, branding, feature state, and authorization decisions belong in consumers.
+Read `ui-registry.md` before UI work and update reusable visual conventions when patterns change.
+Keep detailed layout and control placement in the registry and feature brief.
 
-Learner controls MUST have accessible names, keyboard operation, visible focus, and
-appropriate focus restoration. Explanations and state changes MUST be understandable
-without color alone. Playback MUST offer pause and manual stepping; motion MUST respect
-reduced-motion preferences. Feature specifications MUST define loading, empty, error,
-unsupported-input, and unavailable-service states where applicable.
+Controls MUST have accessible names, keyboard operation, visible focus, and appropriate focus
+restoration. State MUST be understandable without color alone. Icons MUST open the tool or tab
+they identify; unavailable actions MUST be clearly marked or disabled. Responsive layout changes,
+panel toggles, and theme changes MUST preserve the current problem's source, editor state, inputs,
+help expansion, and results unless an explicit reset or navigation discards them.
+
+Support narrow screens without document-level horizontal overflow; contain code overflow within
+its panel. Motion MUST respect reduced-motion preferences. Future playback MUST offer pause and
+manual stepping. Define loading, empty, error, unsupported-input, and unavailable-service states
+where applicable.
 
 ## Technology and UI constraints
 
-The product is a learning platform targeting the browser and an Electron desktop app.
-JavaScript is the first subject; the architecture must accommodate later algorithm
-practice and design-system learning without duplicating the platform shell.
+Code Atlas targets the web and a future Electron app. JavaScript is the first subject and
+Practice is the current delivery focus. `/javascript/practice` owns the catalog and
+`/javascript/practice/<problem>` owns a coding workspace. `/javascript/learn` is a separate future
+learning experience; its requirements remain open. Later subjects include Algorithms and React JS.
+Do not treat a practice problem as a guided lesson or require visualization to judge a solution.
 
-The installed baseline is pnpm, Turborepo, TypeScript, Next.js web/admin apps, an Express
-API, shared shadcn UI, Clerk authentication scaffolding, Prisma for Neon, Biome, Vitest,
-Playwright, and web bundle analysis. Preserve these boundaries unless a feature plan
-records the rationale and impact of changing them. Review bundle analysis when adding
-significant client dependencies and load specialized editors or visualizers on demand.
+The installed baseline is pnpm, Turborepo, TypeScript, one Next.js learner app, an Express API,
+shared shadcn UI, Clerk, CodeMirror, QuickJS, trusted MDX, Prisma for Neon, Biome, Vitest,
+Playwright, and web bundle analysis. There is currently no admin or Electron app. Preserve the
+application/package boundaries unless a feature brief records the rationale and impact of a change.
+Review bundle analysis for significant client dependencies and load specialized editors on demand.
 
-MDX authoring, a CodeMirror editor, and an Acorn-based simulator are proposed choices for
-future features, not implemented capabilities. Relevant feature plans MUST confirm their
-selection and integration. External reference sites provide evidence and design input;
-their dependencies, styling, and source organization do not become project requirements.
+Sleep is the first complete practice problem for review. Additional problems, connected AI tutoring,
+saved notes, account history/progress, and desktop delivery require their own working slices.
+External reference sites provide interaction evidence and design input; their dependencies,
+styles, and source organization do not become project requirements.
 
-The following choices remain open: personal versus multi-user scope; offline learning and
-synchronization; desktop operating systems and distribution; and repository-based versus
-admin-based curriculum authoring. Resolve each in the relevant specification before work
-that depends on it. Do not silently assume these product decisions.
+Resolve personal versus multi-user scope, offline operation/synchronization, desktop distribution,
+and repository versus future administrative content publishing in the relevant feature brief
+before dependent work. Do not silently assume these product decisions.
 
 ## Feature workflow
 
-For substantial features, use `$speckit-specify`, `$speckit-clarify` when needed,
-`$speckit-plan`, `$speckit-tasks`, `$speckit-analyze` when needed, and
-`$speckit-implement`. Run `$speckit-converge` to assess remaining work against the spec.
+Use `.agents/skills/feature-workflow/SKILL.md` by default: one short brief in `docs/features/`,
+consistent feature folders, one working slice, browser review, and relevant checks. A brief MUST
+state the outcome, included and deferred scope, observable acceptance checks, a short implementation
+checklist, actual verification results, and material limitations. Add design detail when an
+execution, authentication, persistence, or other architecture decision needs it.
 
-Each plan MUST name module ownership, content/state contracts, relevant constitution
-principles, and verification criteria. Deliver one complete learner outcome at a time.
-Keep specifications and task completion aligned with verified behavior. Record future
-capabilities as planned work, with a clear boundary from delivered functionality.
+Implement small maintenance and presentation changes directly. Iterate the existing slice and
+brief during review without regenerating plans or requiring a new approval cycle for routine
+implementation choices. Follow explicit user direction for scope and workflow.
+
+Spec Kit remains available when explicitly requested. Existing `specs/` artifacts are historical
+unless selected for further work; they MUST NOT override newer accepted behavior. Keep README
+focused on startup, current capabilities, ownership, and checks. Keep detailed UI conventions in
+`ui-registry.md` and feature decisions in the brief. Documentation MUST distinguish delivered
+behavior from future work. No workflow change relaxes authorization, isolation, or honest validation.
 
 ## Governance
 
-Feature plans and reviews MUST check compliance with these principles. Document any
-exception in the feature plan with its rationale, scope, and effect on other consumers.
-Permanent changes to principles require a constitution amendment that records the reason,
-affected specifications, and any migration work. Follow explicit user decisions when
-reconciling project guidance.
+Feature work and reviews MUST check compliance with these principles. Record exceptions in the
+feature brief with rationale, scope, and effects on consumers. Permanent principle changes require
+an amendment describing the reason, affected guidance/specifications, and any migration work.
+Explicit user decisions take precedence when reconciling project guidance.
 
-Use a major version for incompatible principle removals or redefinitions, a minor version
-for added principles or materially expanded guidance, and a patch version for wording
-clarifications. Preserve the original ratification date and update the amendment date when
-content changes. Runtime templates read this constitution directly; maintain the rules
-here as their source of truth.
+Use a major version for incompatible principle removals or redefinitions, a minor version for
+added principles or materially expanded guidance, and a patch version for wording clarifications.
+Preserve the original ratification date and update the amendment date when content changes.
+Runtime templates read this constitution directly; keep governance here as their source of truth.
 
-**Version**: 1.1.1 | **Ratified**: 2026-11-07 | **Last Amended**: 2026-11-09
+**Version**: 2.1.0 | **Ratified**: 2026-11-07 | **Last Amended**: 2026-11-09

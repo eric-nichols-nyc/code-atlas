@@ -11,6 +11,14 @@ const badgeVariants = cva(
         default: "bg-primary text-primary-foreground [a&]:hover:bg-primary/90",
         secondary:
           "bg-secondary text-secondary-foreground [a&]:hover:bg-secondary/90",
+        easy: "border-difficulty-easy/20 bg-difficulty-easy/10 text-difficulty-easy",
+        medium:
+          "border-difficulty-medium/20 bg-difficulty-medium/10 text-difficulty-medium",
+        hard: "border-difficulty-hard/20 bg-difficulty-hard/10 text-difficulty-hard",
+        blue: "border-badge-blue-border bg-badge-blue text-badge-blue-foreground",
+        amber:
+          "border-badge-amber-border bg-badge-amber text-badge-amber-foreground",
+        rose: "border-badge-rose-border bg-badge-rose text-badge-rose-foreground",
         destructive:
           "bg-destructive text-white focus-visible:ring-destructive/20 dark:bg-destructive/60 dark:focus-visible:ring-destructive/40 [a&]:hover:bg-destructive/90",
         outline:

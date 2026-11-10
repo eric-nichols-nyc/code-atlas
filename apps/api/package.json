@@ -12,9 +12,11 @@
   "dependencies": {
     "@clerk/express": "2.1.88",
     "@workspace/db": "workspace:*",
+    "@workspace/problems": "workspace:*",
     "cors": "^2.8.5",
     "express": "5.3.0",
-    "helmet": "^8.1.0"
+    "helmet": "^8.1.0",
+    "quickjs-emscripten": "0.32.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",

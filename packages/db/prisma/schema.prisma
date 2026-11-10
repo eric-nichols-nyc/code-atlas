@@ -10,4 +10,26 @@ datasource db {
   provider = "postgresql"
 }
 
-// Add feature models here when the first persistence requirement is known.
+model User {
+  id          String             @id @default(cuid())
+  clerkUserId String             @unique @db.VarChar(160)
+  createdAt   DateTime           @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime           @updatedAt @db.Timestamptz(3)
+  progress    PracticeProgress[]
+}
+
+model PracticeProgress {
+  id              String    @id @default(cuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  problemId       String    @db.VarChar(160)
+  flagged         Boolean   @default(false)
+  solvedAt        DateTime? @db.Timestamptz(3)
+  legacyCompleted Boolean   @default(false)
+  lastCode        String?
+  codeUpdatedAt   DateTime? @db.Timestamptz(3)
+  createdAt       DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt       DateTime  @updatedAt @db.Timestamptz(3)
+
+  @@unique([userId, problemId])
+}

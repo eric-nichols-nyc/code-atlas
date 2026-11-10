@@ -1,0 +1,5 @@
+Write an asynchronous function named `sleep(millis)` that returns a Promise. The Promise should settle after approximately `millis` milliseconds. Its resolved value does not matter.
+
+The caller should be able to use `await sleep(millis)` before continuing. Use asynchronous scheduling so the wait does not block JavaScript.
+
+Small timing differences are normal because a timer callback may run slightly after its scheduled time. The judge measures elapsed time independently of any value your function returns.

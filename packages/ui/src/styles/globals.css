@@ -23,6 +23,22 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-badge-blue: var(--badge-blue);
+  --color-badge-blue-foreground: var(--badge-blue-foreground);
+  --color-badge-blue-border: var(--badge-blue-border);
+  --color-badge-amber: var(--badge-amber);
+  --color-badge-amber-foreground: var(--badge-amber-foreground);
+  --color-badge-amber-border: var(--badge-amber-border);
+  --color-badge-rose: var(--badge-rose);
+  --color-badge-rose-foreground: var(--badge-rose-foreground);
+  --color-badge-rose-border: var(--badge-rose-border);
+  --color-difficulty-easy: var(--difficulty-easy);
+  --color-difficulty-medium: var(--difficulty-medium);
+  --color-difficulty-hard: var(--difficulty-hard);
+  --color-category-recommended: var(--category-recommended);
+  --color-category-async: var(--category-async);
+  --color-category-closures: var(--category-closures);
+  --color-category-arrays: var(--category-arrays);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -31,6 +47,18 @@
 }
 
 :root {
+  --clerk-color-background: var(--card);
+  --clerk-color-foreground: var(--foreground);
+  --clerk-color-primary: var(--primary);
+  --clerk-color-primary-foreground: var(--primary-foreground);
+  --clerk-color-muted: var(--muted);
+  --clerk-color-muted-foreground: var(--muted-foreground);
+  --clerk-color-input: var(--background);
+  --clerk-color-input-foreground: var(--foreground);
+  --clerk-color-border: var(--border);
+  --clerk-color-ring: var(--ring);
+  --clerk-font-family: var(--font-sans);
+  --clerk-border-radius: var(--radius);
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -50,6 +78,22 @@
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
+  --badge-blue: #edf3fb;
+  --badge-blue-foreground: #244b78;
+  --badge-blue-border: #cfdded;
+  --badge-amber: #fbf3e3;
+  --badge-amber-foreground: #6b4a12;
+  --badge-amber-border: #e8d4ad;
+  --badge-rose: #faeef2;
+  --badge-rose-foreground: #713647;
+  --badge-rose-border: #e6cbd4;
+  --difficulty-easy: #087a4b;
+  --difficulty-medium: #925d00;
+  --difficulty-hard: #c52e50;
+  --category-recommended: #7548bd;
+  --category-async: #087e91;
+  --category-closures: #99610c;
+  --category-arrays: #245ca6;
 }
 
 .dark {
@@ -71,6 +115,22 @@
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.556 0 0);
+  --badge-blue: #172437;
+  --badge-blue-foreground: #a8c8ef;
+  --badge-blue-border: #30455f;
+  --badge-amber: #312719;
+  --badge-amber-foreground: #e8cc93;
+  --badge-amber-border: #5c482b;
+  --badge-rose: #301e25;
+  --badge-rose-foreground: #deafba;
+  --badge-rose-border: #59323e;
+  --difficulty-easy: #34d399;
+  --difficulty-medium: #fbbf24;
+  --difficulty-hard: #fb7185;
+  --category-recommended: #a78bfa;
+  --category-async: #22d3ee;
+  --category-closures: #fbbf24;
+  --category-arrays: #60a5fa;
 }
 
 @layer base {

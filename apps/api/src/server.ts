@@ -2,9 +2,7 @@ import { createApp } from "./app.js";
 
 const port = Number(process.env.PORT ?? 4000);
 const host = process.env.HOST ?? "127.0.0.1";
-const allowedOrigins = (
-  process.env.CORS_ORIGINS ?? "http://localhost:3000,http://localhost:3001"
-)
+const allowedOrigins = (process.env.CORS_ORIGINS ?? "http://localhost:3000")
   .split(",")
   .map((origin) => origin.trim())
   .filter(Boolean);

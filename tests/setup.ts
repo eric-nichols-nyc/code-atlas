@@ -3,3 +3,20 @@ import { cleanup } from "@testing-library/react";
 import { afterEach } from "vitest";
 
 afterEach(cleanup);
+
+// jsdom does not perform layout; real splitter geometry is verified in Playwright.
+class TestResizeObserver implements ResizeObserver {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+Object.defineProperty(globalThis, "ResizeObserver", {
+  value: TestResizeObserver,
+  configurable: true,
+});
+
+// Radix Select scrolls its focused option; scrolling needs a real browser layout.
+Object.defineProperty(HTMLElement.prototype, "scrollIntoView", {
+  value() {},
+  configurable: true,
+});

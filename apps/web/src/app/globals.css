@@ -1,2 +1,37 @@
 @import "@workspace/ui/globals.css";
 @source "../**/*.{ts,tsx}";
+
+@layer components {
+  .learning-panel {
+    @apply flex min-h-0 min-w-0 flex-col overflow-hidden rounded-md border bg-card text-card-foreground;
+    height: 100%;
+  }
+  .learning-panel-header {
+    @apply flex min-h-[42px] shrink-0 items-center gap-3 border-b px-3 text-[13px];
+  }
+  [data-layout="flow"] .learning-panel {
+    height: auto;
+  }
+}
+
+/* Viewport workspaces scroll within panes; reading flow keeps document scrolling. */
+html[data-learning-workspace="wide"],
+html[data-learning-workspace="split"] {
+  overflow: hidden;
+}
+
+:root {
+  --code-keyword: #b41c64;
+  --code-string: #075f35;
+  --code-comment: #636b75;
+  --code-number: #7a3e00;
+}
+.dark {
+  --code-keyword: #b7c9e8;
+  --code-string: #d9c58e;
+  --code-comment: #909898;
+  --code-number: #dc9a79;
+}
+[data-layout="flow"] [aria-label="Code editor"] {
+  height: 460px;
+}
