@@ -30,7 +30,7 @@ Only a server-judged accepted Submit marks a problem solved. Saving failures are
 
 | Route                                             | Behavior                                                                                            |
 | ------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| `/`                                               | Public home page                                                                                    |
+| `/`                                               | Public landing page with an interactive Counter example and published JavaScript problems           |
 | `/dashboard`                                      | Protected subject picker; JavaScript is available, Algorithms and React JS are coming soon          |
 | `/javascript`                                     | Redirects to JavaScript Practice                                                                    |
 | `/javascript/practice`                            | Searchable table with Recommended, Closures, Arrays and Async categories, plus difficulty filtering |
@@ -45,6 +45,11 @@ JavaScript catalog and Learn pages use centered Learn/Practice navigation, with 
 Code Atlas for returning to the subject picker. Learn/Practice have book/code icons and text-only hover states. Individual problem pages use a focused workspace
 with Back to Practice and AI/Notes icons. Each icon opens its corresponding tab; clicking the active
 icon closes the tools panel. Legacy `/learn/javascript` URLs redirect to Practice.
+
+The public landing page has a fixed, interactive closure example with selectable starting values,
+recent return values and reset. It works without signing in and does not evaluate learner code or
+write progress. Its problem links and counts come from the existing catalog. See the
+[landing-page feature brief](docs/features/dynamic-landing-page.md) for scope and reference evidence.
 
 The workspace provides:
 
