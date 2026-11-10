@@ -85,23 +85,25 @@ Keep Clerk and session decisions in app-owned components passed through GlobalNa
 
 ## Public home page
 
-File: `apps/web/src/app/page.tsx`.
+Files: `apps/web/src/features/landing/components/landing-page.tsx`, `counter-preview.tsx`; composed by `apps/web/src/app/page.tsx`.
 Last updated: 2026-11-09.
 
-| Property       | Pattern                                                         |
-| -------------- | --------------------------------------------------------------- |
-| Background     | Inherited `bg-background`; subject cards use `bg-card`          |
-| Text           | `text-foreground`; supporting copy uses `text-muted-foreground` |
-| Hero heading   | `text-4xl font-semibold tracking-tight`, larger on wide screens |
-| Page spacing   | `px-6 py-16`, `gap-20` between sections                         |
-| Section border | `border-t` with `pt-10`                                         |
-| Subject cards  | Shared Card composition, `gap-4` between cards                  |
-| Primary action | Default Button, `size="lg"`                                     |
-| Browse action  | Outline Button, `size="lg"`                                     |
-| Subject status | Secondary Badge                                                 |
-| Focus / hover  | Shared Button variants                                          |
+| Property       | Pattern                                                                             |
+| -------------- | ----------------------------------------------------------------------------------- |
+| Background     | Inherited `bg-background`; shared Cards use `bg-card`                               |
+| Text           | `text-foreground`; supporting copy uses `text-muted-foreground`                     |
+| Hero heading   | `text-4xl leading-[1.06] font-semibold tracking-[-0.045em]`, larger on wide screens |
+| Hero accent    | `text-category-closures`; theme-owned amber                                         |
+| Page spacing   | `px-5 pt-16 pb-8`, `gap-20` between sections                                        |
+| Panels         | Shared Card composition, `rounded-xl border shadow-sm`; `gap-4` between cards       |
+| Primary action | Default Button, `size="lg"`                                                         |
+| Browse action  | Outline Button, `size="lg"`                                                         |
+| Subject status | Amber Badge for available; disabled outline Button for coming soon                  |
+| Focus / hover  | Shared Button variants                                                              |
 
-Use semantic section headings. Link the primary action to the real dashboard and the browse action to the subjects section. Keep subjects informational and label unfinished content "Coming soon" until lesson routes exist.
+Use semantic section headings. Primary actions link to JavaScript Practice or Counter; secondary hero action jumps to the live example. Public home navigation uses centered text links to Try it, How it works and Subjects, while Dashboard remains beside the brand. List published problems from catalog metadata and label unfinished subjects "Coming soon".
+
+The preview uses shared Cards, Buttons, Badges and Tabs: muted captions, `text-sm leading-6` prose, `font-mono text-[13px] leading-7` source with existing code tokens, and `text-5xl font-mono text-category-closures` return values. Description, source and controls stack on narrow screens. Keep card descriptions in their first grid column when an action is hidden. Wrap source lines and retain focus rings. The fixed Counter example supports call, starting-value selection and reset; it never pretends to submit, save or judge learner code. FAQ uses the shared single-open Accordion.
 
 ## Learner dashboard
 
@@ -122,7 +124,7 @@ Last updated: 2026-11-09. Reference: Paper **code atlas**, Dashboard desktop/mob
 | Focus and hover | Shared Button variants and Radix dialog focus handling                                     |
 | Shadow          | Existing shared Card `shadow-sm`; no added effects                                         |
 
-Map Basics to blue, Functions to amber, and Async to rose in feature-owned metadata. Keep these color variants generic in the UI package. The JavaScript action is a real link to the protected subject landing. State lesson availability honestly; do not display invented progress or link to missing lesson routes. Reuse the shared shell and primitives for later learner screens. Home and dashboard use the same subject metadata, card title size, content width, and grid breakpoints.
+Map Basics to blue, Functions to amber, and Async to rose in feature-owned metadata. Keep these color variants generic in the UI package. The JavaScript action is a real link to the protected subject landing. State lesson availability honestly; do not display invented progress or link to missing lesson routes. Reuse the shared shell and primitives for later learner screens. Home and dashboard share subject metadata, Card title size and theme; the public landing gives available JavaScript more space and lists its published problems.
 
 ## Theme selection
 

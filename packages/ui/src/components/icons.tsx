@@ -1,5 +1,7 @@
 export {
   ArrowLeftIcon,
+  ArrowRightIcon,
+  ArrowUpRightIcon,
   BookOpenIcon,
   BracesIcon,
   CircleCheckIcon,

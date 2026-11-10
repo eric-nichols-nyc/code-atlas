@@ -6,7 +6,7 @@ test("home introduces the subjects and links to the dashboard", async ({
   await page.goto("/");
   await expect(
     page.getByRole("heading", {
-      name: "Find your way through code.",
+      name: "Know the concept. Write the code.",
       level: 1,
     }),
   ).toBeVisible();
@@ -14,7 +14,7 @@ test("home introduces the subjects and links to the dashboard", async ({
   await expect(
     page.getByRole("heading", { name: "Subjects to explore" }),
   ).toBeInViewport();
-  await expect(page.getByText("Coming soon", { exact: true })).toHaveCount(3);
+  await expect(page.getByText("Coming soon", { exact: true })).toHaveCount(2);
   await page.getByRole("link", { name: "Go to dashboard" }).click();
   await expect(page).toHaveURL(/\/dashboard$/);
   await expect(

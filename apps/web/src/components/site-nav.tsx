@@ -40,6 +40,21 @@ const javascriptItems: readonly GlobalNavItem[] = [
     appearance: "text",
   },
 ];
+const landingItems: readonly GlobalNavItem[] = [
+  {
+    id: "example",
+    label: "Try it",
+    href: "#practice-preview",
+    appearance: "text",
+  },
+  {
+    id: "how",
+    label: "How it works",
+    href: "#how-it-works",
+    appearance: "text",
+  },
+  { id: "subjects", label: "Subjects", href: "#subjects", appearance: "text" },
+];
 
 function NavLink(props: GlobalNavLinkProps) {
   return <Link {...props} prefetch={false} />;
@@ -51,7 +66,12 @@ export function SiteNav({ authConfigured }: { authConfigured: boolean }) {
   if (/^\/javascript\/practice\/[^/]+\/?$/.test(pathname)) return null;
   const inJavaScript =
     pathname === "/javascript" || pathname.startsWith("/javascript/");
-  const navigationItems = inJavaScript ? javascriptItems : [];
+  const onLanding = pathname === "/";
+  const navigationItems = inJavaScript
+    ? javascriptItems
+    : onLanding
+      ? landingItems
+      : [];
   const activeItem = [...items, ...navigationItems].find((item) =>
     item.href === "/"
       ? pathname === "/"
@@ -68,7 +88,7 @@ export function SiteNav({ authConfigured }: { authConfigured: boolean }) {
       }
       items={navigationItems}
       leadingItems={items}
-      itemsAlign={inJavaScript ? "center" : "start"}
+      itemsAlign={inJavaScript || onLanding ? "center" : "start"}
       activeItemId={activeItem?.id}
       containerClassName="max-w-none"
       linkComponent={NavLink}
