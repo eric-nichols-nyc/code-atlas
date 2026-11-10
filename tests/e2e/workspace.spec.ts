@@ -308,6 +308,9 @@ for (const path of [
   "/javascript/learn",
   "/javascript/practice",
   "/javascript/practice/sleep",
+  "/javascript/practice/counter",
+  "/javascript/practice/debounce",
+  "/javascript/practice/filter-elements-from-array",
   "/javascript/practice/scope-and-shadowing",
   "/javascript/practice/closures",
   "/javascript/practice/unknown",
@@ -320,6 +323,7 @@ for (const path of [
       page.getByText("Authentication setup", { exact: true }),
     ).toBeVisible();
     await expect(page.getByRole("heading", { name: "Sleep" })).toHaveCount(0);
+    await expect(page.getByRole("heading", { name: "Counter" })).toHaveCount(0);
     await expect(
       page.getByRole("button", { name: "Run", exact: true }),
     ).toHaveCount(0);
@@ -341,3 +345,19 @@ for (const [oldPath, destination] of [
     ).toBe(destination);
   });
 }
+
+test("withholds account progress before authentication is configured", async ({
+  request,
+}) => {
+  expect((await request.get("/api/practice-progress")).status()).toBe(503);
+  expect(
+    (
+      await request.patch("/api/practice-progress/javascript.sleep", {
+        data: { flagged: true },
+      })
+    ).status(),
+  ).toBe(503);
+  expect(
+    (await request.get("http://127.0.0.1:4000/v1/practice-progress")).status(),
+  ).toBe(503);
+});

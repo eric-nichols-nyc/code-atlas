@@ -6,6 +6,8 @@ export const topics: {
 }[] = [
   { id: "basics", label: "Basics", variant: "blue" },
   { id: "functions", label: "Functions", variant: "amber" },
+  { id: "closures", label: "Closures", variant: "amber" },
+  { id: "arrays", label: "Arrays", variant: "blue" },
   { id: "async", label: "Async", variant: "rose" },
 ];
 export function filterCatalog<T extends CatalogEntry>(
@@ -21,15 +23,6 @@ export function filterCatalog<T extends CatalogEntry>(
         `${e.title} ${e.summary}`.toLowerCase().includes(q),
     )
     .sort((a, b) => a.order - b.order);
-}
-export function catalogCounts(entries: CatalogEntry[]) {
-  return {
-    available: entries.filter((x) => x.status === "published").length,
-    planned: entries.filter((x) => x.status === "planned").length,
-  };
-}
-export function firstPublished(entries: CatalogEntry[]) {
-  return filterCatalog(entries).find((x) => x.status === "published");
 }
 export function problemHref(entry: CatalogEntry | undefined) {
   return entry?.status === "published"

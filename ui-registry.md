@@ -2,8 +2,8 @@
 
 ## Starter surfaces
 
-Files: `apps/web/src/app/page.tsx`, `apps/admin/src/app/page.tsx`, `packages/ui/src/components/card.tsx`.
-Last updated: 2026-11-07.
+Files: `apps/web/src/app/page.tsx`, `packages/ui/src/components/card.tsx`.
+Last updated: 2026-11-09.
 
 | Property       | Pattern                                                 |
 | -------------- | ------------------------------------------------------- |
@@ -18,23 +18,24 @@ Last updated: 2026-11-07.
 
 Use the full Card composition. Keep titles in the CardTitle component; use semantic headings through its children when the page needs them. Theme values are defined once in `packages/ui/src/styles/globals.css`.
 
-## Buttons and dialogs
+## Buttons
 
-Files: `packages/ui/src/components/button.tsx`, `packages/ui/src/components/dialog.tsx`, `apps/web/src/components/component-preview.tsx`.
-Last updated: 2026-11-07.
+File: `packages/ui/src/components/button.tsx`.
+Last updated: 2026-11-09.
 
-| Property         | Pattern                                                     |
-| ---------------- | ----------------------------------------------------------- |
-| Primary action   | Default Button variant; semantic primary colors             |
-| Secondary action | `outline` or `ghost` Button variant                         |
-| Button radius    | `rounded-md`                                                |
-| Button text      | `text-sm font-medium`                                       |
-| Button spacing   | Default `h-9 px-4 py-2 gap-2`                               |
-| Hover            | Variant-defined semantic hover colors                       |
-| Focus            | `focus-visible` ring using the shared ring token            |
-| Dialog surface   | `bg-background`, `border`, `rounded-lg`, `p-6`, `shadow-lg` |
+| Property         | Pattern                                          |
+| ---------------- | ------------------------------------------------ |
+| Primary action   | Default Button variant; semantic primary colors  |
+| Secondary action | `outline` or `ghost` Button variant              |
+| Button radius    | `rounded-md`                                     |
+| Button text      | `text-sm font-medium`                            |
+| Button spacing   | Default `h-9 px-4 py-2 gap-2`                    |
+| Hover            | Variant-defined semantic hover colors            |
+| Focus            | `focus-visible` ring using the shared ring token |
 
-Use `asChild` for links and Radix dialog triggers. Every dialog includes a DialogTitle and DialogDescription. Prefer component variants over overriding their colors or typography. Both applications share these patterns.
+Use `asChild` for links. The optional `navigation` Button variant changes text color without a hover background, retaining the shared focus ring. Prefer component variants over overriding their colors or typography.
+The unused starter preview and Alert, Dialog, Field, RadioGroup, and Separator
+primitives were removed; add shared primitives through shadcn when a feature needs them.
 
 ## Global navigation
 
@@ -56,9 +57,9 @@ The shared component receives branding, items, active item ID, optional actions,
 
 Brand links use a decorative compass icon beside the text, aligned with `inline-flex items-center gap-2`. The icon inherits the text color. Keep the visible name as the link's accessible name and truncate the text before shrinking the icon. Brand content remains supplied by each app.
 
-The Code Atlas brand link returns to the app's home page. The web and admin navigation use Dashboard as their explicit route item, with no separate Home item.
+The Code Atlas brand link returns to the app's home page. The web navigation uses Dashboard as their explicit route item, with no separate Home item.
 
-Consumers may supply `containerClassName` for the inner navigation width. The web and admin apps consistently use the full viewport width on every page. The optional `utilities` slot keeps controls such as the theme switcher visible even when the mobile route links are collapsed. Keep its DOM and visual order aligned with the brand, disclosure, and route links.
+Consumers may supply `containerClassName` for the inner navigation width. The web app uses the full viewport width on every page. The optional `utilities` slot keeps controls such as the theme switcher visible even when the mobile route links are collapsed. Keep its DOM and visual order aligned with the brand, disclosure, and route links.
 
 On desktop, utilities sit immediately before the account actions, placing the theme switcher to the left of the avatar. Mobile retains an always-visible utility control beside the navigation disclosure. Responsive utility instances are mutually hidden so only one is visible and keyboard-reachable at a time.
 
@@ -161,9 +162,9 @@ Last updated: 2026-11-09. Implemented in `apps/web/src/features/learning/`, `fea
 
 The coding workspace puts a problem description on the left, editable JavaScript above Testcase/Test Result in the center, and optional unavailable tutor/notes on the right. The visualization and multiple-choice checkpoint are removed. All three splitters resize; closing the tutor releases its column. Mobile uses a reading flow and drawers. Preserve source, editor selection/undo, cases and results above responsive branches.
 
-Shared learning panels use `learning-panel` (`bg-card`, `border`, `rounded-md`, no shadow),42px headers and16–20px inner padding. Problem headings use24/32px; prose14/23px. CodeMirror uses Menlo13/24px, semantic light/dark syntax roles and local assets. Default Tab exits the editor; Mod-Enter runs. Lazy editor loading reserves its space. Session drafts and submissions must never say saved to account.
+Shared learning panels use `learning-panel` (`bg-card`, `border`, `rounded-md`, no shadow),42px headers and16–20px inner padding. Problem headings use24/32px; prose14/23px. CodeMirror uses Menlo13/24px, semantic light/dark syntax roles and local assets. Default Tab exits the editor; Mod-Enter runs. Lazy editor loading reserves its space. Show Saved to account only after a successful database write/read; ordinary typing is Unsaved edits and latest verdicts remain session results.
 
-The problem description is continuous, with no left-panel tabs or Submissions view. Hints and Solution use shared Accordion rows; Testcase/Test Result retain shared line Tabs. Cases use shared Buttons and labeled numeric Input. Verdicts are server results with text labels, bounded diagnostics and explicit stale-code warnings. Hidden cases never expose private values/logs. Tutor and Notes remain unavailable. Sleep is the sole published problem; Scope is now planned.
+The problem description is continuous, with no left-panel tabs or Submissions view. Hints and Solution use shared Accordion rows; Testcase/Test Result retain shared line Tabs. Cases use shared Buttons and labeled numeric Input. Verdicts are server results with text labels, bounded diagnostics and explicit stale-code warnings. Hidden cases never expose private values/logs. Tutor and Notes remain unavailable. Counter (Closures), Filter Elements from Array (Arrays), Debounce and Sleep (Async) are published practice problems. Learn remains future work.
 
 Feature CSS in `apps/web/src/app/globals.css` owns viewport containment and editor layout; shared primitives/tokens remain in UI. Split mode contains document scrolling; route exit removes the root mode attribute and restores ordinary scrolling. Sheets disable animation for reduced-motion preferences.
 
@@ -176,7 +177,7 @@ Last updated: 2026-11-09.
 
 | Property          | Pattern                                                                                                                                |
 | ----------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| Section links     | GlobalNav shared Button asChild; active `secondary`, inactive `ghost`; `aria-current="page"`                                           |
+| Section links     | GlobalNav text appearance with decorative book/code icons; active text and `aria-current="page"`, no hover background                  |
 | Link spacing      | Existing `gap-1`; centered as one group on desktop                                                                                     |
 | Header appearance | Existing background/border, Button text/focus states and `px-6 py-3`; no new colors, shadow or decoration                              |
 | Placement         | `itemsAlign="center"` uses equal side columns; brand and Dashboard left, section links at the viewport center, utilities/account right |
@@ -207,22 +208,25 @@ Files: `apps/web/src/features/catalog/components/javascript-practice.tsx`,
 `apps/web/src/content/javascript/practice/catalog.ts`.
 Last updated: 2026-11-09. Reference: TraceCode practice category sidebar and list.
 
-| Property        | Pattern                                                                                     |
-| --------------- | ------------------------------------------------------------------------------------------- |
-| Categories      | Shared vertical Tabs, default TabsList surface and active/focus states; `min-h-11` triggers |
-| Category counts | Secondary Badge with real published counts; result count announced in the selected panel    |
-| Main heading    | Existing subject heading sizes; panel headings 22/30px, supporting text muted               |
-| Row surface     | Shared card background, subtle border, rounded-md list, no added shadow                     |
-| Row spacing     | 16px padding, 20px horizontal on larger screens, 12–16px gap                                |
-| Row labels      | Title with concise topic Badge; secondary difficulty Badge; summary uses muted text         |
-| Search          | Labeled shared Input; empty search results offer Clear search while retaining category      |
+| Property        | Pattern                                                                                                                                |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| Categories      | Shared vertical Tabs, default TabsList surface and active/focus states; `min-h-11` triggers                                            |
+| Category icons  | Decorative Star/Braces/Layers/Timer for Recommended/Closures/Arrays/Async; semantic purple/amber/blue/cyan colors and shared icon size |
+| Category counts | Secondary Badge with real published counts; result count announced in the selected panel                                               |
+| Main heading    | Existing subject heading sizes; panel headings 22/30px, supporting text muted                                                          |
+| Row surface     | Shared Table in one card surface with border and rounded-md corners; header/search above rows; no shadow                               |
+| Row spacing     | 16px vertical cell padding, 12px horizontal increasing to 20px on larger screens                                                       |
+| Row labels      | Flag and problem title link, Difficulty, Topic and Solved; no description beneath the title                                            |
+| Search          | Decorative Search icon inside the input, hidden accessible label, and shared Select for difficulty; empty results can clear filters    |
 
 Recommended is an explicit curated view; each topic category lists its published
-problems. Sleep is recommended and Async. Do not duplicate problem records for
+problems. All four published problems are recommended and appear in their own topic category. Do not duplicate problem records for
 recommendations, invent progress or show empty topic categories. Desktop places
 categories beside the list; narrow screens stack categories above it. Tabs own
 keyboard navigation and selection. Keep the global header separate from content
-filtering and preserve the flat problem rows.
+filtering. The page title has no supporting subtitle. Use semantic table headings and a single
+title link per problem. Search, category and difficulty filters intersect; clearing filters
+preserves the selected category. Keep table overflow contained on narrow screens.
 
 ## Focused problem workspace
 
@@ -267,3 +271,49 @@ the authored code and explanation below the hints. Remove left-tab selection and
 submission-history state; keep the latest real result in Test Result. Reset code is
 only enabled for an edited source and restores starter code. Icons have accessible
 names; tooltips identify the reset/share actions.
+
+## Difficulty and category colors
+
+Files: `packages/ui/src/styles/globals.css`, `packages/ui/src/components/badge.tsx`,
+`apps/web/src/features/catalog/components/difficulty-badge.tsx`. Last updated: 2026-11-09.
+
+Use semantic `difficulty-easy` (green), `difficulty-medium` (amber), and
+`difficulty-hard` (red) tokens through the shared Badge variants in both catalog
+and problem headers. Category icons use `category-recommended` (purple),
+`category-closures` (amber), `category-arrays` (blue), and `category-async` (cyan). Tokens have separate
+light/dark values; labels remain visible so meaning never depends on color alone.
+
+GlobalNav items may supply an icon component and `appearance="text"`. Learn/Practice
+use this appearance with BookOpen/CodeXml, while retaining centering, mobile keyboard
+behavior, and accessible link names. Dashboard and account controls retain their own variants.
+
+## Row flags and solved status
+
+Files: `apps/web/src/features/catalog/components/javascript-practice.tsx` and
+`state/practice-records.ts`. Last updated: 2026-11-09.
+
+Use a shared ghost icon Button with a decorative Flag and `aria-pressed`. Flagged
+icons use a solid red fill (`fill-current text-destructive`); accessible names identify the
+problem and whether clicking flags or unflags it. Solved is a read-only CircleCheck
+in the Easy green token; unsolved uses a muted Circle. The status name and title identify account-backed records. Only a server-judged accepted Submit marks solved.
+Retain old browser completion separately as unverified history; its title requests an accepted resubmission.
+Namespace browser backups to the authenticated learner. Show account loading, failure and Retry progress without claiming a local flag is saved. Keep flag clicks separate from
+problem navigation. On mobile, hide the separate Topic column and group its badge
+with Difficulty, retaining the flag, title and solved indicator without page overflow.
+Dashboard uses a decorative LayoutDashboard icon through GlobalNav's item icon prop.
+
+Case fields remain labeled shared Input/Select controls: Sleep takes millis; Counter
+takes a start and invocation count; Debounce takes a delay and JSON call schedule;
+Filter takes a JSON array and a supplied callback with its source shown below. Keep
+JSON fields and output arrays inside their panes, and reject invalid drafts before Run.
+
+## Account progress and saved code
+
+Files: `features/catalog/state/practice-records.ts`, `features/problems/state/problem-session.tsx`, and code panel.
+Last updated: 2026-11-09.
+
+Reuse existing muted text, bordered error rows and shared small Buttons. The editor footer distinguishes
+Loading saved code, Saved to account, Unsaved edits, and Not saved to account; Retry saved code retries reads.
+Run/Submit save the submitted source, while later typing stays unsaved. Restoring a delayed response must
+never replace typing or Reset. Flag controls disable during initial loading and their own write; account
+errors retain browser backups and expose Retry progress. Keep verdicts separate from save status.

@@ -1,10 +1,16 @@
 import { getAuth } from "@clerk/express";
 import {
+  type ExecutionResult,
+  findProblem,
   MAX_SOURCE_BYTES,
-  sleepProblem,
-  validMillis,
+  type ProblemInput,
+  validRunInputs,
 } from "@workspace/problems";
 import { Router } from "express";
+import {
+  createProgressService,
+  type ProgressService,
+} from "../progress/service.js";
 import {
   type ExecutionJob,
   ExecutionUnavailable,
@@ -12,6 +18,7 @@ import {
 } from "./service.js";
 export function executionRoutes(
   execute: typeof executeProblem = executeProblem,
+  progress: ProgressService = createProgressService(),
 ) {
   const router = Router();
   const limits = new Map<
@@ -19,10 +26,8 @@ export function executionRoutes(
     { start: number; count: number; pending: number }
   >();
   router.post("/:problemId/:action", async (req, res) => {
-    if (
-      req.params.problemId !== sleepProblem.id ||
-      !["run", "submit"].includes(req.params.action as string)
-    ) {
+    const problem = findProblem(req.params.problemId as string);
+    if (!problem || !["run", "submit"].includes(req.params.action as string)) {
       res.status(404).json({ error: "Problem or action unavailable" });
       return;
     }
@@ -43,20 +48,14 @@ export function executionRoutes(
       return;
     }
     const action = req.params.action as ExecutionJob["action"];
-    if (
-      action === "run" &&
-      body.inputs !== undefined &&
-      (!Array.isArray(body.inputs) ||
-        body.inputs.length < 1 ||
-        body.inputs.length > 5 ||
-        !body.inputs.every(validMillis))
-    ) {
+    if (action === "run" && !validRunInputs(problem, body.inputs)) {
       res.status(400).json({
-        error: "Use 1–5 test cases with integer delays from 1 to 1000ms.",
+        error: `Use 1–5 test cases. ${problem.inputError}`,
       });
       return;
     }
     const now = Date.now();
+    const startedAt = new Date(now);
     for (const [key, entry] of limits)
       if (now - entry.start > 60000 && entry.pending === 0) limits.delete(key);
     let limit = limits.get(userId);
@@ -77,19 +76,47 @@ export function executionRoutes(
       if (!res.writableEnded) controller.abort();
     };
     res.once("close", abort);
+    const save = async (result?: ExecutionResult) => {
+      let deadline: ReturnType<typeof setTimeout> | undefined;
+      try {
+        const stored = await Promise.race([
+          progress.recordExecution(
+            userId,
+            problem.id,
+            body.code as string,
+            startedAt,
+            action,
+            result,
+          ),
+          new Promise<never>((_resolve, reject) => {
+            deadline = setTimeout(
+              () => reject(new Error("Saving timed out")),
+              4000,
+            );
+          }),
+        ]);
+        return stored === false ? ("unavailable" as const) : ("saved" as const);
+      } catch {
+        return "unavailable" as const;
+      } finally {
+        clearTimeout(deadline);
+      }
+    };
     try {
-      res.json(
-        await execute({
-          code: body.code,
-          action,
-          inputs:
-            action === "run"
-              ? (body.inputs as number[] | undefined)
-              : undefined,
-          signal: controller.signal,
-        }),
-      );
+      const result = await execute({
+        problemId: problem.id,
+        code: body.code,
+        action,
+        inputs:
+          action === "run"
+            ? (body.inputs as ProblemInput[] | undefined)
+            : undefined,
+        signal: controller.signal,
+      });
+      const persistence = await save(result);
+      if (!controller.signal.aborted) res.json({ ...result, persistence });
     } catch (error) {
+      await save();
       if (!res.headersSent && !controller.signal.aborted)
         res
           .status(

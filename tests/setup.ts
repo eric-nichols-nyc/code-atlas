@@ -14,3 +14,9 @@ Object.defineProperty(globalThis, "ResizeObserver", {
   value: TestResizeObserver,
   configurable: true,
 });
+
+// Radix Select scrolls its focused option; scrolling needs a real browser layout.
+Object.defineProperty(HTMLElement.prototype, "scrollIntoView", {
+  value() {},
+  configurable: true,
+});

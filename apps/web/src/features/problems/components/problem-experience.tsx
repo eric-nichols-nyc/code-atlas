@@ -9,13 +9,19 @@ import { DescriptionPanel } from "./description-panel";
 import { ResultPanel } from "./result-panel";
 export function ProblemExperience({
   problem,
+  learnerId,
   children,
 }: {
   problem: ProblemDefinition;
+  learnerId?: string;
   children: ReactNode;
 }) {
   return (
-    <ProblemSession key={problem.id} problem={problem}>
+    <ProblemSession
+      key={`${learnerId ?? "guest"}:${problem.id}`}
+      problem={problem}
+      learnerId={learnerId}
+    >
       <WorkspaceTools>
         <LearningWorkspace
           lesson={<DescriptionPanel>{children}</DescriptionPanel>}

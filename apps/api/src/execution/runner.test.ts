@@ -1,3 +1,8 @@
+import {
+  counterProblem,
+  debounceProblem,
+  filterArrayProblem,
+} from "@workspace/problems";
 import { describe, expect, it } from "vitest";
 import { executeProblem } from "./service.js";
 
@@ -91,4 +96,188 @@ describe("isolated asynchronous JavaScript judging", () => {
     });
     expect(logs.cases[0]?.logs.length).toBeLessThanOrEqual(41);
   }, 4000);
+});
+
+describe("isolated Counter judging", () => {
+  const job = { problemId: counterProblem.id, code: counterProblem.solution };
+  it("runs edited starts and call counts, including negative and zero-call cases", async () => {
+    const result = await executeProblem({
+      ...job,
+      action: "run",
+      inputs: [
+        { n: -3, calls: 4 },
+        { n: 0, calls: 0 },
+      ],
+    });
+    expect(result.verdict).toBe("accepted");
+    expect(result.cases[0]?.actual).toEqual([-3, -2, -1, 0]);
+    expect(result.cases[0]?.expected).toEqual([-3, -2, -1, 0]);
+    expect(result.cases[1]?.actual).toEqual([]);
+  });
+  it("accepts the full private suite and redacts hidden inputs and outputs", async () => {
+    const result = await executeProblem({ ...job, action: "submit" });
+    expect(result.verdict).toBe("accepted");
+    expect(result.total).toBe(10);
+    expect(result.passed).toBe(10);
+    for (const c of result.cases.filter((c) => c.hidden)) {
+      expect(c.input).toBeUndefined();
+      expect(c.expected).toBeUndefined();
+      expect(c.actual).toBeUndefined();
+      expect(c.logs).toEqual([]);
+    }
+  });
+  it("reports off-by-one output against the visible expected sequence", async () => {
+    const result = await executeProblem({
+      ...job,
+      code: "function createCounter(n){return ()=>++n;}",
+      action: "run",
+    });
+    expect(result.verdict).toBe("wrong-answer");
+    expect(result.cases[0]?.actual).toEqual([11]);
+    expect(result.cases[0]?.expected).toEqual([10, 11, 12]);
+  });
+  it("rejects shared global state even when sample sequences pass", async () => {
+    const code =
+      "let count; function createCounter(n){count=n; return ()=>count++;}";
+    expect(
+      (await executeProblem({ ...job, code, action: "run" })).verdict,
+    ).toBe("accepted");
+    const result = await executeProblem({ ...job, code, action: "submit" });
+    expect(result.verdict).toBe("wrong-answer");
+    expect(result.cases.at(-1)?.hidden).toBe(true);
+    expect(result.cases.at(-1)?.message).not.toContain("10");
+  });
+  it.each([
+    ["function createCounter(){return 1;}", "runtime-error"],
+    ["function createCounter(){return ()=>undefined;}", "wrong-answer"],
+    [
+      "function createCounter(){return ()=>{while(true){}};}",
+      "time-limit-exceeded",
+    ],
+    ["function createCounter( {", "compile-error"],
+  ])("fails safely for %s", async (code, verdict) => {
+    expect(
+      (await executeProblem({ ...job, code, action: "run" })).verdict,
+    ).toBe(verdict);
+  });
+});
+
+describe("Debounce and array-filter judging", () => {
+  it.each([debounceProblem, filterArrayProblem])(
+    "accepts the examples and private suite for $title",
+    async (problem) => {
+      const job = { problemId: problem.id, code: problem.solution };
+      const visible = await executeProblem({ ...job, action: "run" });
+      expect(visible.verdict).toBe("accepted");
+      expect(visible.cases.map((c) => c.actual)).toEqual(
+        problem.samples.map((sample) => sample.expected),
+      );
+      const submitted = await executeProblem({ ...job, action: "submit" });
+      expect(submitted.verdict).toBe("accepted");
+      expect(submitted.passed).toBe(10);
+      for (const c of submitted.cases.filter((c) => c.hidden)) {
+        expect(c.input).toBeUndefined();
+        expect(c.actual).toBeUndefined();
+        expect(c.expected).toBeUndefined();
+        expect(c.logs).toEqual([]);
+      }
+    },
+    10000,
+  );
+  it("rejects debounce implementations that never cancel or drop arguments", async () => {
+    for (const code of [
+      "function debounce(fn,t){return (...args)=>setTimeout(()=>fn(...args),t);}",
+      "function debounce(fn,t){let id;return (...args)=>{clearTimeout(id);id=setTimeout(()=>fn(),t);};}",
+    ]) {
+      expect(
+        (
+          await executeProblem({
+            problemId: debounceProblem.id,
+            code,
+            action: "submit",
+          })
+        ).verdict,
+      ).toBe("wrong-answer");
+    }
+  });
+  it("handles zero delay, same-time calls and deadline ties deterministically", async () => {
+    const r = await executeProblem({
+      problemId: debounceProblem.id,
+      code: debounceProblem.solution,
+      action: "run",
+      inputs: [
+        {
+          t: 0,
+          calls: [
+            { t: 0, inputs: [1] },
+            { t: 0, inputs: [2] },
+          ],
+        },
+        {
+          t: 10,
+          calls: [
+            { t: 0, inputs: [1] },
+            { t: 10, inputs: [2] },
+          ],
+        },
+      ],
+    });
+    expect(r.verdict).toBe("accepted");
+    expect(r.cases[0]?.actual).toEqual([{ t: 0, inputs: [2] }]);
+    expect(r.cases[1]?.actual).toEqual([{ t: 20, inputs: [2] }]);
+  });
+  it("bounds recursive debounce timers and recovers", async () => {
+    const r = await executeProblem({
+      problemId: debounceProblem.id,
+      code: "function debounce(fn,t){return ()=>setTimeout(function loop(){setTimeout(loop,0);},0);}",
+      action: "run",
+    });
+    expect(r.verdict).not.toBe("accepted");
+    expect(
+      (
+        await executeProblem({
+          problemId: debounceProblem.id,
+          code: debounceProblem.solution,
+          action: "run",
+        })
+      ).verdict,
+    ).toBe("accepted");
+  });
+  it("rejects strict boolean filtering, wrong indices, and built-in filter use", async () => {
+    for (const code of [
+      "function filter(arr,fn){const a=[];for(let i=0;i<arr.length;i++)if(fn(arr[i],i)===true)a.push(arr[i]);return a;}",
+      "function filter(arr,fn){const a=[];for(let i=0;i<arr.length;i++)if(fn(arr[i]))a.push(arr[i]);return a;}",
+    ]) {
+      expect(
+        (
+          await executeProblem({
+            problemId: filterArrayProblem.id,
+            code,
+            action: "submit",
+          })
+        ).verdict,
+      ).toBe("wrong-answer");
+    }
+    const builtIn = await executeProblem({
+      problemId: filterArrayProblem.id,
+      code: "function filter(arr,fn){return arr.filter(fn);}",
+      action: "run",
+    });
+    expect(builtIn.verdict).toBe("runtime-error");
+    expect(builtIn.cases[0]?.message).toContain("disabled");
+  });
+  it("uses a pristine array check and interrupts hostile output getters", async () => {
+    const fake = await executeProblem({
+      problemId: filterArrayProblem.id,
+      code: "Array.isArray=()=>true;function filter(){return {0:20,1:30,length:2};}",
+      action: "run",
+    });
+    expect(fake.verdict).toBe("runtime-error");
+    const hostile = await executeProblem({
+      problemId: filterArrayProblem.id,
+      code: "function filter(){return new Proxy([], {get(){while(true){}}});}",
+      action: "run",
+    });
+    expect(hostile.verdict).toBe("time-limit-exceeded");
+  });
 });

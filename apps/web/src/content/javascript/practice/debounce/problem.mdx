@@ -1,0 +1,7 @@
+Implement `debounce(fn, t)`. Return a wrapper that waits for a quiet period of `t` milliseconds before invoking `fn`.
+
+Every new call should replace the pending call. When the waiting window finishes, invoke `fn` with all arguments from the most recent call. Calls separated by a full waiting window should each produce an invocation.
+
+Use the timer APIs rather than a blocking loop. Keep the pending timeout in the returned function's closure. External utility libraries are unavailable.
+
+The test panel accepts a delay and a JSON schedule. Each scheduled call contains its timestamp `t` and numeric `inputs`. Results show when the supplied callback ran and the arguments it received. The judge advances a deterministic clock; calls sharing a timestamp run in input order before timers due at that timestamp.

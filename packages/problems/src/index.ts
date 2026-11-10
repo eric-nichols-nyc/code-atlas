@@ -1,85 +1,32 @@
-export const MAX_SOURCE_BYTES = 32 * 1024;
-export const verdicts = [
-  "accepted",
-  "wrong-answer",
-  "compile-error",
-  "runtime-error",
-  "time-limit-exceeded",
-] as const;
-export type Verdict = (typeof verdicts)[number];
-export type ExecutionAction = "run" | "submit";
-export interface CaseResult {
-  id: string;
-  passed: boolean;
-  verdict: Verdict;
-  input?: number;
-  elapsedMs?: number;
-  message: string;
-  logs: string[];
-  hidden: boolean;
-}
-export interface ExecutionResult {
-  attemptId: string;
-  action: ExecutionAction;
-  verdict: Verdict;
-  passed: number;
-  total: number;
-  cases: CaseResult[];
-}
-export interface ProblemDefinition {
-  id: string;
-  slug: string;
-  subjectId: string;
-  topicId: "basics" | "functions" | "async";
-  title: string;
-  summary: string;
-  difficulty: string;
-  entryFunction: string;
-  starterCode: string;
-  samples: { id: string; millis: number; explanation: string }[];
-  constraints: string[];
-  hints: string[];
-  solution: string;
-  solutionExplanation: string;
-}
-export const sleepProblem: ProblemDefinition = {
-  id: "javascript.sleep",
-  slug: "sleep",
-  subjectId: "javascript",
-  topicId: "async",
-  title: "Sleep",
-  summary: "Build a Promise-based delay with JavaScript timers.",
-  difficulty: "Easy",
-  entryFunction: "sleep",
-  starterCode: `/**\n * @param {number} millis\n * @return {Promise<void>}\n */\nasync function sleep(millis) {\n  // Resolve a Promise after millis milliseconds.\n}\n`,
-  samples: [
-    {
-      id: "sample-1",
-      millis: 100,
-      explanation:
-        "The returned Promise should settle about 100 milliseconds after the call.",
-    },
-    {
-      id: "sample-2",
-      millis: 200,
-      explanation: "Waiting twice as long should take about 200 milliseconds.",
-    },
-  ],
-  constraints: [
-    "millis is an integer between 1 and 1000, inclusive.",
-    "Return a Promise; its resolved value can be anything.",
-    "Use asynchronous timing. Small scheduling delays are allowed.",
-    "This workspace supports single-file JavaScript with bounded timers and console output; external modules are unavailable.",
-  ],
-  hints: [
-    "A Promise can stay pending until a callback calls resolve.",
-    "setTimeout schedules a callback after the requested delay. Pass resolve as that callback.",
-  ],
-  solution: `function sleep(millis) {\n  return new Promise((resolve) => {\n    setTimeout(resolve, millis);\n  });\n}`,
-  solutionExplanation:
-    "The Promise starts pending. setTimeout schedules resolve, so the caller can await the delay without blocking the JavaScript thread. Returning the Promise lets the caller observe when the wait finishes.",
+import { counterProblem } from "./problems/counter.js";
+import { debounceProblem } from "./problems/debounce.js";
+import {
+  filterArrayProblem,
+  filterPredicates,
+} from "./problems/filter-array.js";
+import { sleepProblem } from "./problems/sleep.js";
+import {
+  type ExecutionResult,
+  type ProblemDefinition,
+  type ProblemInput,
+  type Verdict,
+  verdicts,
+} from "./types.js";
+
+export * from "./types.js";
+export {
+  counterProblem,
+  debounceProblem,
+  filterArrayProblem,
+  filterPredicates,
+  sleepProblem,
 };
-export const publicProblems = [sleepProblem];
+export const publicProblems = [
+  sleepProblem,
+  counterProblem,
+  debounceProblem,
+  filterArrayProblem,
+];
 export function findProblem(slugOrId: string) {
   return publicProblems.find((p) => p.slug === slugOrId || p.id === slugOrId);
 }
@@ -91,6 +38,64 @@ export function validMillis(value: unknown): value is number {
     value <= 1000
   );
 }
+const integer = (value: unknown, min: number, max: number): value is number =>
+  typeof value === "number" &&
+  Number.isInteger(value) &&
+  value >= min &&
+  value <= max;
+const numericArray = (value: unknown, max: number): value is number[] =>
+  Array.isArray(value) &&
+  value.length <= max &&
+  value.every((n) => integer(n, -1e9, 1e9));
+export function validProblemInput(
+  problem: ProblemDefinition,
+  value: unknown,
+): value is ProblemInput {
+  if (problem.kind === "delay") return validMillis(value);
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+  const input = value as Record<string, unknown>;
+  if (Object.keys(input).length !== 2) return false;
+  if (problem.kind === "counter")
+    return integer(input.n, -1000, 1000) && integer(input.calls, 0, 1000);
+  if (problem.kind === "debounce")
+    return (
+      integer(input.t, 0, 1000) &&
+      Array.isArray(input.calls) &&
+      input.calls.length >= 1 &&
+      input.calls.length <= 10 &&
+      input.calls.every(
+        (call) =>
+          call &&
+          typeof call === "object" &&
+          Object.keys(call).length === 2 &&
+          integer(call.t, 0, 1000) &&
+          numericArray(call.inputs, 10),
+      )
+    );
+  return (
+    numericArray(input.arr, 1000) &&
+    filterPredicates.some((predicate) => predicate.id === input.predicate)
+  );
+}
+export function validRunInputs(
+  problem: ProblemDefinition,
+  value: unknown,
+): value is ProblemInput[] | undefined {
+  return (
+    value === undefined ||
+    (Array.isArray(value) &&
+      value.length >= 1 &&
+      value.length <= 5 &&
+      value.every((input) => validProblemInput(problem, input)))
+  );
+}
+export function formatProblemInput(input: ProblemInput) {
+  if (typeof input === "number") return `millis = ${input}`;
+  if ("n" in input) return `n = ${input.n}, calls = ${input.calls}`;
+  if ("arr" in input)
+    return `arr = ${JSON.stringify(input.arr)}, fn = ${input.predicate}`;
+  return `t = ${input.t}, calls = ${JSON.stringify(input.calls)}`;
+}
 export function isExecutionResult(value: unknown): value is ExecutionResult {
   if (!value || typeof value !== "object") return false;
   const r = value as Record<string, unknown>;
@@ -101,6 +106,9 @@ export function isExecutionResult(value: unknown): value is ExecutionResult {
     Number.isInteger(r.passed) &&
     Number.isInteger(r.total) &&
     Array.isArray(r.cases) &&
+    (r.persistence === undefined ||
+      r.persistence === "saved" ||
+      r.persistence === "unavailable") &&
     r.cases.every(
       (c) =>
         c &&

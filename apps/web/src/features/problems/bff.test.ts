@@ -70,3 +70,49 @@ describe("web execution boundary", () => {
     ).toBe("Bearer test-token");
   });
 });
+
+it("validates and forwards Counter cases with the session, and strips Submit inputs", async () => {
+  const fetch = vi.fn(async (_url: string, _init?: RequestInit) =>
+    Response.json({
+      attemptId: "counter-attempt",
+      action: "run",
+      verdict: "accepted",
+      passed: 1,
+      total: 1,
+      cases: [],
+    }),
+  );
+  vi.stubGlobal("fetch", fetch);
+  const counter = {
+    params: Promise.resolve({ problemId: "javascript.counter", action: "run" }),
+  };
+  expect(
+    (await POST(req({ code: "x", inputs: [{ n: 0, calls: 1001 }] }), counter))
+      .status,
+  ).toBe(400);
+  expect(fetch).not.toHaveBeenCalled();
+  const inputs = [{ n: -2, calls: 5 }];
+  expect(
+    (await POST(req({ code: "function createCounter(){}", inputs }), counter))
+      .status,
+  ).toBe(200);
+  expect(fetch.mock.calls[0]?.[0]).toContain(
+    "/v1/problems/javascript.counter/run",
+  );
+  expect(JSON.parse(fetch.mock.calls[0]?.[1]?.body as string).inputs).toEqual(
+    inputs,
+  );
+  expect(
+    (
+      await POST(req({ code: "x", inputs }), {
+        params: Promise.resolve({
+          problemId: "javascript.counter",
+          action: "submit",
+        }),
+      })
+    ).status,
+  ).toBe(200);
+  expect(
+    JSON.parse(fetch.mock.calls[1]?.[1]?.body as string),
+  ).not.toHaveProperty("inputs");
+});

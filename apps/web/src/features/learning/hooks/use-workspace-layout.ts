@@ -14,14 +14,15 @@ import {
   workspaceMode,
 } from "../lib/layout";
 import type { LayoutPreferences } from "../lib/types";
-export function readLayout() {
+
+function readLayout() {
   try {
     return parsePreferences(localStorage.getItem(LAYOUT_KEY));
   } catch {
     return { ...DEFAULT_LAYOUT };
   }
 }
-export function storeLayout(preferences: LayoutPreferences) {
+function storeLayout(preferences: LayoutPreferences) {
   try {
     localStorage.setItem(LAYOUT_KEY, JSON.stringify(preferences));
   } catch {
@@ -32,7 +33,6 @@ export function useWorkspaceLayout() {
   const host = useRef<HTMLDivElement>(null);
   const [ready, setReady] = useState(false);
   const [preferences, setPreferences] = useState(DEFAULT_LAYOUT);
-  const [resetVersion, setResetVersion] = useState(0);
   const [capacity, setCapacity] = useState({ width: 0, height: 0 });
   useEffect(() => {
     setPreferences(readLayout());
@@ -72,11 +72,6 @@ export function useWorkspaceLayout() {
       return next;
     });
   }, []);
-  const reset = () => {
-    setPreferences({ ...DEFAULT_LAYOUT });
-    storeLayout(DEFAULT_LAYOUT);
-    setResetVersion((x) => x + 1);
-  };
   const mode = ready ? workspaceMode(capacity.width, capacity.height) : "flow";
   useLayoutEffect(() => {
     document.documentElement.dataset.learningWorkspace = mode;
@@ -92,8 +87,6 @@ export function useWorkspaceLayout() {
     capacity,
     preferences,
     save,
-    reset,
-    resetVersion,
     mode,
   };
 }

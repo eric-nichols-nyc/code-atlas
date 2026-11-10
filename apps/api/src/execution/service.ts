@@ -4,22 +4,33 @@ import {
   type CaseResult,
   type ExecutionAction,
   type ExecutionResult,
+  findProblem,
+  type ProblemInput,
   sleepProblem,
+  validRunInputs,
 } from "@workspace/problems";
 export interface ExecutionJob {
+  problemId?: string;
   code: string;
   action: ExecutionAction;
-  inputs?: number[];
+  inputs?: ProblemInput[];
   signal?: AbortSignal;
 }
-// Private full-suite inputs never enter the public content package or web payload.
-const privateInputs = [1, 15, 40, 125, 333, 500, 750, 1000];
+
+import { privateSuites } from "./private-suites.js";
+
 let active = 0;
 const queue: (() => void)[] = [];
 export class ExecutionUnavailable extends Error {}
 export async function executeProblem(
   job: ExecutionJob,
 ): Promise<ExecutionResult> {
+  const problem = findProblem(job.problemId ?? sleepProblem.id);
+  if (
+    !problem ||
+    (job.action === "run" && !validRunInputs(problem, job.inputs))
+  )
+    throw new ExecutionUnavailable("Problem or test inputs are invalid.");
   if (job.signal?.aborted)
     throw new ExecutionUnavailable("Execution was cancelled.");
   if (active >= 2) {
@@ -43,17 +54,18 @@ export async function executeProblem(
   try {
     const visible = (
       job.action === "run"
-        ? (job.inputs ?? sleepProblem.samples.map((x) => x.millis))
-        : sleepProblem.samples.map((x) => x.millis)
-    ).map((millis, i) => ({ id: `case-${i + 1}`, millis, hidden: false }));
+        ? (job.inputs ?? problem.samples.map((x) => x.input))
+        : problem.samples.map((x) => x.input)
+    ).map((input, i) => ({ id: `case-${i + 1}`, input, hidden: false }));
     const tests =
       job.action === "submit"
         ? [
             ...visible,
-            ...privateInputs.map((millis, i) => ({
+            ...privateSuites[problem.kind].map((input, i) => ({
               id: `hidden-${i + 1}`,
-              millis,
+              input,
               hidden: true,
+              independent: problem.kind === "counter" && i === 6,
             })),
           ]
         : visible;
@@ -62,7 +74,13 @@ export async function executeProblem(
         ? "./runner-worker.ts"
         : "./runner-worker.js";
       const worker = new Worker(new URL(path, import.meta.url), {
-        workerData: { code: job.code, action: job.action, cases: tests },
+        workerData: {
+          problemId: problem.id,
+          entryFunction: problem.entryFunction,
+          code: job.code,
+          action: job.action,
+          cases: tests,
+        },
         env: {},
         execArgv: [],
         resourceLimits: {

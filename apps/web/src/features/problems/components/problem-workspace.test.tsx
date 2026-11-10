@@ -1,6 +1,12 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { type ExecutionResult, sleepProblem } from "@workspace/problems";
+import {
+  counterProblem,
+  type ExecutionResult,
+  type ProblemDefinition,
+  sleepProblem,
+} from "@workspace/problems";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { readPracticeRecord } from "../../catalog/state/practice-records";
 import { useProblemSession } from "../state/problem-session";
 import { ProblemExperience } from "./problem-experience";
 
@@ -34,9 +40,15 @@ const accepted: ExecutionResult = {
     },
   ],
 };
-function Workspace() {
+function Workspace({
+  problem = sleepProblem,
+  learnerId,
+}: {
+  problem?: ProblemDefinition;
+  learnerId?: string;
+}) {
   return (
-    <ProblemExperience problem={sleepProblem}>
+    <ProblemExperience problem={problem} learnerId={learnerId}>
       <p>Write an asynchronous sleep function.</p>
     </ProblemExperience>
   );
@@ -176,4 +188,107 @@ describe("real coding workspace", () => {
     await waitFor(() => expect(ai).toHaveFocus());
     expect(editor).toHaveValue("// My work");
   });
+});
+
+it("runs Counter with editable start and call count and marks changed inputs stale", async () => {
+  const fetch = vi.fn(async (_url: string, _init?: RequestInit) =>
+    Response.json({
+      ...accepted,
+      cases: [
+        {
+          id: "case-1",
+          input: { n: -3, calls: 4 },
+          expected: [-3, -2, -1, 0],
+          actual: [-3, -2, -1, 0],
+          hidden: false,
+          passed: true,
+          verdict: "accepted",
+          message: "Sequence matched.",
+          logs: [],
+        },
+      ],
+    }),
+  );
+  vi.stubGlobal("fetch", fetch);
+  render(<Workspace problem={counterProblem} />);
+  fireEvent.change(
+    screen.getByRole("textbox", { name: "JavaScript solution" }),
+    { target: { value: counterProblem.solution } },
+  );
+  fireEvent.change(screen.getByLabelText("n ="), { target: { value: "-3" } });
+  fireEvent.change(screen.getByLabelText("calls ="), {
+    target: { value: "4" },
+  });
+  fireEvent.click(screen.getByRole("button", { name: "Run" }));
+  await screen.findByTestId("execution-verdict");
+  expect(fetch.mock.calls[0]?.[0]).toBe("/api/problems/javascript.counter/run");
+  expect(JSON.parse(fetch.mock.calls[0]?.[1]?.body as string).inputs).toEqual([
+    { n: -3, calls: 4 },
+    { n: -2, calls: 5 },
+  ]);
+  expect(screen.getByText("Output")).toBeVisible();
+  fireEvent.mouseDown(screen.getByRole("tab", { name: "Testcase" }), {
+    button: 0,
+    ctrlKey: false,
+  });
+  fireEvent.change(screen.getByLabelText("calls ="), {
+    target: { value: "0" },
+  });
+  fireEvent.mouseDown(screen.getByRole("tab", { name: "Test Result" }), {
+    button: 0,
+    ctrlKey: false,
+  });
+  expect(screen.getByText(/Code or inputs changed/)).toBeVisible();
+});
+
+it("records solved only after an accepted Submit, separately from Run and failures", async () => {
+  const learnerId = "solved-workspace-test";
+  const execution = vi
+    .fn()
+    .mockResolvedValueOnce(Response.json(accepted))
+    .mockResolvedValueOnce(
+      Response.json({
+        ...accepted,
+        action: "submit",
+        verdict: "wrong-answer",
+        passed: 0,
+      }),
+    )
+    .mockResolvedValueOnce(
+      Response.json({ ...accepted, action: "submit", persistence: "saved" }),
+    );
+  const fetch = vi.fn((url: string) =>
+    url.startsWith("/api/practice-progress")
+      ? Promise.resolve(Response.json({ record: null }))
+      : execution(),
+  );
+  vi.stubGlobal("fetch", fetch);
+  render(<Workspace learnerId={learnerId} />);
+  fireEvent.click(screen.getByRole("button", { name: "Run" }));
+  await screen.findByTestId("execution-verdict");
+  expect(readPracticeRecord(learnerId).solved).toEqual([]);
+  fireEvent.click(screen.getByRole("button", { name: "Submit" }));
+  await screen.findByText("Wrong Answer", { selector: "h2" });
+  expect(readPracticeRecord(learnerId).solved).toEqual([]);
+  fireEvent.click(screen.getByRole("button", { name: "Submit" }));
+  await waitFor(() =>
+    expect(readPracticeRecord(learnerId).solved).toEqual([sleepProblem.id]),
+  );
+});
+
+it("discards an old learner's editor session when the account changes", () => {
+  const view = render(<Workspace learnerId="first-learner" />);
+  fireEvent.change(
+    screen.getByRole("textbox", { name: "JavaScript solution" }),
+    { target: { value: "// First learner's draft" } },
+  );
+  fireEvent.click(screen.getByRole("button", { name: "Hint 1" }));
+  view.rerender(<Workspace learnerId="second-learner" />);
+  expect(
+    screen.getByRole("textbox", { name: "JavaScript solution" }),
+  ).toHaveValue(sleepProblem.starterCode);
+  expect(screen.getByRole("button", { name: "Hint 1" })).toHaveAttribute(
+    "aria-expanded",
+    "false",
+  );
 });

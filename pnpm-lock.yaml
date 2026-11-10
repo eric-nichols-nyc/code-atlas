@@ -141,9 +141,6 @@ importers:
       '@next/mdx':
         specifier: 16.4.5
         version: 16.4.5(@mdx-js/loader@3.1.1)(@mdx-js/react@3.1.1(@types/react@19.3.0)(react@19.3.1))
-      '@workspace/db':
-        specifier: workspace:*
-        version: link:../../packages/db
       '@workspace/problems':
         specifier: workspace:*
         version: link:../../packages/problems
@@ -159,9 +156,6 @@ importers:
       react-dom:
         specifier: 19.3.1
         version: 19.3.1(react@19.3.1)
-      server-only:
-        specifier: 0.0.1
-        version: 0.0.1
     devDependencies:
       '@next/bundle-analyzer':
         specifier: 16.4.5

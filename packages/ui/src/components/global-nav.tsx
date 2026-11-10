@@ -16,6 +16,8 @@ export type GlobalNavItem = {
   id: string;
   label: string;
   href: string;
+  icon?: ElementType;
+  appearance?: "button" | "text";
   target?: ComponentPropsWithoutRef<"a">["target"];
   rel?: string;
 };
@@ -70,29 +72,39 @@ export function GlobalNav({
   const toggleRef = useRef<HTMLButtonElement>(null);
   const hasContent =
     leadingItems.length > 0 || items.length > 0 || Boolean(actions);
-  const renderItem = (item: GlobalNavItem) => (
-    <li key={item.id} className="min-w-0">
-      <Button
-        asChild
-        variant={item.id === activeItemId ? "secondary" : "ghost"}
-        className="w-full justify-start md:w-auto"
-      >
-        <LinkComponent
-          href={item.href}
-          aria-current={item.id === activeItemId ? "page" : undefined}
-          target={item.target}
-          rel={
-            item.target === "_blank"
-              ? ["noopener", "noreferrer", item.rel].filter(Boolean).join(" ")
-              : item.rel
+  const renderItem = (item: GlobalNavItem) => {
+    const Icon = item.icon;
+    return (
+      <li key={item.id} className="min-w-0">
+        <Button
+          asChild
+          variant={
+            item.appearance === "text"
+              ? "navigation"
+              : item.id === activeItemId
+                ? "secondary"
+                : "ghost"
           }
-          onClick={() => setMenuOpen(false)}
+          className="w-full justify-start md:w-auto"
         >
-          <span className="truncate">{item.label}</span>
-        </LinkComponent>
-      </Button>
-    </li>
-  );
+          <LinkComponent
+            href={item.href}
+            aria-current={item.id === activeItemId ? "page" : undefined}
+            target={item.target}
+            rel={
+              item.target === "_blank"
+                ? ["noopener", "noreferrer", item.rel].filter(Boolean).join(" ")
+                : item.rel
+            }
+            onClick={() => setMenuOpen(false)}
+          >
+            {Icon && <Icon aria-hidden="true" data-icon="inline-start" />}
+            <span className="truncate">{item.label}</span>
+          </LinkComponent>
+        </Button>
+      </li>
+    );
+  };
 
   return (
     // biome-ignore lint/a11y/noStaticElementInteractions: Delegates Escape from descendant controls; the header itself is not focusable.

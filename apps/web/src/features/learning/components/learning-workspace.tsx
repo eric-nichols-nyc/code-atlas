@@ -117,7 +117,6 @@ export function LearningWorkspace({
             preferences={layout.preferences}
             width={layout.capacity.width}
             height={layout.capacity.height}
-            resetVersion={layout.resetVersion}
             onSave={layout.save}
           />
         )}

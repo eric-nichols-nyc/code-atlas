@@ -39,7 +39,7 @@ describe("authorized JavaScript sections", () => {
       "href",
       "/javascript/practice/sleep",
     );
-    expect(screen.getByRole("status")).toHaveTextContent("1 problem");
+    expect(screen.getByRole("status")).toHaveTextContent("4 problems");
   });
   it("reserves Learn without publishing lessons or coding controls", async () => {
     render(await JavaScriptLearnPage());

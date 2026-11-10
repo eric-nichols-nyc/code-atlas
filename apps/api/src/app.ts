@@ -4,6 +4,11 @@ import express, { type ErrorRequestHandler } from "express";
 import helmet from "helmet";
 import { executionRoutes } from "./execution/routes.js";
 import type { executeProblem } from "./execution/service.js";
+import { progressRoutes } from "./progress/routes.js";
+import {
+  createProgressService,
+  type ProgressService,
+} from "./progress/service.js";
 
 export type ApiConfig = {
   publishableKey?: string;
@@ -13,7 +18,10 @@ export type ApiConfig = {
 
 export function createApp(
   config: ApiConfig = {},
-  services: { execute?: typeof executeProblem } = {},
+  services: {
+    execute?: typeof executeProblem;
+    progress?: ProgressService;
+  } = {},
 ) {
   const app = express();
   const allowedOrigins = config.allowedOrigins ?? ["http://localhost:3000"];
@@ -46,7 +54,9 @@ export function createApp(
     next();
   });
 
-  app.use("/v1/problems", executionRoutes(services.execute));
+  const progress = services.progress ?? createProgressService();
+  app.use("/v1/practice-progress", progressRoutes(progress));
+  app.use("/v1/problems", executionRoutes(services.execute, progress));
 
   app.get("/v1/me", (request, response) => {
     response.json({ userId: getAuth(request).userId });

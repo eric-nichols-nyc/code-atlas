@@ -86,3 +86,102 @@ describe("authenticated execution boundary", () => {
     expect(execute).toHaveBeenCalledTimes(20);
   });
 });
+
+it("validates Counter inputs and ignores client cases on Submit", async () => {
+  auth.userId = "counter-learner";
+  const app = createApp(
+    { publishableKey: "test", secretKey: "test" },
+    { execute },
+  );
+  const path = "/v1/problems/javascript.counter/";
+  for (const input of [
+    { n: 1001, calls: 3 },
+    { n: 0, calls: -1 },
+    { n: 0, calls: 1001 },
+    { n: 0, calls: 2, expected: [0, 0] },
+  ]) {
+    expect(
+      (
+        await request(app)
+          .post(`${path}run`)
+          .send({ code: "x", inputs: [input] })
+      ).status,
+    ).toBe(400);
+  }
+  expect(execute).not.toHaveBeenCalled();
+  expect(
+    (
+      await request(app)
+        .post(`${path}run`)
+        .send({
+          code: "function createCounter(){}",
+          inputs: [{ n: -1000, calls: 1000 }],
+        })
+    ).status,
+  ).toBe(200);
+  expect(execute).toHaveBeenLastCalledWith(
+    expect.objectContaining({
+      problemId: "javascript.counter",
+      inputs: [{ n: -1000, calls: 1000 }],
+      action: "run",
+    }),
+  );
+  expect(
+    (
+      await request(app)
+        .post(`${path}submit`)
+        .send({ code: "x", inputs: [{ n: 9999, calls: 0 }] })
+    ).status,
+  ).toBe(200);
+  expect(execute).toHaveBeenLastCalledWith(
+    expect.objectContaining({
+      problemId: "javascript.counter",
+      inputs: undefined,
+      action: "submit",
+    }),
+  );
+});
+
+it("validates Debounce and Filter cases before scheduling a worker", async () => {
+  auth.userId = "extra-problems-learner";
+  const app = createApp(
+    { publishableKey: "test", secretKey: "test" },
+    { execute },
+  );
+  for (const [id, input] of [
+    ["javascript.debounce", { t: -1, calls: [{ t: 0, inputs: [] }] }],
+    ["javascript.debounce", { t: 50, calls: [] }],
+    ["javascript.debounce", { t: 50, calls: [{ t: 1001, inputs: [] }] }],
+    [
+      "javascript.filter-elements-from-array",
+      { arr: [1.5], predicate: "isTruthy" },
+    ],
+    [
+      "javascript.filter-elements-from-array",
+      { arr: [1], predicate: "unknown" },
+    ],
+  ])
+    expect(
+      (
+        await request(app)
+          .post(`/v1/problems/${id}/run`)
+          .send({ code: "x", inputs: [input] })
+      ).status,
+    ).toBe(400);
+  expect(execute).not.toHaveBeenCalled();
+  for (const [id, input] of [
+    ["javascript.debounce", { t: 0, calls: [{ t: 0, inputs: [] }] }],
+    [
+      "javascript.filter-elements-from-array",
+      { arr: [], predicate: "isTruthy" },
+    ],
+  ])
+    expect(
+      (
+        await request(app)
+          .post(`/v1/problems/${id}/run`)
+          .send({ code: "x", inputs: [input] })
+      ).status,
+    ).toBe(200);
+  expect(execute).toHaveBeenCalledTimes(2);
+});

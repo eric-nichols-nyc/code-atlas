@@ -7,6 +7,11 @@ import { isAuthConfigured } from "@/lib/auth";
 export const metadata: Metadata = { title: "JavaScript Practice | Code Atlas" };
 export default async function JavaScriptPracticePage() {
   if (!isAuthConfigured()) return <AuthSetup />;
-  await auth.protect();
-  return <JavaScriptPractice catalog={javascriptPracticeCatalog} />;
+  const session = await auth.protect();
+  return (
+    <JavaScriptPractice
+      catalog={javascriptPracticeCatalog}
+      learnerId={session?.userId}
+    />
+  );
 }

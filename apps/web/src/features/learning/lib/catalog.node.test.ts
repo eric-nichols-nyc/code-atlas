@@ -1,33 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { javascriptLearningTopics } from "../../../content/javascript/learn/planned-topics";
 import { javascriptPracticeCatalog } from "../../../content/javascript/practice/catalog";
-import {
-  catalogCounts,
-  filterCatalog,
-  firstPublished,
-  problemHref,
-} from "./catalog";
+import { filterCatalog, problemHref } from "./catalog";
 
 describe("JavaScript problem catalog", () => {
-  it("publishes only practice problems and keeps planned learning topics separate", () => {
-    expect(firstPublished(javascriptPracticeCatalog)?.slug).toBe("sleep");
-    expect(catalogCounts(javascriptPracticeCatalog)).toEqual({
-      available: 1,
-      planned: 0,
-    });
-    expect(
-      problemHref(
-        javascriptLearningTopics.find((x) => x.slug === "scope-and-shadowing"),
-      ),
-    ).toBeUndefined();
-    expect(problemHref(firstPublished(javascriptPracticeCatalog))).toBe(
-      "/javascript/practice/sleep",
-    );
-    expect(
-      javascriptLearningTopics.some((topic) =>
-        javascriptPracticeCatalog.some((problem) => problem.id === topic.id),
-      ),
-    ).toBe(false);
+  it("links published problems and leaves missing or planned entries unavailable", () => {
+    const sleep = javascriptPracticeCatalog[0];
+    if (!sleep) throw new Error("Missing Sleep");
+    expect(problemHref(sleep)).toBe("/javascript/practice/sleep");
+    expect(problemHref(undefined)).toBeUndefined();
+    expect(problemHref({ ...sleep, status: "planned" })).toBeUndefined();
   });
   it("intersects query and topic while preserving order", () => {
     expect(
@@ -42,11 +23,10 @@ describe("JavaScript problem catalog", () => {
       filterCatalog([...javascriptPracticeCatalog].reverse()).map(
         (x) => x.order,
       ),
-    ).toEqual([65]);
+    ).toEqual([10, 20, 30, 65]);
   });
   it("handles empty catalogs and resets filters", () => {
-    expect(firstPublished([])).toBeUndefined();
-    expect(catalogCounts([])).toEqual({ available: 0, planned: 0 });
-    expect(filterCatalog(javascriptPracticeCatalog, "", "all")).toHaveLength(1);
+    expect(filterCatalog([])).toEqual([]);
+    expect(filterCatalog(javascriptPracticeCatalog, "", "all")).toHaveLength(4);
   });
 });

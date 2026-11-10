@@ -25,7 +25,6 @@ export function ResizableWorkspace({
   preferences,
   width,
   height,
-  resetVersion,
   onSave,
   apiRef,
 }: {
@@ -36,15 +35,12 @@ export function ResizableWorkspace({
   preferences: LayoutPreferences;
   width: number;
   height: number;
-  resetVersion: number;
   onSave: (p: Partial<LayoutPreferences>) => void;
   apiRef: Ref<WorkspaceHandle>;
 }) {
   const left = useRef<PanelImperativeHandle>(null);
   const right = useRef<PanelImperativeHandle>(null);
-  const upper = useRef<PanelImperativeHandle>(null);
   const capture = useRef<{ left: number; right: number } | null>(null);
-  const previousReset = useRef(resetVersion);
   const desired = useRef(preferences);
   desired.current = preferences;
   const hasTutor = Boolean(tutor);
@@ -65,22 +61,18 @@ export function ResizableWorkspace({
     [],
   );
   useEffect(() => {
-    const resetting = previousReset.current !== resetVersion;
-    previousReset.current = resetVersion;
     const requested = capture.current;
     capture.current = null;
     const p = fitLayout(
-      resetting
-        ? desired.current
-        : {
-            ...desired.current,
-            ...(requested
-              ? {
-                  lessonWidthPx: requested.left,
-                  lastTutorWidthPx: requested.right,
-                }
-              : {}),
-          },
+      {
+        ...desired.current,
+        ...(requested
+          ? {
+              lessonWidthPx: requested.left,
+              lastTutorWidthPx: requested.right,
+            }
+          : {}),
+      },
       width,
       height,
       hasTutor,
@@ -97,11 +89,10 @@ export function ResizableWorkspace({
       }
       left.current.resize(`${p.lessonWidthPx}px`);
       if (hasTutor) right.current?.resize(`${p.lastTutorWidthPx}px`);
-      if (resetting) upper.current?.resize(`${p.codeSharePercent}%`);
     };
     frame = requestAnimationFrame(apply);
     return () => cancelAnimationFrame(frame);
-  }, [hasTutor, width, height, resetVersion]);
+  }, [hasTutor, width, height]);
   return (
     <ResizablePanelGroup
       id="learning-columns"
@@ -142,7 +133,6 @@ export function ResizableWorkspace({
           >
             <ResizablePanel
               id="code"
-              panelRef={upper}
               defaultSize={`${fitted.codeSharePercent}%`}
               minSize="240px"
             >

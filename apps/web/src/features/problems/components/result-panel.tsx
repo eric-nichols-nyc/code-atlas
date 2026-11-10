@@ -1,14 +1,15 @@
 "use client";
+import { formatProblemInput } from "@workspace/problems";
 import { Button } from "@workspace/ui/components/button";
-import { Input } from "@workspace/ui/components/input";
-import { Label } from "@workspace/ui/components/label";
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from "@workspace/ui/components/tabs";
+import { inputDraft } from "../lib/input-drafts";
 import { useProblemSession } from "../state/problem-session";
+import { CaseInputFields } from "./case-input-fields";
 import { verdictLabels } from "./description-panel";
 export function ResultPanel() {
   const s = useProblemSession();
@@ -18,7 +19,7 @@ export function ResultPanel() {
     s.latest &&
     (s.latest.source !== s.source ||
       (result?.action === "run" &&
-        s.latest.inputs.join() !== s.inputs.map(Number).join()));
+        JSON.stringify(s.latest.inputs) !== JSON.stringify(s.parsedInputs)));
   return (
     <section className="learning-panel" aria-label="Test cases and results">
       <Tabs
@@ -60,32 +61,16 @@ export function ResultPanel() {
                 disabled={s.inputs.length >= 5 || Boolean(s.pending)}
                 onClick={() => {
                   s.inputIds.current.push(crypto.randomUUID());
-                  s.setInputs([...s.inputs, "100"]);
+                  const sample = s.problem.samples[0];
+                  if (!sample) return;
+                  s.setInputs([...s.inputs, inputDraft(sample.input)]);
                   s.setSelectedCase(String(s.inputs.length));
                 }}
               >
                 Add case
               </Button>
             </div>
-            <Label htmlFor="millis-input" className="mb-2 font-mono text-xs">
-              millis =
-            </Label>
-            <Input
-              id="millis-input"
-              type="number"
-              min={1}
-              max={1000}
-              step={1}
-              value={s.inputs[index] ?? ""}
-              onChange={(e) =>
-                s.setInputs(
-                  s.inputs.map((value, i) =>
-                    i === index ? e.target.value : value,
-                  ),
-                )
-              }
-              className="font-mono"
-            />
+            <CaseInputFields index={index} />
             <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
               Run checks these visible inputs. Submit uses the complete server
               test suite.
@@ -132,13 +117,34 @@ export function ResultPanel() {
                         {!c.hidden && (
                           <dl className="mb-2 grid grid-cols-2 gap-2 font-mono text-xs">
                             <dt>Input</dt>
-                            <dd>millis = {c.input}</dd>
-                            <dt>Observed delay</dt>
-                            <dd>
-                              {c.elapsedMs === undefined
+                            <dd className="min-w-0 [overflow-wrap:anywhere]">
+                              {c.input === undefined
                                 ? "—"
-                                : `${c.elapsedMs} ms`}
+                                : formatProblemInput(c.input)}
                             </dd>
+                            {s.problem.kind === "delay" ? (
+                              <>
+                                <dt>Observed delay</dt>
+                                <dd>
+                                  {c.elapsedMs === undefined
+                                    ? "—"
+                                    : `${c.elapsedMs} ms`}
+                                </dd>
+                              </>
+                            ) : (
+                              <>
+                                <dt>Expected</dt>
+                                <dd className="max-h-32 overflow-auto [overflow-wrap:anywhere]">
+                                  {c.expected
+                                    ? JSON.stringify(c.expected)
+                                    : "—"}
+                                </dd>
+                                <dt>Output</dt>
+                                <dd className="max-h-32 overflow-auto [overflow-wrap:anywhere]">
+                                  {c.actual ? JSON.stringify(c.actual) : "—"}
+                                </dd>
+                              </>
+                            )}
                           </dl>
                         )}
                         <p className="text-sm leading-relaxed text-muted-foreground">

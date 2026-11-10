@@ -1,4 +1,5 @@
-export type TopicId = "basics" | "functions" | "async";
+import type { ProblemDefinition } from "@workspace/problems";
+export type TopicId = ProblemDefinition["topicId"];
 export interface CatalogEntry {
   id: string;
   slug: string;

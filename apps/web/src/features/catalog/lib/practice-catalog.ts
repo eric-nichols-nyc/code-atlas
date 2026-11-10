@@ -37,10 +37,12 @@ export function practiceProblems(
   entries: PracticeEntry[],
   category: string,
   query = "",
+  difficulty = "all",
 ) {
   const published = entries.filter(
     (entry) =>
       entry.status === "published" &&
+      (difficulty === "all" || entry.difficulty === difficulty) &&
       (category !== "recommended" || entry.recommended),
   );
   return filterCatalog(

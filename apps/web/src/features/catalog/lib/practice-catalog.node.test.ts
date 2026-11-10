@@ -7,22 +7,36 @@ import {
 } from "./practice-catalog";
 
 describe("practice categories", () => {
-  it("lists the same Sleep problem in Recommended and Async", () => {
+  it("lists the published problems in Recommended and their own categories", () => {
     expect(practiceCategories(javascriptPracticeCatalog)).toEqual([
       {
         id: "recommended",
         label: "Recommended",
         heading: "Recommended problems",
+        count: 4,
+      },
+      {
+        id: "closures",
+        label: "Closures",
+        heading: "Closures problems",
         count: 1,
       },
-      { id: "async", label: "Async", heading: "Async problems", count: 1 },
+      { id: "arrays", label: "Arrays", heading: "Arrays problems", count: 1 },
+      { id: "async", label: "Async", heading: "Async problems", count: 2 },
     ]);
-    expect(practiceProblems(javascriptPracticeCatalog, "recommended")[0]).toBe(
-      javascriptPracticeCatalog[0],
-    );
-    expect(practiceProblems(javascriptPracticeCatalog, "async")[0]).toBe(
-      javascriptPracticeCatalog[0],
-    );
+    expect(
+      practiceProblems(javascriptPracticeCatalog, "recommended").map(
+        (entry) => entry.slug,
+      ),
+    ).toEqual(["counter", "filter-elements-from-array", "debounce", "sleep"]);
+    expect(
+      practiceProblems(javascriptPracticeCatalog, "closures")[0]?.slug,
+    ).toBe("counter");
+    expect(
+      practiceProblems(javascriptPracticeCatalog, "async").map(
+        (entry) => entry.slug,
+      ),
+    ).toEqual(["debounce", "sleep"]);
   });
 
   it("keeps recommendations curated, excludes unpublished entries, and intersects search with category", () => {
@@ -87,4 +101,19 @@ describe("practice categories", () => {
     ]);
     expect(practiceProblems([], "recommended")).toEqual([]);
   });
+});
+
+it("intersects difficulty with the selected category and search", () => {
+  const entries = javascriptPracticeCatalog.map((entry) => ({
+    ...entry,
+    difficulty: entry.slug === "counter" ? "Medium" : "Easy",
+  }));
+  expect(
+    practiceProblems(entries, "recommended", "counter", "Medium").map(
+      (entry) => entry.slug,
+    ),
+  ).toEqual(["counter"]);
+  expect(practiceProblems(entries, "async", "", "Medium")).toEqual([]);
+  expect(practiceProblems(entries, "closures", "sleep", "Medium")).toEqual([]);
+  expect(practiceProblems(entries, "recommended", "", "Hard")).toEqual([]);
 });

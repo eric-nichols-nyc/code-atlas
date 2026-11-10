@@ -53,9 +53,16 @@ export function CodePanel() {
         <JavaScriptEditor />
       </div>
       <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-t px-3 py-2">
-        <p className="text-xs text-muted-foreground">
-          Session draft · Tab moves focus out
-        </p>
+        <div className="flex min-w-0 flex-wrap items-center gap-2">
+          <p className="text-xs text-muted-foreground" aria-live="polite">
+            {s.codeStatus}
+          </p>
+          {s.restoreUnavailable && (
+            <Button size="sm" variant="ghost" onClick={s.retryRestore}>
+              Retry saved code
+            </Button>
+          )}
+        </div>
         <div className="flex gap-2">
           <Button
             variant="outline"

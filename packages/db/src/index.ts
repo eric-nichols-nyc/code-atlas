@@ -13,7 +13,12 @@ export function getDb(): PrismaClient {
   }
   if (!globalForDb.prisma) {
     globalForDb.prisma = new PrismaClient({
-      adapter: new PrismaNeon({ connectionString }),
+      adapter: new PrismaNeon({
+        connectionString,
+        connectionTimeoutMillis: 4000,
+        query_timeout: 4000,
+        max: 5,
+      }),
     });
   }
   return globalForDb.prisma;

@@ -27,6 +27,10 @@
       "dependsOn": ["^build"],
       "outputs": []
     },
+    "@workspace/db#typecheck": {
+      "dependsOn": ["build"],
+      "outputs": []
+    },
     "db:generate": {
       "cache": false
     },

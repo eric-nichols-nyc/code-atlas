@@ -3,7 +3,7 @@ import {
   findProblem,
   isExecutionResult,
   MAX_SOURCE_BYTES,
-  validMillis,
+  validRunInputs,
 } from "@workspace/problems";
 import { isAuthConfigured } from "@/lib/auth";
 export const runtime = "nodejs";
@@ -29,7 +29,8 @@ export async function POST(
       { status: 403 },
     );
   const { problemId, action } = await params;
-  if (!findProblem(problemId) || !["run", "submit"].includes(action))
+  const problem = findProblem(problemId);
+  if (!problem || !["run", "submit"].includes(action))
     return Response.json(
       { error: "Problem or action unavailable." },
       { status: 404 },
@@ -72,16 +73,9 @@ export async function POST(
       { error: "Provide JavaScript source up to 32 KiB." },
       { status: 400 },
     );
-  if (
-    action === "run" &&
-    body.inputs !== undefined &&
-    (!Array.isArray(body.inputs) ||
-      body.inputs.length < 1 ||
-      body.inputs.length > 5 ||
-      !body.inputs.every(validMillis))
-  )
+  if (action === "run" && !validRunInputs(problem, body.inputs))
     return Response.json(
-      { error: "Use 1–5 integer delays between 1 and 1000ms." },
+      { error: `Use 1–5 test cases. ${problem.inputError}` },
       { status: 400 },
     );
   const token = await session.getToken();
@@ -104,7 +98,7 @@ export async function POST(
           code: body.code,
           ...(action === "run" ? { inputs: body.inputs } : {}),
         }),
-        signal: AbortSignal.any([request.signal, AbortSignal.timeout(12000)]),
+        signal: AbortSignal.any([request.signal, AbortSignal.timeout(20000)]),
         cache: "no-store",
       },
     );

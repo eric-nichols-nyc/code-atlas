@@ -32,6 +32,13 @@
   --color-badge-rose: var(--badge-rose);
   --color-badge-rose-foreground: var(--badge-rose-foreground);
   --color-badge-rose-border: var(--badge-rose-border);
+  --color-difficulty-easy: var(--difficulty-easy);
+  --color-difficulty-medium: var(--difficulty-medium);
+  --color-difficulty-hard: var(--difficulty-hard);
+  --color-category-recommended: var(--category-recommended);
+  --color-category-async: var(--category-async);
+  --color-category-closures: var(--category-closures);
+  --color-category-arrays: var(--category-arrays);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -80,6 +87,13 @@
   --badge-rose: #faeef2;
   --badge-rose-foreground: #713647;
   --badge-rose-border: #e6cbd4;
+  --difficulty-easy: #087a4b;
+  --difficulty-medium: #925d00;
+  --difficulty-hard: #c52e50;
+  --category-recommended: #7548bd;
+  --category-async: #087e91;
+  --category-closures: #99610c;
+  --category-arrays: #245ca6;
 }
 
 .dark {
@@ -110,6 +124,13 @@
   --badge-rose: #301e25;
   --badge-rose-foreground: #deafba;
   --badge-rose-border: #59323e;
+  --difficulty-easy: #34d399;
+  --difficulty-medium: #fbbf24;
+  --difficulty-hard: #fb7185;
+  --category-recommended: #a78bfa;
+  --category-async: #22d3ee;
+  --category-closures: #fbbf24;
+  --category-arrays: #60a5fa;
 }
 
 @layer base {

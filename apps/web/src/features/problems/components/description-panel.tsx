@@ -1,5 +1,6 @@
 "use client";
 
+import { formatProblemInput } from "@workspace/problems";
 import {
   Accordion,
   AccordionContent,
@@ -8,6 +9,8 @@ import {
 } from "@workspace/ui/components/accordion";
 import { Badge } from "@workspace/ui/components/badge";
 import type { ReactNode } from "react";
+import { DifficultyBadge } from "../../catalog/components/difficulty-badge";
+import { topics } from "../../learning/lib/catalog";
 import { useProblemSession } from "../state/problem-session";
 
 export const verdictLabels = {
@@ -20,6 +23,7 @@ export const verdictLabels = {
 
 export function DescriptionPanel({ children }: { children: ReactNode }) {
   const s = useProblemSession();
+  const topic = topics.find((item) => item.id === s.problem.topicId);
   return (
     <section className="learning-panel" aria-label="Problem description">
       <div className="min-h-0 flex-1 overflow-y-auto p-5 [overflow-wrap:anywhere]">
@@ -27,8 +31,8 @@ export function DescriptionPanel({ children }: { children: ReactNode }) {
           {s.problem.title}
         </h1>
         <div className="mb-6 flex gap-2">
-          <Badge variant="secondary">{s.problem.difficulty}</Badge>
-          <Badge variant="rose">Async</Badge>
+          <DifficultyBadge difficulty={s.problem.difficulty} />
+          <Badge variant={topic?.variant}>{topic?.label}</Badge>
         </div>
         {children}
         <div className="mt-6 flex flex-col gap-5">
@@ -36,9 +40,13 @@ export function DescriptionPanel({ children }: { children: ReactNode }) {
             <section key={example.id}>
               <h2 className="mb-2 text-sm font-semibold">Example {i + 1}</h2>
               <div className="rounded-md border-l-2 bg-background p-3 text-sm leading-relaxed">
-                <p className="font-mono">Input: millis = {example.millis}</p>
+                <p className="font-mono [overflow-wrap:anywhere]">
+                  Input: {formatProblemInput(example.input)}
+                </p>
                 <p className="font-mono">
-                  Expected delay: ≈ {example.millis} ms
+                  {typeof example.input === "number"
+                    ? `Expected delay: ≈ ${example.input} ms`
+                    : `Output: ${JSON.stringify(example.expected)}`}
                 </p>
                 <p className="mt-2 text-muted-foreground">
                   {example.explanation}

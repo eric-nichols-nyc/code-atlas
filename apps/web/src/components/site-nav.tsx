@@ -6,17 +6,39 @@ import {
   type GlobalNavItem,
   type GlobalNavLinkProps,
 } from "@workspace/ui/components/global-nav";
+import {
+  BookOpenIcon,
+  CodeXmlIcon,
+  LayoutDashboardIcon,
+} from "@workspace/ui/components/icons";
 import { ThemeSwitcher } from "@workspace/ui/components/theme-switcher";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { NavAuth } from "@/components/nav-auth";
 
 const items: readonly GlobalNavItem[] = [
-  { id: "dashboard", label: "Dashboard", href: "/dashboard" },
+  {
+    id: "dashboard",
+    label: "Dashboard",
+    href: "/dashboard",
+    icon: LayoutDashboardIcon,
+  },
 ];
 const javascriptItems: readonly GlobalNavItem[] = [
-  { id: "learn", label: "Learn", href: "/javascript/learn" },
-  { id: "practice", label: "Practice", href: "/javascript/practice" },
+  {
+    id: "learn",
+    label: "Learn",
+    href: "/javascript/learn",
+    icon: BookOpenIcon,
+    appearance: "text",
+  },
+  {
+    id: "practice",
+    label: "Practice",
+    href: "/javascript/practice",
+    icon: CodeXmlIcon,
+    appearance: "text",
+  },
 ];
 
 function NavLink(props: GlobalNavLinkProps) {
