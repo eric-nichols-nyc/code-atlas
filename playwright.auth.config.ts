@@ -17,7 +17,6 @@ if (!process.env.CLERK_TEST_USER_EMAIL) {
     "Set CLERK_TEST_USER_EMAIL to a dedicated existing development learner (no MFA/session tasks). No tests ran.",
   );
 }
-process.env.CLERK_PUBLISHABLE_KEY = publishable;
 export default defineConfig({
   testDir: "./tests/e2e-auth",
   fullyParallel: false,

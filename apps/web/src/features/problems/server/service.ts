@@ -1,4 +1,7 @@
+import "server-only";
 import { randomUUID } from "node:crypto";
+import { existsSync } from "node:fs";
+import { resolve as resolvePath } from "node:path";
 import { Worker } from "node:worker_threads";
 import {
   type CaseResult,
@@ -17,7 +20,7 @@ export interface ExecutionJob {
   signal?: AbortSignal;
 }
 
-import { privateSuites } from "./private-suites.js";
+import { privateSuites } from "./private-suites";
 
 let active = 0;
 const queue: (() => void)[] = [];
@@ -70,25 +73,31 @@ export async function executeProblem(
           ]
         : visible;
     const result = await new Promise<CaseResult[]>((resolve, reject) => {
-      const path = import.meta.url.endsWith(".ts")
-        ? "./runner-worker.ts"
-        : "./runner-worker.js";
-      const worker = new Worker(new URL(path, import.meta.url), {
-        workerData: {
-          problemId: problem.id,
-          entryFunction: problem.entryFunction,
-          code: job.code,
-          action: job.action,
-          cases: tests,
+      const localWorker = resolvePath(
+        process.cwd(),
+        ".workers/runner-worker.js",
+      );
+      const worker = new Worker(
+        existsSync(localWorker)
+          ? localWorker
+          : resolvePath(process.cwd(), "apps/web/.workers/runner-worker.js"),
+        {
+          workerData: {
+            problemId: problem.id,
+            entryFunction: problem.entryFunction,
+            code: job.code,
+            action: job.action,
+            cases: tests,
+          },
+          env: {},
+          execArgv: [],
+          resourceLimits: {
+            maxOldGenerationSizeMb: 64,
+            maxYoungGenerationSizeMb: 16,
+            stackSizeMb: 4,
+          },
         },
-        env: {},
-        execArgv: [],
-        resourceLimits: {
-          maxOldGenerationSizeMb: 64,
-          maxYoungGenerationSizeMb: 16,
-          stackSizeMb: 4,
-        },
-      });
+      );
       let settled = false;
       const finish = (error?: Error, cases?: CaseResult[]) => {
         if (settled) return;

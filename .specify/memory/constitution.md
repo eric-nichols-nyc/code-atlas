@@ -21,8 +21,10 @@ features; substantial features keep their components, state/hooks, helpers, and 
 in feature folders. Shared shadcn primitives and semantic theme tokens belong in `packages/ui`.
 Prisma schema and server database access belong in `packages/db`.
 
-Public problem contracts and definitions belong in `packages/problems` because web and API
-consume them. Hidden test inputs, judging policy, and execution workers MUST remain in the API.
+Public problem contracts and definitions belong in `packages/problems` for browser and server
+consumers. Hidden test inputs, judging policy and execution workers MUST remain in feature-owned
+Next.js server modules. Privileged entry modules MUST use `server-only`; worker assets MUST stay
+in the server output and retain their isolated native Node execution boundary.
 Trusted authored prose belongs in subject content folders, separate from rendering and execution.
 Extract additional packages only when real consumers need a stable shared interface.
 
@@ -34,9 +36,10 @@ lifecycle and native integration MUST remain separate from learning and practice
 
 Every protected page, Route Handler, Server Action, and API resource MUST verify its own Clerk
 session and required authorization before accessing protected data or executing learner code.
-The Next.js proxy initializes Clerk; it does not replace resource-level authorization. Express
-feature endpoints MUST live under `/v1`, behind the shared authentication boundary. Web API
-adapters MUST validate requests and forward verified credentials to that boundary.
+The Next.js proxy initializes Clerk; it does not replace resource-level authorization. API endpoints
+MUST use App Router Route Handlers under `apps/web/src/app/api`. Protected handlers MUST verify
+Clerk identity through the shared server boundary, validate origins and payloads, and call
+feature-owned server services directly. Ownership MUST come from verified identity, not client input.
 
 Future administrative resources MUST enforce server-side admin authorization with default denial.
 Public setup or navigation pages MUST NOT expose administrative data. Missing credentials MUST
@@ -132,14 +135,15 @@ Practice is the current delivery focus. `/javascript/practice` owns the catalog 
 learning experience; its requirements remain open. Later subjects include Algorithms and React JS.
 Do not treat a practice problem as a guided lesson or require visualization to judge a solution.
 
-The installed baseline is pnpm, Turborepo, TypeScript, one Next.js learner app, an Express API,
+The installed baseline is pnpm, Turborepo, TypeScript, one Next.js application with App Router APIs,
 shared shadcn UI, Clerk, CodeMirror, QuickJS, trusted MDX, Prisma for Neon, Biome, Vitest,
 Playwright, and web bundle analysis. There is currently no admin or Electron app. Preserve the
 application/package boundaries unless a feature brief records the rationale and impact of a change.
 Review bundle analysis for significant client dependencies and load specialized editors on demand.
 
-Sleep is the first complete practice problem for review. Additional problems, connected AI tutoring,
-saved notes, account history/progress, and desktop delivery require their own working slices.
+Sleep, Counter, Debounce and Filter Elements from Array are published practice problems. Account
+flags, solved status and latest Run/Submit source persist in Neon. Additional problems, connected
+AI tutoring, saved notes, individual submission history and desktop delivery require working slices.
 External reference sites provide interaction evidence and design input; their dependencies,
 styles, and source organization do not become project requirements.
 
@@ -177,4 +181,8 @@ added principles or materially expanded guidance, and a patch version for wordin
 Preserve the original ratification date and update the amendment date when content changes.
 Runtime templates read this constitution directly; keep governance here as their source of truth.
 
-**Version**: 2.1.0 | **Ratified**: 2026-11-07 | **Last Amended**: 2026-11-09
+Amendment 2.2.0 consolidates the Express application into Next.js App Router APIs. The user-approved
+refactor changes deployment and request boundaries while preserving server authorization, ownership,
+private test handling and worker isolation. See `docs/features/nextjs-api.md` for migration and checks.
+
+**Version**: 2.2.0 | **Ratified**: 2026-11-07 | **Last Amended**: 2026-11-10

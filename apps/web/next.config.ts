@@ -1,3 +1,4 @@
+import { fileURLToPath } from "node:url";
 import bundleAnalyzer from "@next/bundle-analyzer";
 import createMDX from "@next/mdx";
 import type { NextConfig } from "next";
@@ -5,6 +6,17 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   pageExtensions: ["ts", "tsx", "md", "mdx"],
   transpilePackages: ["@workspace/ui"],
+  serverExternalPackages: ["@workspace/db"],
+  outputFileTracingRoot: fileURLToPath(new URL("../..", import.meta.url)),
+  outputFileTracingIncludes: {
+    "/api/problems/**/*": [
+      "./.workers/**/*",
+      "./node_modules/quickjs-emscripten/**/*",
+      "../../node_modules/.pnpm/quickjs-emscripten@*/**/*",
+      "../../node_modules/.pnpm/quickjs-emscripten-core@*/**/*",
+      "../../node_modules/.pnpm/@jitl+quickjs*/**/*",
+    ],
+  },
   async redirects() {
     return [
       {

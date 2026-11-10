@@ -1,7 +1,7 @@
 import type { getDb } from "@workspace/db";
 import type { ExecutionResult } from "@workspace/problems";
 import { beforeEach, expect, it, vi } from "vitest";
-import { createProgressService } from "./service.js";
+import { createProgressService } from "./progress-service";
 
 const db = {
   user: { upsert: vi.fn(async () => ({ id: "internal-owner" })) },

@@ -5,11 +5,18 @@ export default defineConfig({
   test: {
     projects: [
       {
+        resolve: {
+          alias: {
+            "@": fileURLToPath(new URL("./apps/web/src", import.meta.url)),
+            "server-only": fileURLToPath(
+              new URL("./tests/server-only.ts", import.meta.url),
+            ),
+          },
+        },
         test: {
           name: "server",
           environment: "node",
           include: [
-            "apps/api/src/**/*.test.ts",
             "packages/db/src/**/*.test.ts",
             "apps/web/src/**/*.node.test.ts",
           ],
@@ -43,7 +50,11 @@ export default defineConfig({
     ],
     coverage: {
       provider: "v8",
-      include: ["apps/api/src/app.ts", "packages/ui/src/components/button.tsx"],
+      include: [
+        "apps/web/src/features/**/server/*.ts",
+        "apps/web/src/server/*.ts",
+        "packages/ui/src/components/button.tsx",
+      ],
     },
   },
 });

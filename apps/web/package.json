@@ -4,12 +4,13 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "next dev --port 3000",
-    "build": "pnpm content:check && next build",
+    "dev": "pnpm worker:build && next dev --port 3000",
+    "build": "pnpm worker:build && pnpm content:check && next build",
     "start": "next start --port 3000",
     "typecheck": "next typegen && tsc --noEmit",
-    "analyze": "ANALYZE=true next build --webpack",
-    "content:check": "tsx scripts/validate-learning-content.ts"
+    "analyze": "pnpm worker:build && ANALYZE=true next build --webpack",
+    "content:check": "tsx scripts/validate-learning-content.ts",
+    "worker:build": "tsc -p tsconfig.worker.json"
   },
   "dependencies": {
     "@clerk/nextjs": "7.9.25",
@@ -23,11 +24,14 @@
     "@mdx-js/loader": "3.1.1",
     "@mdx-js/react": "3.1.1",
     "@next/mdx": "16.4.5",
+    "@workspace/db": "workspace:*",
     "@workspace/problems": "workspace:*",
     "@workspace/ui": "workspace:*",
     "next": "16.4.5",
+    "quickjs-emscripten": "0.32.0",
     "react": "19.3.1",
-    "react-dom": "19.3.1"
+    "react-dom": "19.3.1",
+    "server-only": "0.0.1"
   },
   "devDependencies": {
     "@next/bundle-analyzer": "16.4.5",
