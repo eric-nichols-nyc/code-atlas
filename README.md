@@ -28,6 +28,28 @@ The public landing page includes a Counter example that works without an account
 
 </details>
 
+## How It Works
+
+Start by choosing a JavaScript challenge, from a foundational concept like closures
+to something more involved like debouncing.
+
+Once you open a challenge, you'll see the problem description on one side and a code
+editor on the other. Write your solution, experiment with different approaches, and
+click **Run** to check your code against the visible test cases. You can edit these
+inputs to try your own examples.
+
+When you're ready, click **Submit**. Code Atlas evaluates your solution in an isolated
+server-side JavaScript environment against the full test suite, including private
+cases. You'll receive a verdict and feedback to guide your next attempt. Only an
+accepted Submit marks the problem solved.
+
+Your latest executed code is saved to your account after Run or Submit, regardless
+of the verdict. Your flags and solved progress stay with your account too, so you
+can pick up where you left off, even on another device.
+
+The idea is to make learning more hands-on: **read the problem, experiment, get
+feedback, and improve.**
+
 ## What works today
 
 - **Focused practice:** CodeMirror JavaScript editor, resizable panels, hints and solutions,
