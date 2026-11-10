@@ -17,6 +17,7 @@ Only a server-judged accepted Submit marks a problem solved. Saving failures are
 - [Quick start](#quick-start)
 - [Environment and authentication](#environment-and-authentication)
 - [Commands](#commands)
+- [System architecture](#system-architecture)
 - [Where the code lives](#where-the-code-lives)
 - [Feature workflow](#feature-workflow)
 - [Authoring practice problems](#authoring-practice-problems)
@@ -144,6 +145,57 @@ Root `package.json` is the source of truth for scripts.
 | `pnpm db:migrate --name <name>`               | Create/apply a development migration once models and credentials exist   |
 | `pnpm db:deploy` / `pnpm db:studio`           | Apply committed migrations / open Prisma Studio                          |
 | `pnpm specify version` / `pnpm specify check` | Inspect the optional pinned Spec Kit CLI and available tools             |
+
+## System architecture
+
+One Next.js application serves pages and same-origin API Route Handlers. Privileged services
+stay on the server, and learner code runs in an isolated QuickJS worker.
+
+```mermaid
+flowchart TB
+    Browser["Learner’s browser<br/>React UI · CodeMirror"]
+    Clerk["Clerk<br/>Sign-in and sessions"]
+    Neon[("Neon PostgreSQL<br/>User · PracticeProgress")]
+
+    subgraph Next["Next.js application · apps/web · port 3000"]
+        Pages["Pages<br/>Landing · Dashboard · Practice"]
+        Routes["App Router Route Handlers<br/>/api/problems/*<br/>/api/practice-progress/*"]
+        Auth["Server validation<br/>Clerk identity · Origin · Payload limits"]
+        Judge["Problem server services<br/>Run and Submit"]
+        Tests["Private test suites"]
+        Worker["Isolated Node Worker<br/>QuickJS WebAssembly"]
+        Progress["Progress server services<br/>Flags · Solved status · Latest code"]
+        Prisma["packages/db<br/>Prisma + Neon adapter"]
+
+        Routes --> Auth
+        Auth --> Judge
+        Auth --> Progress
+        Tests -.-> Judge
+        Judge <--> Worker
+        Judge -->|Save code and judged result| Progress
+        Progress <--> Prisma
+    end
+
+    Browser <-->|Page navigation| Pages
+    Browser <-->|Same-origin requests| Routes
+    Browser <-->|Authentication| Clerk
+    Clerk -.->|Session verification| Auth
+    Prisma <--> Neon
+
+    Content["Trusted MDX + catalog files"] -.-> Pages
+
+    classDef app fill:#e8f0fe,stroke:#537bc1,color:#142e55
+    classDef server fill:#e6f4ea,stroke:#43835b,color:#163c23
+    classDef data fill:#fff3d6,stroke:#ae8124,color:#543b07
+    class Browser,Pages,Routes,Clerk app
+    class Auth,Judge,Worker,Progress server
+    class Tests,Prisma,Neon,Content data
+```
+
+Protected pages and API handlers verify their own Clerk sessions. Run checks visible cases;
+Submit checks the full server-selected suite. Both save the latest executed source, and only an
+accepted Submit marks a problem solved. Neon stores learner records while authored content stays
+in files. See the ownership map below for shared UI, contracts and server code locations.
 
 ## Where the code lives
 
