@@ -20,11 +20,11 @@ import {
   ArrowRightIcon,
   ArrowUpRightIcon,
   BracesIcon,
-  CircleCheckIcon,
   CodeXmlIcon,
   LayersIcon,
   TimerIcon,
 } from "@workspace/ui/components/icons";
+import { cn } from "@workspace/ui/lib/utils";
 import Link from "next/link";
 import { javascriptPracticeCatalog } from "@/content/javascript/practice/catalog";
 import { DifficultyBadge } from "@/features/catalog/components/difficulty-badge";
@@ -33,6 +33,7 @@ import { practiceProblems } from "@/features/catalog/lib/practice-catalog";
 import { topics } from "@/features/learning/lib/catalog";
 import { landingQuestions, practiceSteps } from "../data/content";
 import { CounterPreview } from "./counter-preview";
+import styles from "./landing-page.module.css";
 
 const topicIcons = {
   closures: BracesIcon,
@@ -40,70 +41,72 @@ const topicIcons = {
   async: TimerIcon,
 };
 
-export function LandingPage() {
+export function LandingPage({
+  startHref,
+}: {
+  startHref: "/sign-in" | "/dashboard";
+}) {
   const published = practiceProblems(javascriptPracticeCatalog, "recommended");
   const javascript = subjects.find((subject) => subject.id === "javascript");
   const upcoming = subjects.filter((subject) => subject.id !== "javascript");
   const topicCount = new Set(published.map((problem) => problem.topicId)).size;
   return (
-    <main className="mx-auto flex w-full max-w-[1200px] min-w-0 flex-1 flex-col gap-20 px-5 pt-16 pb-8 md:gap-24 md:px-6 md:pt-20">
+    <main
+      className={cn(
+        styles.copy,
+        "mx-auto flex w-full max-w-[1200px] min-w-0 flex-1 flex-col gap-20 px-5 pt-16 pb-8 md:gap-24 md:px-6 md:pt-22",
+      )}
+    >
       <section
         aria-labelledby="home-title"
         className="flex flex-col items-center gap-6 text-center"
       >
-        <Badge variant="amber">
-          <CodeXmlIcon aria-hidden="true" />
-          JavaScript is your starting point
-        </Badge>
+        <div className={cn(styles.intro, "inline-flex items-center gap-2")}>
+          <BrandIcon className="size-8 shrink-0" aria-hidden="true" />
+          <span className="text-base font-semibold">Code Atlas</span>
+        </div>
         <h1
           id="home-title"
-          className="max-w-4xl text-4xl leading-[1.06] font-semibold tracking-[-0.045em] sm:text-6xl lg:text-7xl"
+          className={cn(
+            styles.intro,
+            styles.introCopy,
+            "max-w-4xl text-4xl leading-[1.06] font-semibold tracking-[-0.045em] sm:text-6xl lg:text-7xl",
+          )}
         >
-          Know the concept.
-          <br />
+          Know the concept. <br />
           <span className="text-category-closures">Write the code.</span>
         </h1>
-        <p className="max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8">
+        <p
+          className={cn(
+            styles.intro,
+            styles.introCopy,
+            "max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8",
+          )}
+        >
           A focused place to think through JavaScript, solve real problems, and
           turn understanding into something you can actually write.
         </p>
-        <div className="flex w-full flex-col justify-center gap-3 sm:w-auto sm:flex-row">
-          <Button asChild size="lg">
-            <Link href="/javascript/practice" prefetch={false}>
-              Start practicing
-              <ArrowRightIcon data-icon="inline-end" aria-hidden="true" />
-            </Link>
-          </Button>
-          <Button asChild size="lg" variant="outline">
-            <a href="#practice-preview">
-              Try an example
-              <CodeXmlIcon data-icon="inline-end" aria-hidden="true" />
-            </a>
-          </Button>
-        </div>
-        <ul
-          className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs text-muted-foreground"
-          aria-label="Practice benefits"
+        <Button
+          asChild
+          size="lg"
+          variant="secondary"
+          className={cn(
+            styles.startAction,
+            styles.intro,
+            styles.introAction,
+            "h-12 w-full border border-input sm:w-52",
+          )}
         >
-          {[
-            "Real test cases",
-            "A focused workspace",
-            "Progress that stays with you",
-          ].map((label) => (
-            <li key={label} className="flex items-center gap-2">
-              <CircleCheckIcon
-                className="size-3.5 text-difficulty-easy"
-                aria-hidden="true"
-              />
-              {label}
-            </li>
-          ))}
-        </ul>
+          <Link href={startHref} prefetch={false}>
+            Start practicing
+            <ArrowRightIcon data-icon="inline-end" aria-hidden="true" />
+          </Link>
+        </Button>
       </section>
 
       <section
         id="practice-preview"
-        className="min-w-0 scroll-mt-6"
+        className={cn(styles.previewIntro, "min-w-0 scroll-mt-6")}
         aria-label="Try JavaScript without signing in"
       >
         <CounterPreview />
@@ -112,7 +115,11 @@ export function LandingPage() {
       <section
         id="how-it-works"
         aria-labelledby="how-title"
-        className="flex scroll-mt-8 flex-col gap-8"
+        className={cn(
+          styles.intro,
+          styles.contentIntro,
+          "flex scroll-mt-8 flex-col gap-8",
+        )}
       >
         <div className="flex max-w-2xl flex-col gap-3">
           <p className="text-xs font-medium tracking-widest text-muted-foreground uppercase">
@@ -168,7 +175,11 @@ export function LandingPage() {
       <section
         id="subjects"
         aria-labelledby="subjects-title"
-        className="flex scroll-mt-8 flex-col gap-8"
+        className={cn(
+          styles.intro,
+          styles.contentIntro,
+          "flex scroll-mt-8 flex-col gap-8",
+        )}
       >
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div className="flex max-w-xl flex-col gap-3">
@@ -286,7 +297,11 @@ export function LandingPage() {
       </section>
 
       <section
-        className="mx-auto flex w-full max-w-3xl flex-col gap-6"
+        className={cn(
+          styles.intro,
+          styles.contentIntro,
+          "mx-auto flex w-full max-w-3xl flex-col gap-6",
+        )}
         aria-labelledby="questions-title"
       >
         <h2
@@ -307,7 +322,11 @@ export function LandingPage() {
 
       <section
         aria-labelledby="start-title"
-        className="flex flex-col items-center gap-5 rounded-xl border bg-card px-6 py-12 text-center sm:py-16"
+        className={cn(
+          styles.intro,
+          styles.contentIntro,
+          "flex flex-col items-center gap-5 rounded-xl border bg-card px-6 py-12 text-center sm:py-16",
+        )}
       >
         <BrandIcon
           className="size-8 text-muted-foreground"

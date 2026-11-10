@@ -8,6 +8,7 @@ import {
   CircleIcon,
   FlagIcon,
   LayersIcon,
+  Repeat2Icon,
   SearchIcon,
   StarIcon,
   TimerIcon,
@@ -70,9 +71,9 @@ export function JavaScriptPractice({
   const hasProblems = catalog.some((entry) => entry.status === "published");
 
   return (
-    <main className="mx-auto flex w-full max-w-[1200px] min-w-0 flex-1 flex-col gap-8 px-5 py-8 md:px-6 md:py-10">
+    <main className="mx-auto flex w-full max-w-[1920px] min-w-0 flex-1 flex-col gap-11 px-5 pt-6 pb-8 md:px-8 md:pt-14 lg:px-14">
       <header className="max-w-2xl">
-        <h1 className="text-[28px] leading-9 font-semibold tracking-tight md:text-4xl md:leading-11">
+        <h1 className="text-[28px] leading-9 font-semibold tracking-tight md:text-[40px] md:leading-[50px]">
           JavaScript practice
         </h1>
       </header>
@@ -96,19 +97,23 @@ export function JavaScriptPractice({
         orientation="vertical"
         value={selectedId}
         onValueChange={setCategory}
-        className="min-w-0 flex-col gap-6 md:grid md:grid-cols-[220px_minmax(0,1fr)] md:items-start md:gap-8"
+        className="min-w-0 flex-col gap-6 lg:grid lg:grid-cols-[280px_minmax(0,1fr)] lg:items-start"
       >
         <aside
           className="flex min-w-0 flex-col gap-3"
           aria-label="Problem categories"
         >
           <h2 className="text-sm font-medium">Categories</h2>
-          <TabsList aria-label="Problem categories" className="w-full">
+          <TabsList
+            variant="panel"
+            aria-label="Problem categories"
+            className="w-full"
+          >
             {categories.map((item) => (
               <TabsTrigger
                 key={item.id}
                 value={item.id}
-                className="min-h-11 gap-3 px-3"
+                className="min-h-[45px] gap-3 px-3"
               >
                 {item.id === "recommended" ? (
                   <StarIcon
@@ -134,6 +139,12 @@ export function JavaScriptPractice({
                     data-icon="inline-start"
                     className="text-category-arrays"
                   />
+                ) : item.id === "generators" ? (
+                  <Repeat2Icon
+                    aria-hidden="true"
+                    data-icon="inline-start"
+                    className="text-category-generators"
+                  />
                 ) : null}
                 <span className="min-w-0 flex-1 truncate text-left">
                   {item.label}
@@ -153,7 +164,7 @@ export function JavaScriptPractice({
           >
             <div className="flex flex-wrap items-center justify-between gap-4 border-b px-4 py-5 sm:px-5">
               <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1">
-                <h2 className="text-[22px] leading-[30px] font-semibold">
+                <h2 className="text-xl leading-7 font-semibold">
                   {selected?.heading}
                 </h2>
                 <p role="status" className="text-sm text-muted-foreground">
@@ -167,7 +178,8 @@ export function JavaScriptPractice({
                 <Select value={difficulty} onValueChange={setDifficulty}>
                   <SelectTrigger
                     id={difficultyId}
-                    className="w-full sm:w-40"
+                    size="sm"
+                    className="w-full sm:w-[148px]"
                     aria-label="Difficulty"
                   >
                     <SelectValue placeholder="Difficulty" />
@@ -183,10 +195,10 @@ export function JavaScriptPractice({
                     </SelectGroup>
                   </SelectContent>
                 </Select>
-                <div className="relative w-full sm:w-64">
+                <div className="relative w-full sm:w-80">
                   <SearchIcon
                     aria-hidden="true"
-                    className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
+                    className="pointer-events-none absolute top-1/2 left-4 size-4 -translate-y-1/2 text-muted-foreground"
                   />
                   <Label htmlFor={searchId} className="sr-only">
                     Search problems
@@ -197,29 +209,29 @@ export function JavaScriptPractice({
                     placeholder="Search problems…"
                     value={query}
                     onChange={(event) => setQuery(event.target.value)}
-                    className="pl-9"
+                    className="h-11 pl-11"
                   />
                 </div>
               </div>
             </div>
             <Table aria-label="Practice problems" className="table-fixed">
               <TableHeader>
-                <TableRow>
-                  <TableHead scope="col" className="px-3 sm:px-5">
+                <TableRow className="h-[44.5px]">
+                  <TableHead scope="col" className="px-3 sm:pr-0 sm:pl-[52px]">
                     Problem
                   </TableHead>
-                  <TableHead scope="col" className="w-20 px-2 sm:w-28 sm:px-5">
+                  <TableHead scope="col" className="w-20 px-2 sm:w-28 sm:px-0">
                     Difficulty
                   </TableHead>
                   <TableHead
                     scope="col"
-                    className="hidden px-3 sm:table-cell sm:w-36 sm:px-5"
+                    className="hidden px-3 sm:table-cell sm:w-[190px] sm:px-0"
                   >
                     Topic
                   </TableHead>
                   <TableHead
                     scope="col"
-                    className="w-10 px-2 text-center sm:w-20 sm:px-3"
+                    className="w-10 px-2 text-center sm:w-[92px] sm:pr-5 sm:pl-0 sm:text-right"
                   >
                     <span className="sr-only sm:not-sr-only">Solved</span>
                     <CircleCheckIcon
@@ -242,9 +254,13 @@ export function JavaScriptPractice({
                     const legacy = records.legacySolved.includes(entry.id);
                     const SolvedIcon = solved ? CircleCheckIcon : CircleIcon;
                     return (
-                      <TableRow key={entry.id}>
-                        <TableCell className="px-3 py-4 whitespace-normal sm:px-5">
-                          <div className="flex min-w-0 items-center gap-2">
+                      <TableRow
+                        key={entry.id}
+                        variant="striped"
+                        className="h-[58px]"
+                      >
+                        <TableCell className="px-3 py-2 whitespace-normal sm:pr-0 sm:pl-5">
+                          <div className="flex min-w-0 items-center">
                             <Button
                               type="button"
                               variant="ghost"
@@ -283,7 +299,7 @@ export function JavaScriptPractice({
                             </Link>
                           </div>
                         </TableCell>
-                        <TableCell className="px-2 py-4 sm:px-5">
+                        <TableCell className="px-2 py-2 sm:px-0">
                           <DifficultyBadge difficulty={entry.difficulty} />
                           <div className="mt-1 sm:hidden">
                             <Badge variant={topic?.variant}>
@@ -291,10 +307,10 @@ export function JavaScriptPractice({
                             </Badge>
                           </div>
                         </TableCell>
-                        <TableCell className="hidden px-3 py-4 sm:table-cell sm:px-5">
+                        <TableCell className="hidden px-3 py-2 sm:table-cell sm:px-0">
                           <Badge variant={topic?.variant}>{topic?.label}</Badge>
                         </TableCell>
-                        <TableCell className="px-2 py-4 text-center sm:px-3">
+                        <TableCell className="px-2 py-2 text-center sm:pr-5 sm:pl-0 sm:text-right">
                           <span
                             role="img"
                             aria-label={`${entry.title}: ${!records.ready ? "loading status" : solved ? "solved in your account" : legacy ? "previous browser completion, unverified" : "not solved"}`}

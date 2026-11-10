@@ -1,4 +1,7 @@
-import type { ExecutionResult } from "@workspace/problems";
+import {
+  type ExecutionResult,
+  fibonacciGeneratorProblem,
+} from "@workspace/problems";
 import { beforeEach, expect, it, vi } from "vitest";
 import type { ProgressService } from "@/features/catalog/server/progress-service";
 import { createExecutionHandler } from "./handler";
@@ -83,6 +86,7 @@ it("bounds source and JSON and validates all current problem inputs before sched
     ["javascript.sleep", [0]],
     ["javascript.counter", [{ n: 0, calls: 1001 }]],
     ["javascript.debounce", [{ t: -1, calls: [] }]],
+    ["javascript.fibonacci-generator", [{ count: 51 }]],
     [
       "javascript.filter-elements-from-array",
       [{ arr: [1], predicate: "unknown" }],
@@ -228,3 +232,35 @@ it("runs and submits real Sleep source through the Next handler with private dia
   for (const c of result.cases.filter((c) => c.hidden))
     expect(c).not.toHaveProperty("input");
 }, 10000);
+
+it("runs the generator through the authenticated Next boundary and saves its real Submit verdict", async () => {
+  const post = createExecutionHandler({ progress });
+  const id = fibonacciGeneratorProblem.id;
+  const code = fibonacciGeneratorProblem.solution;
+  const ran = await post(
+    req({ code, inputs: [{ count: 12 }] }),
+    context("run", id),
+  );
+  expect(await ran.json()).toMatchObject({
+    verdict: "accepted",
+    total: 1,
+    persistence: "saved",
+  });
+  const submitted = await post(
+    req({ code, inputs: [{ count: 999 }] }),
+    context("submit", id),
+  );
+  expect(await submitted.json()).toMatchObject({
+    verdict: "accepted",
+    total: 9,
+    passed: 9,
+  });
+  expect(progress.recordExecution).toHaveBeenLastCalledWith(
+    "owner-a",
+    id,
+    code,
+    expect.any(Date),
+    "submit",
+    expect.objectContaining({ verdict: "accepted" }),
+  );
+});

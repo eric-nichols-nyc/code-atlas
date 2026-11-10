@@ -1,7 +1,22 @@
 import { expect, type Page, test } from "@playwright/test";
-import { sleepProblem } from "@workspace/problems";
+import { fibonacciGeneratorProblem, sleepProblem } from "@workspace/problems";
 
 const path = "/javascript/practice/sleep";
+test("signed-in landing action opens Dashboard without the global header", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await expect(
+    page.getByRole("navigation", { name: "Main navigation" }),
+  ).toHaveCount(0);
+  await page
+    .getByRole("link", { name: "Start practicing", exact: true })
+    .click();
+  await expect(page).toHaveURL(/\/dashboard$/);
+  await expect(
+    page.getByRole("heading", { name: "Subjects to explore", exact: true }),
+  ).toBeVisible();
+});
 async function solution(page: Page) {
   await page
     .getByRole("textbox", { name: "JavaScript solution" })
@@ -14,6 +29,32 @@ async function noOverflow(page: Page) {
     ),
   ).toBe(true);
 }
+test("Generators → Fibonacci → edited Run → accepted Submit → restored code", async ({
+  page,
+}) => {
+  await page.goto("/javascript/practice");
+  await page.getByRole("tab", { name: "Generators", exact: true }).click();
+  await page
+    .getByRole("link", { name: "Fibonacci Generator", exact: true })
+    .click();
+  await expect(
+    page.getByRole("heading", { name: "Fibonacci Generator", exact: true }),
+  ).toBeVisible();
+  await page
+    .getByRole("textbox", { name: "JavaScript solution" })
+    .fill(fibonacciGeneratorProblem.solution);
+  await page.getByRole("spinbutton", { name: "count =" }).fill("50");
+  await page.getByRole("button", { name: "Run", exact: true }).click();
+  await expect(page.getByText("3/3 tests passed · Run")).toBeVisible();
+  await page.getByRole("button", { name: "Submit", exact: true }).click();
+  await expect(page.getByText("9/9 tests passed · Submit")).toBeVisible();
+  await page.reload();
+  await expect(
+    page.getByRole("textbox", { name: "JavaScript solution" }),
+  ).toHaveText(fibonacciGeneratorProblem.solution);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await noOverflow(page);
+});
 test("dashboard → JavaScript → editable Sleep problem", async ({ page }) => {
   await page.goto("/dashboard");
   await page.getByRole("link", { name: "Explore JavaScript" }).click();

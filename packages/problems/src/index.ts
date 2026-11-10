@@ -1,5 +1,7 @@
 import { counterProblem } from "./problems/counter.js";
 import { debounceProblem } from "./problems/debounce.js";
+import { delayEachPromiseProblem } from "./problems/delay-each-promise.js";
+import { fibonacciGeneratorProblem } from "./problems/fibonacci-generator.js";
 import {
   filterArrayProblem,
   filterPredicates,
@@ -17,6 +19,8 @@ export * from "./types.js";
 export {
   counterProblem,
   debounceProblem,
+  delayEachPromiseProblem,
+  fibonacciGeneratorProblem,
   filterArrayProblem,
   filterPredicates,
   sleepProblem,
@@ -26,6 +30,8 @@ export const publicProblems = [
   counterProblem,
   debounceProblem,
   filterArrayProblem,
+  fibonacciGeneratorProblem,
+  delayEachPromiseProblem,
 ];
 export function findProblem(slugOrId: string) {
   return publicProblems.find((p) => p.slug === slugOrId || p.id === slugOrId);
@@ -54,7 +60,24 @@ export function validProblemInput(
   if (problem.kind === "delay") return validMillis(value);
   if (!value || typeof value !== "object" || Array.isArray(value)) return false;
   const input = value as Record<string, unknown>;
+  if (problem.kind === "fibonacci-generator")
+    return Object.keys(input).length === 1 && integer(input.count, 0, 50);
   if (Object.keys(input).length !== 2) return false;
+  if (problem.kind === "delay-all")
+    return (
+      integer(input.ms, 0, 1000) &&
+      Array.isArray(input.functions) &&
+      input.functions.length <= 10 &&
+      input.functions.every(
+        (item) =>
+          item &&
+          typeof item === "object" &&
+          !Array.isArray(item) &&
+          Object.keys(item).length === 2 &&
+          integer(item.t, 0, 1000) &&
+          integer(item.value, -1e9, 1e9),
+      )
+    );
   if (problem.kind === "counter")
     return integer(input.n, -1000, 1000) && integer(input.calls, 0, 1000);
   if (problem.kind === "debounce")
@@ -91,6 +114,9 @@ export function validRunInputs(
 }
 export function formatProblemInput(input: ProblemInput) {
   if (typeof input === "number") return `millis = ${input}`;
+  if ("ms" in input)
+    return `ms = ${input.ms}, functions = ${JSON.stringify(input.functions)}`;
+  if ("count" in input) return `count = ${input.count}`;
   if ("n" in input) return `n = ${input.n}, calls = ${input.calls}`;
   if ("arr" in input)
     return `arr = ${JSON.stringify(input.arr)}, fn = ${input.predicate}`;

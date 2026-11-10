@@ -160,7 +160,7 @@ export function CounterPreview() {
                       >
                         <span>
                           counter(){" "}
-                          <span className="text-muted-foreground/60">
+                          <span className="text-muted-foreground">
                             #{entry.call}
                           </span>
                         </span>

@@ -30,6 +30,8 @@ const tabsListVariants = cva(
     variants: {
       variant: {
         default: "bg-muted",
+        panel:
+          "gap-1 rounded-md border bg-card p-3 [&_[data-slot=tabs-trigger][data-state=active]]:border-transparent [&_[data-slot=tabs-trigger][data-state=active]]:bg-accent [&_[data-slot=tabs-trigger][data-state=active]]:shadow-none",
         line: "gap-1 bg-transparent",
       },
     },

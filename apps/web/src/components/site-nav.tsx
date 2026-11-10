@@ -40,38 +40,18 @@ const javascriptItems: readonly GlobalNavItem[] = [
     appearance: "text",
   },
 ];
-const landingItems: readonly GlobalNavItem[] = [
-  {
-    id: "example",
-    label: "Try it",
-    href: "#practice-preview",
-    appearance: "text",
-  },
-  {
-    id: "how",
-    label: "How it works",
-    href: "#how-it-works",
-    appearance: "text",
-  },
-  { id: "subjects", label: "Subjects", href: "#subjects", appearance: "text" },
-];
-
 function NavLink(props: GlobalNavLinkProps) {
   return <Link {...props} prefetch={false} />;
 }
 
 export function SiteNav({ authConfigured }: { authConfigured: boolean }) {
   const pathname = usePathname();
-  // Problem workspaces provide their own compact navigation back to the catalog.
-  if (/^\/javascript\/practice\/[^/]+\/?$/.test(pathname)) return null;
+  // The public landing and focused workspaces provide their own navigation.
+  if (pathname === "/" || /^\/javascript\/practice\/[^/]+\/?$/.test(pathname))
+    return null;
   const inJavaScript =
     pathname === "/javascript" || pathname.startsWith("/javascript/");
-  const onLanding = pathname === "/";
-  const navigationItems = inJavaScript
-    ? javascriptItems
-    : onLanding
-      ? landingItems
-      : [];
+  const navigationItems = inJavaScript ? javascriptItems : [];
   const activeItem = [...items, ...navigationItems].find((item) =>
     item.href === "/"
       ? pathname === "/"
@@ -88,7 +68,7 @@ export function SiteNav({ authConfigured }: { authConfigured: boolean }) {
       }
       items={navigationItems}
       leadingItems={items}
-      itemsAlign={inJavaScript || onLanding ? "center" : "start"}
+      itemsAlign={inJavaScript ? "center" : "start"}
       activeItemId={activeItem?.id}
       containerClassName="max-w-none"
       linkComponent={NavLink}

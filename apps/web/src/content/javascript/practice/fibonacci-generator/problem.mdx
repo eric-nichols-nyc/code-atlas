@@ -1,0 +1,15 @@
+Write `function* fibonacciGenerator()` to generate the Fibonacci sequence, one number at a time.
+
+The sequence begins with **0, 1**. Every later number is the sum of the previous two. Use `yield` to pause after producing each number and resume when the caller asks for another.
+
+```javascript
+const sequence = fibonacciGenerator();
+sequence.next(); // { value: 0, done: false }
+sequence.next(); // { value: 1, done: false }
+sequence.next(); // { value: 1, done: false }
+sequence.next(); // { value: 2, done: false }
+```
+
+Return a synchronous iterable iterator that continues yielding values, rather than an array or a Promise. Creating a second generator must start a separate sequence without resetting or advancing the first.
+
+In the test panel, `count` controls how many times the judge calls `.next()`. It is **not an argument** to your function. The output collects the yielded numbers. A count of zero produces an empty array. The judge reads only a bounded prefix; do not try to collect the entire infinite sequence with spread or `Array.from`.

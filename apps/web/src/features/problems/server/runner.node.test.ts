@@ -1,10 +1,101 @@
 import {
   counterProblem,
   debounceProblem,
+  fibonacciGeneratorProblem,
   filterArrayProblem,
 } from "@workspace/problems";
 import { describe, expect, it } from "vitest";
 import { executeProblem } from "./service.js";
+
+describe("isolated Fibonacci generator judging", () => {
+  const job = {
+    problemId: fibonacciGeneratorProblem.id,
+    code: fibonacciGeneratorProblem.solution,
+  };
+  it("runs edited counts including zero and the longest supported prefix", async () => {
+    const result = await executeProblem({
+      ...job,
+      action: "run",
+      inputs: [{ count: 0 }, { count: 1 }, { count: 50 }],
+    });
+    expect(result.verdict).toBe("accepted");
+    expect(result.cases[0]?.actual).toEqual([]);
+    expect(result.cases[1]?.actual).toEqual([0]);
+    expect(result.cases[2]?.actual).toHaveLength(50);
+    expect(result.cases[2]?.actual?.at(-1)).toBe(7778742049);
+  });
+  it("submits the full private suite and redacts hidden diagnostics", async () => {
+    const result = await executeProblem({ ...job, action: "submit" });
+    expect(result).toMatchObject({ verdict: "accepted", total: 9, passed: 9 });
+    for (const item of result.cases.filter((c) => c.hidden)) {
+      expect(item.input).toBeUndefined();
+      expect(item.actual).toBeUndefined();
+      expect(item.expected).toBeUndefined();
+      expect(item.logs).toEqual([]);
+    }
+  });
+  it.each([
+    ["function fibonacciGenerator(){return [0,1,1,2,3]}", "runtime-error"],
+    ["async function* fibonacciGenerator(){yield 0}", "runtime-error"],
+    [
+      "function* fibonacciGenerator(){yield* [0,1,1,2,3,5,8,13]}",
+      "wrong-answer",
+    ],
+    ["function* fibonacciGenerator(){while(true) yield 1}", "wrong-answer"],
+    ["function* fibonacciGenerator(){yield '0'}", "wrong-answer"],
+    ["function* fibonacciGenerator(){yield NaN}", "wrong-answer"],
+    [
+      "function* fibonacciGenerator(){throw new Error('broken')}",
+      "runtime-error",
+    ],
+    ["function* fibonacciGenerator(){while(true){}}", "time-limit-exceeded"],
+    [
+      "function fibonacciGenerator(){return {get next(){while(true){}}}}",
+      "time-limit-exceeded",
+    ],
+    [
+      "function fibonacciGenerator(){return {next(){return {done:false,get value(){while(true){}}}},[Symbol.iterator](){return this}}}",
+      "time-limit-exceeded",
+    ],
+    ["function* fibonacciGenerator( {", "compile-error"],
+  ])(
+    "rejects invalid or unbounded generator behavior: %s",
+    async (code, verdict) => {
+      const result = await executeProblem({ ...job, code, action: "submit" });
+      expect(result.verdict).toBe(verdict);
+    },
+  );
+  it("rejects shared global state and a reused singleton iterator", async () => {
+    for (const code of [
+      "let a=0,b=1; function* fibonacciGenerator(){while(true){yield a;[a,b]=[b,a+b]}}",
+      "const shared=(function*(){let a=0,b=1;while(true){yield a;[a,b]=[b,a+b]}})();function fibonacciGenerator(){return shared}",
+    ]) {
+      const result = await executeProblem({ ...job, code, action: "submit" });
+      expect(result.verdict).toBe("wrong-answer");
+    }
+  });
+  it("captures judge intrinsics before learner code and recovers after interruption", async () => {
+    expect(
+      (
+        await executeProblem({
+          ...job,
+          action: "run",
+          inputs: [{ count: 5 }],
+          code: "function* fibonacciGenerator(){while(true){}}",
+        })
+      ).verdict,
+    ).toBe("time-limit-exceeded");
+    expect(
+      (
+        await executeProblem({
+          ...job,
+          action: "submit",
+          code: `Reflect.apply = () => 0; Number.isFinite = () => false; ${job.code}`,
+        })
+      ).verdict,
+    ).toBe("accepted");
+  });
+});
 
 const good =
   "function sleep(millis){return new Promise(resolve=>setTimeout(resolve,millis));}";

@@ -7,6 +7,9 @@ export const problemStatements: Record<
   sleep: () => import("./sleep/problem.mdx"),
   counter: () => import("./counter/problem.mdx"),
   debounce: () => import("./debounce/problem.mdx"),
+  "delay-the-resolution-of-each-promise": () =>
+    import("./delay-the-resolution-of-each-promise/problem.mdx"),
+  "fibonacci-generator": () => import("./fibonacci-generator/problem.mdx"),
   "filter-elements-from-array": () =>
     import("./filter-elements-from-array/problem.mdx"),
 };

@@ -18,6 +18,14 @@ Last updated: 2026-11-09.
 
 Use the full Card composition. Keep titles in the CardTitle component; use semantic headings through its children when the page needs them. Theme values are defined once in `packages/ui/src/styles/globals.css`.
 
+Dark palette matched to the supplied TraceCode practice reference on 2026-11-10:
+page/header `--background: #0e0e0e`, shared panels `--card: #111111`,
+overlays `--popover: #141414`, muted surfaces `--muted: #1d1d1d`,
+active/secondary surfaces `#242424`, and solid subtle borders `#232323`.
+Primary text is `#f9f9f9`; supporting text is `#a3a3a3`. Keep these values in
+the shared theme and consume semantic classes throughout the app. Light theme
+keeps its existing palette. Difficulty and category accents retain their roles.
+
 ## Buttons
 
 File: `packages/ui/src/components/button.tsx`.
@@ -86,24 +94,47 @@ Keep Clerk and session decisions in app-owned components passed through GlobalNa
 ## Public home page
 
 Files: `apps/web/src/features/landing/components/landing-page.tsx`, `counter-preview.tsx`; composed by `apps/web/src/app/page.tsx`.
-Last updated: 2026-11-09.
+Last updated: 2026-11-10.
 
-| Property       | Pattern                                                                             |
-| -------------- | ----------------------------------------------------------------------------------- |
-| Background     | Inherited `bg-background`; shared Cards use `bg-card`                               |
-| Text           | `text-foreground`; supporting copy uses `text-muted-foreground`                     |
-| Hero heading   | `text-4xl leading-[1.06] font-semibold tracking-[-0.045em]`, larger on wide screens |
-| Hero accent    | `text-category-closures`; theme-owned amber                                         |
-| Page spacing   | `px-5 pt-16 pb-8`, `gap-20` between sections                                        |
-| Panels         | Shared Card composition, `rounded-xl border shadow-sm`; `gap-4` between cards       |
-| Primary action | Default Button, `size="lg"`                                                         |
-| Browse action  | Outline Button, `size="lg"`                                                         |
-| Subject status | Amber Badge for available; disabled outline Button for coming soon                  |
-| Focus / hover  | Shared Button variants                                                              |
+| Property       | Pattern                                                                                                                                     |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| Background     | Inherited `bg-background`; shared Cards use `bg-card`                                                                                       |
+| Text           | Landing-scoped foreground copy, including supporting copy, badges, labels and footer; white in dark mode, readable foreground in light mode |
+| Hero heading   | `text-4xl leading-[1.06] font-semibold tracking-[-0.045em]`, larger on wide screens                                                         |
+| Hero accent    | White foreground through the landing-only theme scope                                                                                       |
+| Page spacing   | `px-5 pt-16 pb-8`, `gap-20` between sections                                                                                                |
+| Panels         | Shared Card composition, `rounded-xl border shadow-sm`; `gap-4` between cards                                                               |
+| Branding       | Centered 32px BrandIcon and 16px semibold Code Atlas text above the headline; no hero tag                                                   |
+| Primary action | One Start practicing link, 48px tall and 208px wide on desktop; white surface with black label in both themes                               |
+| Subject status | Amber Badge for available; disabled outline Button for coming soon                                                                          |
+| Focus / hover  | Shared Button variants                                                                                                                      |
 
-Use semantic section headings. Primary actions link to JavaScript Practice or Counter; secondary hero action jumps to the live example. Public home navigation uses centered text links to Try it, How it works and Subjects, while Dashboard remains beside the brand. List published problems from catalog metadata and label unfinished subjects "Coming soon".
+Use semantic section headings. The public home page has no GlobalNav. Resolve the
+hero's Start practicing destination from verified Clerk identity on the server:
+signed-in learners go directly to `/dashboard`; other visitors go to `/sign-in`.
+Missing Clerk configuration uses the sign-in route without attempting session
+access. Keep the hero to branding, headline, description and one action; omit the
+Try an example button and the three benefit labels. Other page sections keep their
+existing Counter/practice links. List published problems from catalog metadata
+and label unfinished subjects "Coming soon".
 
-The preview uses shared Cards, Buttons, Badges and Tabs: muted captions, `text-sm leading-6` prose, `font-mono text-[13px] leading-7` source with existing code tokens, and `text-5xl font-mono text-category-closures` return values. Description, source and controls stack on narrow screens. Keep card descriptions in their first grid column when an action is hidden. Wrap source lines and retain focus rings. The fixed Counter example supports call, starting-value selection and reset; it never pretends to submit, save or judge learner code. FAQ uses the shared single-open Accordion.
+The preview uses shared Cards, Buttons, Badges and Tabs: foreground captions, `text-sm leading-6` prose, `font-mono text-[13px] leading-7` source with existing code tokens, and `text-5xl font-mono` foreground return values. Description, source and controls stack on narrow screens. Keep card descriptions in their first grid column when an action is hidden. Wrap source lines and retain focus rings. The fixed Counter example supports call, starting-value selection and reset; it never pretends to submit, save or judge learner code. FAQ uses the shared single-open Accordion.
+
+`landing-page.module.css` scopes the foreground aliases to the landing main.
+Supporting text, colored badge labels and hero accents render
+white in dark mode; action labels stay readable on dark neutral buttons. Coming
+soon buttons remain disabled with full-opacity labels. Keep syntax highlighting
+inside the source example. Other routes retain their existing semantic colors.
+The primary hero action supplies its own white secondary surface and black
+secondary foreground through scoped theme tokens; preserve the shared focus ring.
+The logo enters immediately, heading/description after 90ms and action after
+180ms, each over 680ms. The preview enters over 520ms after 220ms; lower sections
+share a 260ms entrance delay. Motion fades opacity 0→1 and moves translateY
+16px→0 with `cubic-bezier(0.22,1,0.36,1)`. These are observed TraceCode reference
+values, recorded in the landing feature brief. Keep intro motion in the landing
+CSS module and animate only transform/opacity; reduced motion removes the entrance
+entirely. No JavaScript timer, loading screen, permanent `will-change`, or exit
+delay is needed.
 
 ## Learner dashboard
 
@@ -208,27 +239,60 @@ Learn and Practice remain subject-level links, and page headings identify the cu
 Files: `apps/web/src/features/catalog/components/javascript-practice.tsx`,
 `apps/web/src/features/catalog/lib/practice-catalog.ts`, and
 `apps/web/src/content/javascript/practice/catalog.ts`.
-Last updated: 2026-11-09. Reference: TraceCode practice category sidebar and list.
+Last updated: 2026-11-10. Reference: TraceCode practice category sidebar and list.
 
-| Property        | Pattern                                                                                                                                |
-| --------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| Categories      | Shared vertical Tabs, default TabsList surface and active/focus states; `min-h-11` triggers                                            |
-| Category icons  | Decorative Star/Braces/Layers/Timer for Recommended/Closures/Arrays/Async; semantic purple/amber/blue/cyan colors and shared icon size |
-| Category counts | Secondary Badge with real published counts; result count announced in the selected panel                                               |
-| Main heading    | Existing subject heading sizes; panel headings 22/30px, supporting text muted                                                          |
-| Row surface     | Shared Table in one card surface with border and rounded-md corners; header/search above rows; no shadow                               |
-| Row spacing     | 16px vertical cell padding, 12px horizontal increasing to 20px on larger screens                                                       |
-| Row labels      | Flag and problem title link, Difficulty, Topic and Solved; no description beneath the title                                            |
-| Search          | Decorative Search icon inside the input, hidden accessible label, and shared Select for difficulty; empty results can clear filters    |
+| Property        | Pattern                                                                                                                                                                          |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Categories      | Shared vertical Tabs with `TabsList variant="panel"`: bordered `bg-card`, `rounded-md`, `p-3`, `gap-1`; active item uses `bg-accent` without shadow; 45px minimum trigger height |
+| Category icons  | Decorative Star/Braces/Layers/Repeat2/Timer for Recommended/Closures/Arrays/Generators/Async; semantic purple/amber/blue/pink/cyan colors and shared icon size                   |
+| Category counts | Secondary Badge with real published counts; result count announced in the selected panel                                                                                         |
+| Main heading    | Subject heading 40/50px on desktop; panel headings 20/28px, supporting text muted                                                                                                |
+| Row surface     | Shared Table in one `bg-card` surface with border and rounded-md corners; `TableRow variant="striped"` uses `even:bg-muted/30`, hover `bg-muted/70`; no shadow                   |
+| Row spacing     | 58px minimum row height, 8px vertical cell padding; 20px desktop outer gutters, 32px flag area, aligned title/header and fixed metadata columns                                  |
+| Row labels      | Flag and problem title link, Difficulty, Topic and Solved; no description beneath the title                                                                                      |
+| Search          | Decorative Search icon inside the input, hidden accessible label, and shared Select for difficulty; empty results can clear filters                                              |
 
 Recommended is an explicit curated view; each topic category lists its published
-problems. All four published problems are recommended and appear in their own topic category. Do not duplicate problem records for
+problems. All published problems are recommended and appear in their own topic category. Do not duplicate problem records for
 recommendations, invent progress or show empty topic categories. Desktop places
 categories beside the list; narrow screens stack categories above it. Tabs own
 keyboard navigation and selection. Keep the global header separate from content
 filtering. The page title has no supporting subtitle. Use semantic table headings and a single
 title link per problem. Search, category and difficulty filters intersect; clearing filters
 preserves the selected category. Keep table overflow contained on narrow screens.
+
+Measured directly from the [live reference](https://tracecode.app/practice) on
+2026-11-10 using DOM bounds and computed styles, at a **1280 × 720 CSS-pixel
+viewport with device pixel ratio 1**. Code Atlas was checked at the same viewport:
+
+| Measurement                               | Reference and Code Atlas               |
+| ----------------------------------------- | -------------------------------------- |
+| Page maximum width                        | 1920px, centered; computed CSS maximum |
+| Desktop page side padding                 | 56px                                   |
+| Desktop content width at 1280px           | 1168px                                 |
+| Sidebar outer width                       | 280px                                  |
+| Sidebar border / inner padding            | 1px / 12px each side                   |
+| Category button width                     | 254px = 280 − 2 borders − 24 padding   |
+| Category button height / gap              | 45px / 4px                             |
+| Sidebar-to-table gap                      | 24px                                   |
+| Table panel / inner table width at 1280px | 864px / 862px                          |
+| Table toolbar height                      | 85px when controls share one row       |
+| Table header / normal row height          | 44.5px / 58px                          |
+| Difficulty / topic column width           | 112px / 190px                          |
+| Solved area                               | 72px plus 20px right gutter            |
+| Search input / difficulty control width   | 320px / 148px                          |
+| Search input / difficulty control height  | 44px / 32px                            |
+
+Use `max-w-[1920px]`, `lg:px-14`, `gap-6` and
+`lg:grid-cols-[280px_minmax(0,1fr)]`. Below 1024px, Code Atlas stacks its existing
+category controls above the table; page side padding is 32px from 768px and 20px
+below that. Long content may increase row height and toolbar controls may wrap.
+The fluid Problem column takes the remaining space. Keep the semantic table and
+the existing Code Atlas navigation, content and controls. Measurements describe
+CSS layout pixels, not pixels in a scaled screenshot. When matching another
+reference, inspect its live bounds, box sizing and breakpoints before choosing
+container dimensions; record the viewport and distinguish outer width, padding
+and interactive content width.
 
 ## Focused problem workspace
 
@@ -282,7 +346,7 @@ Files: `packages/ui/src/styles/globals.css`, `packages/ui/src/components/badge.t
 Use semantic `difficulty-easy` (green), `difficulty-medium` (amber), and
 `difficulty-hard` (red) tokens through the shared Badge variants in both catalog
 and problem headers. Category icons use `category-recommended` (purple),
-`category-closures` (amber), `category-arrays` (blue), and `category-async` (cyan). Tokens have separate
+`category-closures` (amber), `category-arrays` (blue), `category-generators` (pink), and `category-async` (cyan). Tokens have separate
 light/dark values; labels remain visible so meaning never depends on color alone.
 
 GlobalNav items may supply an icon component and `appearance="text"`. Learn/Practice
@@ -308,6 +372,12 @@ Case fields remain labeled shared Input/Select controls: Sleep takes millis; Cou
 takes a start and invocation count; Debounce takes a delay and JSON call schedule;
 Filter takes a JSON array and a supplied callback with its source shown below. Keep
 JSON fields and output arrays inside their panes, and reject invalid drafts before Run.
+Promise fulfillment delay uses `ms` and a JSON `functions` field of `{t, value}`
+descriptors, with help explaining that `t` is each original function's delay.
+Both timing fields allow 0–1000ms, and an empty descriptor array is valid. Reuse
+the existing Input controls and inline validation feedback.
+Fibonacci Generator uses a single count field (0–50), with supporting text clarifying
+that it controls `.next()` calls and is not an argument to the learner's function.
 
 ## Account progress and saved code
 

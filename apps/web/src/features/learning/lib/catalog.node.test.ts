@@ -23,10 +23,10 @@ describe("JavaScript problem catalog", () => {
       filterCatalog([...javascriptPracticeCatalog].reverse()).map(
         (x) => x.order,
       ),
-    ).toEqual([10, 20, 30, 65]);
+    ).toEqual([10, 20, 30, 35, 40, 65]);
   });
   it("handles empty catalogs and resets filters", () => {
     expect(filterCatalog([])).toEqual([]);
-    expect(filterCatalog(javascriptPracticeCatalog, "", "all")).toHaveLength(4);
+    expect(filterCatalog(javascriptPracticeCatalog, "", "all")).toHaveLength(6);
   });
 });

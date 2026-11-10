@@ -1,6 +1,8 @@
 import {
   counterProblem,
   debounceProblem,
+  delayEachPromiseProblem,
+  fibonacciGeneratorProblem,
   filterArrayProblem,
   sleepProblem,
 } from "@workspace/problems";
@@ -9,7 +11,9 @@ export const javascriptPracticeCatalog = [
   { problem: sleepProblem, order: 65 },
   { problem: counterProblem, order: 10 },
   { problem: debounceProblem, order: 30 },
+  { problem: delayEachPromiseProblem, order: 35 },
   { problem: filterArrayProblem, order: 20 },
+  { problem: fibonacciGeneratorProblem, order: 40 },
 ].map<PracticeEntry>(({ problem, order }) => ({
   id: problem.id,
   slug: problem.slug,

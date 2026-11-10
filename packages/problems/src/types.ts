@@ -32,8 +32,25 @@ export interface FilterInput {
   arr: number[];
   predicate: FilterPredicate;
 }
-export type ProblemInput = number | CounterInput | DebounceInput | FilterInput;
-export type ProblemOutput = number[] | DebounceCall[];
+export interface GeneratorInput {
+  count: number;
+}
+export interface TimedValue {
+  t: number;
+  value: number;
+}
+export interface PromiseDelayInput {
+  ms: number;
+  functions: TimedValue[];
+}
+export type ProblemInput =
+  | number
+  | CounterInput
+  | DebounceInput
+  | FilterInput
+  | GeneratorInput
+  | PromiseDelayInput;
+export type ProblemOutput = number[] | DebounceCall[] | TimedValue[];
 export interface CaseResult {
   id: string;
   passed: boolean;
@@ -70,8 +87,20 @@ export interface ProblemDefinition {
   id: string;
   slug: string;
   subjectId: string;
-  topicId: "basics" | "functions" | "async" | "closures" | "arrays";
-  kind: "delay" | "counter" | "debounce" | "filter-array";
+  topicId:
+    | "basics"
+    | "functions"
+    | "async"
+    | "closures"
+    | "arrays"
+    | "generators";
+  kind:
+    | "delay"
+    | "counter"
+    | "debounce"
+    | "delay-all"
+    | "filter-array"
+    | "fibonacci-generator";
   inputError: string;
   title: string;
   summary: string;

@@ -5,6 +5,24 @@ import { JavaScriptPractice } from "./components/javascript-practice";
 
 afterEach(() => vi.unstubAllGlobals());
 
+it("opens the Promise delay problem in Async and finds it through search", () => {
+  render(<JavaScriptPractice catalog={javascriptPracticeCatalog} />);
+  fireEvent.mouseDown(screen.getByRole("tab", { name: "Async" }), {
+    button: 0,
+    ctrlKey: false,
+  });
+  fireEvent.change(screen.getByRole("searchbox", { name: "Search problems" }), {
+    target: { value: "fulfillment" },
+  });
+  expect(
+    screen.getByRole("link", { name: "Delay the Resolution of Each Promise" }),
+  ).toHaveAttribute(
+    "href",
+    "/javascript/practice/delay-the-resolution-of-each-promise",
+  );
+  expect(screen.getByRole("status")).toHaveTextContent("1 problem");
+});
+
 it("keeps an empty practice catalog honest without problem links", () => {
   render(<JavaScriptPractice catalog={[]} />);
   expect(
@@ -23,8 +41,8 @@ it("clears an empty query result back to the practice problems", () => {
   });
   expect(screen.getByRole("status")).toHaveTextContent("0 problems");
   fireEvent.click(screen.getByRole("button", { name: "Clear search" }));
-  expect(screen.getAllByRole("row")).toHaveLength(5);
-  expect(screen.getByRole("status")).toHaveTextContent("4 problems");
+  expect(screen.getAllByRole("row")).toHaveLength(7);
+  expect(screen.getByRole("status")).toHaveTextContent("6 problems");
 });
 
 it("opens the canonical practice problem without listing planned learning topics", () => {
@@ -86,6 +104,25 @@ it("opens Counter from its Closures category", () => {
     "/javascript/practice/counter",
   );
   expect(screen.queryByRole("link", { name: "Sleep" })).toBeNull();
+  expect(screen.getByRole("status")).toHaveTextContent("1 problem");
+});
+
+it("opens Fibonacci Generator from Generators and searches within that category", () => {
+  render(<JavaScriptPractice catalog={javascriptPracticeCatalog} />);
+  expect(
+    screen.getByRole("link", { name: "Fibonacci Generator" }),
+  ).toBeVisible();
+  fireEvent.mouseDown(screen.getByRole("tab", { name: "Generators" }), {
+    button: 0,
+    ctrlKey: false,
+  });
+  expect(
+    screen.getByRole("link", { name: "Fibonacci Generator" }),
+  ).toHaveAttribute("href", "/javascript/practice/fibonacci-generator");
+  expect(screen.queryByRole("link", { name: "Counter" })).toBeNull();
+  fireEvent.change(screen.getByRole("searchbox", { name: "Search problems" }), {
+    target: { value: "yield" },
+  });
   expect(screen.getByRole("status")).toHaveTextContent("1 problem");
 });
 

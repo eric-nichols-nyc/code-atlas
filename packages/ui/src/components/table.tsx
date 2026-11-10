@@ -51,12 +51,21 @@ function TableFooter({ className, ...props }: React.ComponentProps<"tfoot">) {
   );
 }
 
-function TableRow({ className, ...props }: React.ComponentProps<"tr">) {
+function TableRow({
+  className,
+  variant = "default",
+  ...props
+}: React.ComponentProps<"tr"> & {
+  variant?: "default" | "striped";
+}) {
   return (
     <tr
       data-slot="table-row"
+      data-variant={variant}
       className={cn(
         "border-b transition-colors hover:bg-muted/50 has-aria-expanded:bg-muted/50 data-[state=selected]:bg-muted",
+        variant === "striped" &&
+          "even:bg-muted/30 hover:bg-muted/70 even:hover:bg-muted/70",
         className,
       )}
       {...props}

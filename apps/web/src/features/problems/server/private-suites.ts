@@ -4,6 +4,53 @@ import type { ProblemDefinition, ProblemInput } from "@workspace/problems";
 export const privateSuites: Record<ProblemDefinition["kind"], ProblemInput[]> =
   {
     delay: [1, 15, 40, 125, 333, 500, 750, 1000],
+    "delay-all": [
+      {
+        ms: 0,
+        functions: [
+          { t: 0, value: 0 },
+          { t: 0, value: -1 },
+        ],
+      },
+      {
+        ms: 50,
+        functions: [
+          { t: 0, value: 9 },
+          { t: 1000, value: 4 },
+        ],
+      },
+      {
+        ms: 1000,
+        functions: [
+          { t: 1000, value: 1000000000 },
+          { t: 1, value: -1000000000 },
+        ],
+      },
+      {
+        ms: 100,
+        functions: [
+          { t: 50, value: 3 },
+          { t: 25, value: 3 },
+          { t: 50, value: 3 },
+        ],
+      },
+      { ms: 300, functions: [] },
+      {
+        ms: 1,
+        functions: Array.from({ length: 10 }, (_, i) => ({
+          t: 1000 - i * 100,
+          value: i - 5,
+        })),
+      },
+      {
+        ms: 120,
+        functions: [
+          { t: 30, value: 5 },
+          { t: 30, value: 8 },
+          { t: 30, value: -20 },
+        ],
+      },
+    ],
     counter: [
       { n: 0, calls: 1 },
       { n: 1, calls: 0 },
@@ -13,6 +60,14 @@ export const privateSuites: Record<ProblemDefinition["kind"], ProblemInput[]> =
       { n: -1, calls: 3 },
       { n: 10, calls: 4 },
       { n: 0, calls: 5 },
+    ],
+    "fibonacci-generator": [
+      { count: 1 },
+      { count: 2 },
+      { count: 3 },
+      { count: 13 },
+      { count: 25 },
+      { count: 50 },
     ],
     debounce: [
       {

@@ -1,0 +1,24 @@
+Implement `delayAll(functions, ms)`. Return an array of wrapper functions in the same order as `functions`.
+
+Creating this array must not call the original functions. When a wrapper is invoked, it must start its original function immediately, wait for the returned promise to fulfill, then wait an **additional `ms` milliseconds** before fulfilling with the same value.
+
+```javascript
+const functions = [
+  () => new Promise(resolve => setTimeout(() => resolve(1), 30)),
+  () => new Promise(resolve => setTimeout(() => resolve(2), 10)),
+];
+const delayed = delayAll(functions, 50);
+
+// Nothing has started yet.
+// Calling both wrappers at time 0 starts both original functions.
+delayed[0](); // Fulfills with 1 at time 80ms.
+delayed[1](); // Fulfills with 2 at time 60ms.
+```
+
+Each function runs independently. Do not wait for one function before starting another, change its result, or replace the wrapper array with a single promise.
+
+The test panel represents functions as JSON descriptors. For example, `{ "t": 30, "value": 1 }` represents a function that fulfills with `1` after `30ms`. The judge calls all wrappers at time zero and displays `{t, value}` results **in input order**, even when a later function finishes first. An empty input array produces an empty output.
+
+The supplied functions always fulfill. The judge uses a deterministic clock so examples and tests have exact times; real browser timers can run later than their requested delay.
+
+Read more: [Promise chaining](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/then) and [setTimeout](https://developer.mozilla.org/en-US/docs/Web/API/Window/setTimeout).

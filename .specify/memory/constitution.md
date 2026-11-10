@@ -141,7 +141,7 @@ Playwright, and web bundle analysis. There is currently no admin or Electron app
 application/package boundaries unless a feature brief records the rationale and impact of a change.
 Review bundle analysis for significant client dependencies and load specialized editors on demand.
 
-Sleep, Counter, Debounce and Filter Elements from Array are published practice problems. Account
+Sleep, Counter, Debounce, Filter Elements from Array and Fibonacci Generator are published practice problems. Account
 flags, solved status and latest Run/Submit source persist in Neon. Additional problems, connected
 AI tutoring, saved notes, individual submission history and desktop delivery require working slices.
 External reference sites provide interaction evidence and design input; their dependencies,
@@ -185,4 +185,7 @@ Amendment 2.2.0 consolidates the Express application into Next.js App Router API
 refactor changes deployment and request boundaries while preserving server authorization, ownership,
 private test handling and worker isolation. See `docs/features/nextjs-api.md` for migration and checks.
 
-**Version**: 2.2.0 | **Ratified**: 2026-11-07 | **Last Amended**: 2026-11-10
+Amendment 2.2.1 refreshes the published problem inventory after adding generator practice;
+the execution, authorization and persistence principles are unchanged.
+
+**Version**: 2.2.1 | **Ratified**: 2026-11-07 | **Last Amended**: 2026-11-10

@@ -1,0 +1,69 @@
+.copy {
+  --intro-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --muted-foreground: var(--foreground);
+  --primary: var(--foreground);
+  --secondary-foreground: var(--foreground);
+  --category-closures: var(--foreground);
+  --badge-blue-foreground: var(--foreground);
+  --badge-amber-foreground: var(--foreground);
+  --badge-rose-foreground: var(--foreground);
+}
+
+.copy [data-slot="badge"] {
+  color: var(--foreground);
+}
+
+.copy [data-slot="button"][data-variant="default"] {
+  --primary: var(--secondary);
+  --primary-foreground: var(--foreground);
+}
+
+.copy [data-slot="button"]:disabled {
+  opacity: 1;
+}
+
+.startAction {
+  --secondary: #ffffff;
+  --secondary-foreground: #000000;
+  transition-property: color, background-color, border-color, box-shadow;
+}
+
+@keyframes riseIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.intro {
+  backface-visibility: hidden;
+  animation: riseIn 680ms var(--intro-ease-out) both;
+}
+
+.introCopy {
+  animation-delay: 90ms;
+}
+
+.introAction {
+  animation-delay: 180ms;
+}
+
+.previewIntro {
+  backface-visibility: hidden;
+  animation: riseIn 520ms var(--intro-ease-out) 220ms both;
+}
+
+.contentIntro {
+  animation-delay: 260ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .intro,
+  .previewIntro {
+    animation: none;
+  }
+}

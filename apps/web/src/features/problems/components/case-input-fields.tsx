@@ -26,20 +26,35 @@ export function CaseInputFields({ index }: { index: number }) {
           <Label htmlFor="primary-input" className="mb-2 font-mono text-xs">
             {kind === "counter"
               ? "n ="
-              : kind === "debounce"
-                ? "t ="
-                : "millis ="}
+              : kind === "fibonacci-generator"
+                ? "count ="
+                : kind === "delay-all"
+                  ? "ms ="
+                  : kind === "debounce"
+                    ? "t ="
+                    : "millis ="}
           </Label>
           <Input
             id="primary-input"
             type="number"
-            min={kind === "counter" ? -1000 : kind === "debounce" ? 0 : 1}
-            max={1000}
+            min={kind === "counter" ? -1000 : kind === "delay" ? 1 : 0}
+            max={kind === "fibonacci-generator" ? 50 : 1000}
             step={1}
             value={draft.value}
             onChange={(e) => s.updateInput(index, { value: e.target.value })}
             className="font-mono"
+            aria-describedby={
+              kind === "fibonacci-generator" ? "generator-help" : undefined
+            }
           />
+          {kind === "fibonacci-generator" && (
+            <p
+              id="generator-help"
+              className="mt-2 text-xs text-muted-foreground"
+            >
+              Number of .next() calls. The generator itself takes no arguments.
+            </p>
+          )}
         </div>
       )}
       {kind === "counter" && (
@@ -63,10 +78,16 @@ export function CaseInputFields({ index }: { index: number }) {
           </p>
         </div>
       )}
-      {(kind === "debounce" || kind === "filter-array") && (
+      {(kind === "debounce" ||
+        kind === "filter-array" ||
+        kind === "delay-all") && (
         <div>
           <Label htmlFor="json-input" className="mb-2 font-mono text-xs">
-            {kind === "debounce" ? "calls =" : "arr ="}
+            {kind === "debounce"
+              ? "calls ="
+              : kind === "delay-all"
+                ? "functions ="
+                : "arr ="}
           </Label>
           <Input
             id="json-input"
@@ -79,7 +100,9 @@ export function CaseInputFields({ index }: { index: number }) {
           <p id="json-help" className="mt-2 text-xs text-muted-foreground">
             {kind === "debounce"
               ? 'JSON schedule, e.g. [{"t":50,"inputs":[1]}]. Times are milliseconds.'
-              : "JSON integer array. Empty arrays are allowed."}
+              : kind === "delay-all"
+                ? 'JSON function descriptors, e.g. [{"t":30,"value":1}]. Each original fulfills after t milliseconds.'
+                : "JSON integer array. Empty arrays are allowed."}
           </p>
         </div>
       )}

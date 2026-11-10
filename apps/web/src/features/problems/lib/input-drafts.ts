@@ -12,6 +12,13 @@ export interface InputDraft {
 export function inputDraft(input: ProblemInput): InputDraft {
   const base = { value: "", calls: "", json: "", predicate: "greaterThan10" };
   if (typeof input === "number") return { ...base, value: String(input) };
+  if ("ms" in input)
+    return {
+      ...base,
+      value: String(input.ms),
+      json: JSON.stringify(input.functions),
+    };
+  if ("count" in input) return { ...base, value: String(input.count) };
   if ("n" in input)
     return { ...base, value: String(input.n), calls: String(input.calls) };
   if ("arr" in input)
@@ -31,6 +38,10 @@ export function parseInputDraft(
       return undefined;
     let input: unknown;
     if (problem.kind === "delay") input = Number(draft.value);
+    else if (problem.kind === "delay-all")
+      input = { ms: Number(draft.value), functions: JSON.parse(draft.json) };
+    else if (problem.kind === "fibonacci-generator")
+      input = { count: Number(draft.value) };
     else if (problem.kind === "counter") {
       if (!draft.calls.trim()) return undefined;
       input = { n: Number(draft.value), calls: Number(draft.calls) };

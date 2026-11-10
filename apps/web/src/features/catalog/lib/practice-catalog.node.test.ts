@@ -13,7 +13,7 @@ describe("practice categories", () => {
         id: "recommended",
         label: "Recommended",
         heading: "Recommended problems",
-        count: 4,
+        count: 6,
       },
       {
         id: "closures",
@@ -22,13 +22,29 @@ describe("practice categories", () => {
         count: 1,
       },
       { id: "arrays", label: "Arrays", heading: "Arrays problems", count: 1 },
-      { id: "async", label: "Async", heading: "Async problems", count: 2 },
+      {
+        id: "generators",
+        label: "Generators",
+        heading: "Generators problems",
+        count: 1,
+      },
+      { id: "async", label: "Async", heading: "Async problems", count: 3 },
     ]);
     expect(
       practiceProblems(javascriptPracticeCatalog, "recommended").map(
         (entry) => entry.slug,
       ),
-    ).toEqual(["counter", "filter-elements-from-array", "debounce", "sleep"]);
+    ).toEqual([
+      "counter",
+      "filter-elements-from-array",
+      "debounce",
+      "delay-the-resolution-of-each-promise",
+      "fibonacci-generator",
+      "sleep",
+    ]);
+    expect(
+      practiceProblems(javascriptPracticeCatalog, "generators")[0]?.slug,
+    ).toBe("fibonacci-generator");
     expect(
       practiceProblems(javascriptPracticeCatalog, "closures")[0]?.slug,
     ).toBe("counter");
@@ -36,7 +52,7 @@ describe("practice categories", () => {
       practiceProblems(javascriptPracticeCatalog, "async").map(
         (entry) => entry.slug,
       ),
-    ).toEqual(["debounce", "sleep"]);
+    ).toEqual(["debounce", "delay-the-resolution-of-each-promise", "sleep"]);
   });
 
   it("keeps recommendations curated, excludes unpublished entries, and intersects search with category", () => {

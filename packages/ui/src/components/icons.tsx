@@ -11,6 +11,7 @@ export {
   LayersIcon,
   LayoutDashboardIcon,
   NotebookPenIcon,
+  Repeat2Icon,
   RotateCcwIcon,
   SearchIcon,
   Share2Icon,

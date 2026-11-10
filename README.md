@@ -4,7 +4,7 @@ Code Atlas is a JavaScript-first learning and coding-practice platform built as 
 monorepo. One Next.js application serves the learner interface and authenticated API Route Handlers.
 Electron is planned.
 
-**Available practice problems: Counter, Filter Elements from Array, Debounce, and Sleep.** Learners edit JavaScript,
+**Available practice problems: Counter, Filter Elements from Array, Debounce, Delay the Resolution of Each Promise, Fibonacci Generator, and Sleep.** Learners edit JavaScript,
 Run visible cases, and Submit against a server-selected test suite. Results come from isolated
 execution. Each learner’s flags, verified solved status, and latest Run/Submit source are stored in Neon.
 Code is restored when a problem reopens, including after reload or in another browser. Unexecuted
@@ -30,26 +30,31 @@ Only a server-judged accepted Submit marks a problem solved. Saving failures are
 
 ## Current experience
 
-| Route                                             | Behavior                                                                                            |
-| ------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| `/`                                               | Public landing page with an interactive Counter example and published JavaScript problems           |
-| `/dashboard`                                      | Protected subject picker; JavaScript is available, Algorithms and React JS are coming soon          |
-| `/javascript`                                     | Redirects to JavaScript Practice                                                                    |
-| `/javascript/practice`                            | Searchable table with Recommended, Closures, Arrays and Async categories, plus difficulty filtering |
-| `/javascript/practice/sleep`                      | Protected coding workspace with real Run/Submit                                                     |
-| `/javascript/practice/counter`                    | Protected Counter workspace with editable start/call count and real Run/Submit                      |
-| `/javascript/practice/debounce`                   | Medium Async problem with a deterministic timer judge                                               |
-| `/javascript/practice/filter-elements-from-array` | Easy Arrays problem with editable array/callback cases                                              |
-| `/javascript/learn`                               | Protected coming-soon page; Learn requirements are deferred                                         |
-| `/sign-in`, `/sign-up`                            | Clerk catch-all authentication routes; completed authentication redirects to Dashboard              |
+| Route                                                       | Behavior                                                                                                        |
+| ----------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `/`                                                         | Public landing page with an interactive Counter example and published JavaScript problems                       |
+| `/dashboard`                                                | Protected subject picker; JavaScript is available, Algorithms and React JS are coming soon                      |
+| `/javascript`                                               | Redirects to JavaScript Practice                                                                                |
+| `/javascript/practice`                                      | Searchable table with Recommended, Closures, Arrays, Generators and Async categories, plus difficulty filtering |
+| `/javascript/practice/sleep`                                | Protected coding workspace with real Run/Submit                                                                 |
+| `/javascript/practice/counter`                              | Protected Counter workspace with editable start/call count and real Run/Submit                                  |
+| `/javascript/practice/debounce`                             | Medium Async problem with a deterministic timer judge                                                           |
+| `/javascript/practice/delay-the-resolution-of-each-promise` | Medium Async problem with editable Promise descriptors and deterministic fulfillment timing                     |
+| `/javascript/practice/filter-elements-from-array`           | Easy Arrays problem with editable array/callback cases                                                          |
+| `/javascript/practice/fibonacci-generator`                  | Easy Generators problem with an editable count and isolated iterator judging                                    |
+| `/javascript/learn`                                         | Protected coming-soon page; Learn requirements are deferred                                                     |
+| `/sign-in`, `/sign-up`                                      | Clerk catch-all authentication routes; completed authentication redirects to Dashboard                          |
 
 JavaScript catalog and Learn pages use centered Learn/Practice navigation, with Dashboard beside
 Code Atlas for returning to the subject picker. Learn/Practice have book/code icons and text-only hover states. Individual problem pages use a focused workspace
 with Back to Practice and AI/Notes icons. Each icon opens its corresponding tab; clicking the active
 icon closes the tools panel. Legacy `/learn/javascript` URLs redirect to Practice.
 
-The public landing page has a fixed, interactive closure example with selectable starting values,
-recent return values and reset. It works without signing in and does not evaluate learner code or
+The public landing page uses standalone Code Atlas hero branding and no global navigation.
+Its white Start practicing button opens Dashboard for a verified signed-in learner or Sign in
+for other visitors. A staggered CSS entrance respects reduced-motion preferences.
+Below the hero, a fixed interactive closure example has selectable starting
+values, recent return values and reset. It works without signing in and does not evaluate learner code or
 write progress. Its problem links and counts come from the existing catalog. See the
 [landing-page feature brief](docs/features/dynamic-landing-page.md) for scope and reference evidence.
 
@@ -243,10 +248,12 @@ Current content ownership is deliberate:
 `features/learning` currently owns the reusable adaptive layout and tools panel; its name does not
 make the current practice experience a guided Learn lesson.
 
-All four published problems have separate server-owned judging contracts.
+All six published problems have separate server-owned judging contracts.
 Register new definitions, catalog entries, trusted MDX loaders and a matching private test suite/adapter;
 the content validator checks that the published catalog agrees with those public definitions.
 Adding MDX alone does not create a runnable problem.
+The [generator feature brief](docs/features/javascript-generator.md) documents the bounded
+Fibonacci iterator contract and verification.
 Future Learn content is a separate feature. Reuse the shared workspace where its interaction fits.
 
 ## API and execution
@@ -268,11 +275,16 @@ Server services use `server-only` boundaries. UI code uses the same-origin `/api
 
 The execution service runs QuickJS WebAssembly inside a disposable Node Worker. Guest memory, stack, CPU, timers,
 console output, concurrency, and wall time are bounded. Learner code has no Node module, filesystem,
-DOM, or network access. The adapters support single-file JavaScript for these four problems, not a general Node runtime.
+DOM, or network access. The adapters support single-file JavaScript for these six problems, not a general Node runtime.
 Sleep measures elapsed time. Counter checks returned numeric sequences and independent closure state;
 its editable `calls` field is the number of invocations. Debounce runs guest timers on a deterministic
 clock with documented same-time ordering. Filter supplies a selectable callback, checks truthy
 results and original indices, and disables the guest Array.prototype.filter built-in.
+Fibonacci Generator advances synchronous iterable iterators for an editable count (0–50)
+and checks independent state. The generator itself takes no arguments.
+Delay the Resolution of Each Promise checks wrapper creation, immediate original invocation,
+preserved values/order and an extra fulfillment delay on the same deterministic clock. See its
+[feature brief](docs/features/delay-each-promise.md) for the original exercise and research sources.
 Hidden inputs, outputs and logs remain private.
 
 Run uses editable visible cases; Submit ignores client-supplied cases and uses the full private suite.

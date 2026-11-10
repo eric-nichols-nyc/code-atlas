@@ -35,7 +35,7 @@ test("web dashboard remains in setup mode before credentials", async ({
 });
 
 test("global navigation follows the active web route", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/sign-in");
   const navigation = page.getByRole("navigation", { name: "Main navigation" });
   await expect(
     navigation.getByRole("link", { name: "Home", exact: true }),
@@ -61,6 +61,7 @@ test("global navigation follows the active web route", async ({ page }) => {
     .getByRole("link", { name: "Code Atlas", exact: true })
     .click();
   await expect(page).toHaveURL(/\/$/);
+  await expect(navigation).toHaveCount(0);
   await expect(page.locator("html")).toHaveClass(/dark/);
 });
 
@@ -68,7 +69,7 @@ test("mobile navigation supports the keyboard and closes after navigation", asyn
   page,
 }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("/");
+  await page.goto("/javascript/practice");
   const navigation = page.getByRole("navigation", { name: "Main navigation" });
   const toggle = navigation.getByRole("button", {
     name: /^(Open|Close) navigation$/,
@@ -202,7 +203,7 @@ for (const { origin, setup, navigationLabel } of [
   test(`${origin} preserves the chosen theme across pages and reloads`, async ({
     page,
   }) => {
-    await page.goto(origin);
+    await page.goto(`${origin}/javascript/practice`);
     const themeButton = page.getByRole("button", {
       name: "Change theme",
       exact: true,
@@ -237,6 +238,9 @@ for (const { origin, setup, navigationLabel } of [
       .click();
     await expect(page).toHaveURL(`${origin}/sign-in`);
     await expect(page.locator("html")).toHaveClass(/light/);
+    await page.goto(origin);
+    await expect(page.locator("html")).toHaveClass(/light/);
+    await expect(themeButton).toHaveCount(0);
   });
 
   test(`${origin} follows system appearance and keeps mobile controls accessible`, async ({
@@ -244,7 +248,7 @@ for (const { origin, setup, navigationLabel } of [
   }) => {
     await page.emulateMedia({ colorScheme: "light" });
     await page.setViewportSize({ width: 390, height: 844 });
-    await page.goto(origin);
+    await page.goto(`${origin}/dashboard`);
     const themeButton = page.getByRole("button", {
       name: "Change theme",
       exact: true,
@@ -281,7 +285,7 @@ for (const { origin, setup, navigationLabel } of [
   test(`${origin} exposes sign-in and sign-up from the navigation`, async ({
     page,
   }) => {
-    await page.goto(origin);
+    await page.goto(`${origin}/dashboard`);
     const navigation = page.getByRole("navigation", { name: navigationLabel });
     await navigation
       .getByRole("link", { name: "Sign in", exact: true })
@@ -317,6 +321,8 @@ for (const path of [
   "/javascript/practice/counter",
   "/javascript/practice/debounce",
   "/javascript/practice/filter-elements-from-array",
+  "/javascript/practice/fibonacci-generator",
+  "/javascript/practice/delay-the-resolution-of-each-promise",
   "/javascript/practice/scope-and-shadowing",
   "/javascript/practice/closures",
   "/javascript/practice/unknown",

@@ -20,6 +20,24 @@ const { judgeDebounce }: typeof import("./adapters/debounce.js") = await import(
 );
 const { judgeFilter }: typeof import("./adapters/filter-array.js") =
   await import(filterAdapterPath);
+const generatorAdapterPath = import.meta.url.endsWith(".ts")
+  ? "./adapters/fibonacci-generator.ts"
+  : "./adapters/fibonacci-generator.js";
+const {
+  generatorHarness,
+  judgeGenerator,
+}: typeof import("./adapters/fibonacci-generator.js") = await import(
+  generatorAdapterPath
+);
+const promiseDelayAdapterPath = import.meta.url.endsWith(".ts")
+  ? "./adapters/delay-each-promise.ts"
+  : "./adapters/delay-each-promise.js";
+const {
+  promiseDelayHarness,
+  judgePromiseDelay,
+}: typeof import("./adapters/delay-each-promise.js") = await import(
+  promiseDelayAdapterPath
+);
 
 interface Work {
   problemId: string;
@@ -46,7 +64,9 @@ async function runCase(test: Work["cases"][number]): Promise<CaseResult> {
   let registrations = 0;
   let jobs = 0;
   let fatal: Verdict | null = null;
-  const virtual = work.problemId === "javascript.debounce";
+  const virtual =
+    work.problemId === "javascript.debounce" ||
+    work.problemId === "javascript.delay-the-resolution-of-each-promise";
   let virtualNow = 0;
   rt.setInterruptHandler(() => {
     if (performance.now() > deadline || cpu > 250) {
@@ -70,6 +90,8 @@ async function runCase(test: Work["cases"][number]): Promise<CaseResult> {
   let truncated = false;
   let fn: QuickJSHandle | undefined;
   let arrayCheck: QuickJSHandle | undefined;
+  let generatorCheck: QuickJSHandle | undefined;
+  let promiseDelayCheck: QuickJSHandle | undefined;
   let promise: QuickJSHandle | undefined;
   const enter = <T>(call: () => T): T => {
     const start = performance.now();
@@ -273,6 +295,30 @@ async function runCase(test: Work["cases"][number]): Promise<CaseResult> {
       return result("runtime-error", "The guest could not initialize.");
     }
     arrayCheck = arrayIntrinsic.value;
+    if (work.problemId === "javascript.delay-the-resolution-of-each-promise") {
+      const harness = enter(() =>
+        ctx.evalCode(promiseDelayHarness, "judge.js"),
+      );
+      if (harness.error) {
+        harness.dispose();
+        return result(
+          "runtime-error",
+          "The Promise delay judge could not initialize.",
+        );
+      }
+      promiseDelayCheck = harness.value;
+    }
+    if (work.problemId === "javascript.fibonacci-generator") {
+      const harness = enter(() => ctx.evalCode(generatorHarness, "judge.js"));
+      if (harness.error) {
+        harness.dispose();
+        return result(
+          "runtime-error",
+          "The generator judge could not initialize.",
+        );
+      }
+      generatorCheck = harness.value;
+    }
     const compiled = enter(() =>
       ctx.evalCode(
         `${work.code}\n;typeof ${work.entryFunction} === "function" ? ${work.entryFunction} : undefined;`,
@@ -301,6 +347,34 @@ async function runCase(test: Work["cases"][number]): Promise<CaseResult> {
       errorText,
       exceeded: () => interrupted || cpu > 250,
     };
+    if (work.problemId === "javascript.delay-the-resolution-of-each-promise") {
+      if (
+        typeof test.input === "number" ||
+        !("ms" in test.input) ||
+        !promiseDelayCheck
+      )
+        return result("runtime-error", "Invalid Promise delay input.");
+      const outcome = judgePromiseDelay(
+        test.input,
+        guest,
+        {
+          now: () => virtualNow,
+          advance: advanceVirtual,
+        },
+        promiseDelayCheck,
+      );
+      return result(outcome.verdict, outcome.message, undefined, outcome);
+    }
+    if (work.problemId === "javascript.fibonacci-generator") {
+      if (
+        typeof test.input === "number" ||
+        !("count" in test.input) ||
+        !generatorCheck
+      )
+        return result("runtime-error", "Invalid generator input.");
+      const outcome = judgeGenerator(test.input, guest, generatorCheck);
+      return result(outcome.verdict, outcome.message, undefined, outcome);
+    }
     if (work.problemId === "javascript.debounce") {
       if (typeof test.input === "number" || !("t" in test.input))
         return result("runtime-error", "Invalid debounce input.");
@@ -525,6 +599,8 @@ async function runCase(test: Work["cases"][number]): Promise<CaseResult> {
     for (const id of [...timers.keys()]) removeTimer(id);
     promise?.dispose();
     arrayCheck?.dispose();
+    generatorCheck?.dispose();
+    promiseDelayCheck?.dispose();
     fn?.dispose();
     ctx.dispose();
     rt.dispose();
