@@ -38,6 +38,9 @@ There are no application UI changes, so browser review is not applicable.
   because the environment’s default pnpm wrapper invokes Node 20; CI explicitly sets 24.
 - In that snapshot, all four root checks passed: Biome, TypeScript, **124 Vitest tests
   across 20 files**, and the production build. No application credentials were supplied.
+- The first GitHub run exposed a root-check ordering issue hidden by local package
+  resolution. `pnpm typecheck` now runs Turbo's workspace checks/build dependencies
+  before root TypeScript checks, so browser tests can resolve the built problem package.
 - Existing feature work and local development servers are preserved. This record covers
   local macOS validation; GitHub-hosted execution and cache behavior are reported by the
   PR/main workflow runs.

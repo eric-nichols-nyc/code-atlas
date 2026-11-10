@@ -13,7 +13,7 @@
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "format": "biome format --write .",
-    "typecheck": "tsc --noEmit && turbo run typecheck",
+    "typecheck": "turbo run typecheck && tsc --noEmit",
     "test": "turbo run build --filter=@workspace/db --filter=@workspace/problems && vitest run",
     "test:watch": "turbo run build --filter=@workspace/db --filter=@workspace/problems && vitest",
     "test:coverage": "turbo run build --filter=@workspace/db --filter=@workspace/problems && vitest run --coverage",
