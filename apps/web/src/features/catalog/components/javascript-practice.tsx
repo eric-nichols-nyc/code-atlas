@@ -157,21 +157,19 @@ export function JavaScriptPractice({
           </TabsList>
         </aside>
 
-        <TabsContent value={selectedId} className="min-w-0">
+        <TabsContent value={selectedId} className="flex min-w-0 flex-col gap-3">
+          <p role="status" className="text-right text-sm text-muted-foreground">
+            {rows.length} {rows.length === 1 ? "problem" : "problems"}
+          </p>
           <section
-            className="min-w-0 overflow-hidden rounded-md border bg-card"
+            className="@container/practice min-w-0 overflow-hidden rounded-md border bg-card"
             aria-label={selected?.heading ?? "Recommended problems"}
           >
-            <div className="flex flex-wrap items-center justify-between gap-4 border-b px-4 py-5 sm:px-5">
-              <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1">
-                <h2 className="text-xl leading-7 font-semibold">
-                  {selected?.heading}
-                </h2>
-                <p role="status" className="text-sm text-muted-foreground">
-                  {rows.length} {rows.length === 1 ? "problem" : "problems"}
-                </p>
-              </div>
-              <div className="flex w-full min-w-0 flex-col gap-3 sm:w-auto sm:flex-row">
+            <div className="flex flex-wrap items-center justify-between gap-4 border-b px-4 py-5 sm:px-5 @min-[700px]/practice:flex-nowrap">
+              <h2 className="min-w-0 text-xl leading-7 font-semibold @min-[700px]/practice:shrink-0">
+                {selected?.heading}
+              </h2>
+              <div className="flex w-full min-w-0 flex-col gap-3 sm:w-auto sm:flex-row sm:items-center @min-[700px]/practice:max-w-[480px] @min-[700px]/practice:flex-1">
                 <Label htmlFor={difficultyId} className="sr-only">
                   Difficulty
                 </Label>
@@ -179,14 +177,14 @@ export function JavaScriptPractice({
                   <SelectTrigger
                     id={difficultyId}
                     size="sm"
-                    className="w-full sm:w-[148px]"
+                    className="w-full rounded-none sm:w-[148px] sm:shrink-0"
                     aria-label="Difficulty"
                   >
                     <SelectValue placeholder="Difficulty" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="rounded-none">
                     <SelectGroup>
-                      <SelectItem value="all">All difficulties</SelectItem>
+                      <SelectItem value="all">Difficulty</SelectItem>
                       {["Easy", "Medium", "Hard"].map((level) => (
                         <SelectItem key={level} value={level}>
                           <DifficultyBadge difficulty={level} />
@@ -195,7 +193,7 @@ export function JavaScriptPractice({
                     </SelectGroup>
                   </SelectContent>
                 </Select>
-                <div className="relative w-full sm:w-80">
+                <div className="relative w-full min-w-0 sm:w-80 @min-[700px]/practice:flex-1">
                   <SearchIcon
                     aria-hidden="true"
                     className="pointer-events-none absolute top-1/2 left-4 size-4 -translate-y-1/2 text-muted-foreground"
@@ -209,7 +207,7 @@ export function JavaScriptPractice({
                     placeholder="Search problems…"
                     value={query}
                     onChange={(event) => setQuery(event.target.value)}
-                    className="h-11 pl-11"
+                    className="h-11 rounded-none pl-11"
                   />
                 </div>
               </div>

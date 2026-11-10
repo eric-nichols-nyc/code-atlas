@@ -260,6 +260,18 @@ keyboard navigation and selection. Keep the global header separate from content
 filtering. The page title has no supporting subtitle. Use semantic table headings and a single
 title link per problem. Search, category and difficulty filters intersect; clearing filters
 preserves the selected category. Keep table overflow contained on narrow screens.
+The unfiltered difficulty option reads "Difficulty". The controls row uses
+`sm:items-center` so the 32px dropdown is vertically centered beside the 44px
+search field, including when the controls wrap below the table heading.
+The difficulty trigger/menu and search field use square corners (`rounded-none`).
+Place the live result count right-aligned above the table card, outside its
+toolbar. Keep its status semantics and update it when search/category filters change.
+At a panel width of at least 700px, keep the heading and controls
+on one row. Use the named `practice` container query with `flex-nowrap`; keep
+the title and 148px dropdown intact while the search field takes the
+remaining space, up to 320px. Below that panel width, allow the toolbar to wrap
+and keep the existing stacked mobile controls. This is based on panel space,
+so the 280px category sidebar does not force an early wrap at 1186px viewports.
 
 Measured directly from the [live reference](https://tracecode.app/practice) on
 2026-11-10 using DOM bounds and computed styles, at a **1280 × 720 CSS-pixel
