@@ -152,44 +152,32 @@ One Next.js application serves pages and same-origin API Route Handlers. Privile
 stay on the server, and learner code runs in an isolated QuickJS worker.
 
 ```mermaid
-flowchart TB
-    Browser["Learner’s browser<br/>React UI · CodeMirror"]
-    Clerk["Clerk<br/>Sign-in and sessions"]
-    Neon[("Neon PostgreSQL<br/>User · PracticeProgress")]
+%%{init: {"look": "classic", "fontFamily": "Arial", "themeVariables": {"fontFamily": "Arial, sans-serif", "fontSize": "14px"}, "flowchart": {"nodeSpacing": 18, "rankSpacing": 30, "curve": "linear", "padding": 12, "wrappingWidth": 220}}}%%
+flowchart LR
+    Browser["Browser<br/>React · CodeMirror"]
+    Clerk["Clerk<br/>Authentication"]
 
-    subgraph Next["Next.js application · apps/web · port 3000"]
-        Pages["Pages<br/>Landing · Dashboard · Practice"]
-        Routes["App Router Route Handlers<br/>/api/problems/*<br/>/api/practice-progress/*"]
-        Auth["Server validation<br/>Clerk identity · Origin · Payload limits"]
-        Judge["Problem server services<br/>Run and Submit"]
-        Tests["Private test suites"]
-        Worker["Isolated Node Worker<br/>QuickJS WebAssembly"]
-        Progress["Progress server services<br/>Flags · Solved status · Latest code"]
-        Prisma["packages/db<br/>Prisma + Neon adapter"]
+    subgraph Next["Next.js application"]
+        Routes["Pages + API routes<br/>Clerk + input validation"]
+        Judge["Code execution<br/>Private tests + QuickJS"]
+        Progress["Account progress<br/>Flags · solved · last code"]
 
-        Routes --> Auth
-        Auth --> Judge
-        Auth --> Progress
-        Tests -.-> Judge
-        Judge <--> Worker
-        Judge -->|Save code and judged result| Progress
-        Progress <--> Prisma
+        Routes --> Judge
+        Routes --> Progress
     end
 
-    Browser <-->|Page navigation| Pages
-    Browser <-->|Same-origin requests| Routes
-    Browser <-->|Authentication| Clerk
-    Clerk -.->|Session verification| Auth
-    Prisma <--> Neon
+    Browser --> Routes
+    Clerk -.-> Routes
+    Progress --> Neon[("Neon Postgres<br/>Prisma")]
 
-    Content["Trusted MDX + catalog files"] -.-> Pages
-
-    classDef app fill:#e8f0fe,stroke:#537bc1,color:#142e55
-    classDef server fill:#e6f4ea,stroke:#43835b,color:#163c23
-    classDef data fill:#fff3d6,stroke:#ae8124,color:#543b07
-    class Browser,Pages,Routes,Clerk app
-    class Auth,Judge,Worker,Progress server
-    class Tests,Prisma,Neon,Content data
+    style Next fill:transparent,stroke:#94a3b8,stroke-width:1px,font-family:Arial
+    classDef default font-family:Arial
+    classDef client fill:#f1f5f9,stroke:#94a3b8,color:#0f172a
+    classDef app fill:#eff6ff,stroke:#60a5fa,color:#1e3a5f
+    classDef data fill:#fffbeb,stroke:#d4a72c,color:#713f12
+    class Browser,Clerk client
+    class Routes,Judge,Progress app
+    class Neon data
 ```
 
 Protected pages and API handlers verify their own Clerk sessions. Run checks visible cases;
