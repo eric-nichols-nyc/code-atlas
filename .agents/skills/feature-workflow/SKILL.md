@@ -24,12 +24,13 @@ Give a short plan in chat and proceed within the authorized scope. Ask a focused
 Routes compose and enforce access. Feature folders own their components, state/hooks, pure helpers and colocated tests. Follow the existing feature's names; add a subfolder only when there are files for it.
 
 - `apps/web/src/features/<capability>/`: learner behavior and UI.
-- `apps/api/src/<capability>/`: authenticated server behavior.
+- `apps/web/src/app/api/**/route.ts`: thin Next.js App Router API entry points.
+- `apps/web/src/features/<capability>/server/`: authenticated server behavior, private judging and persistence.
 - `apps/web/src/content/<subject>/<problem>/`: trusted authored prose.
 - `packages/ui/`: reusable visual primitives and theme tokens.
-- A shared domain package only when two real consumers need the same contract/data. Keep private server data in the API.
+- A shared domain package only when real consumers need the same contract/data. Keep privileged entry modules guarded by `server-only` and private data out of browser imports.
 
-A feature can span web/API/shared contracts while keeping each layer's ownership clear. Prefer extending an existing feature to creating another abstraction. Keep product-specific state out of shared UI primitives.
+A feature can span client/server/shared contracts while keeping each layer's ownership clear. Prefer extending an existing feature to creating another abstraction. Keep product-specific state out of shared UI primitives.
 
 ## Build one reviewable outcome
 

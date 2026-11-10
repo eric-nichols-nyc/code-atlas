@@ -1,0 +1,14 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "rootDir": "src/features/problems/server",
+    "outDir": ".workers",
+    "noEmit": false
+  },
+  "include": [
+    "src/features/problems/server/runner-worker.ts",
+    "src/features/problems/server/adapters/**/*.ts"
+  ]
+}

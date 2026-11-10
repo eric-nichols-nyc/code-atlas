@@ -1,3 +1,4 @@
+import "server-only";
 import type { ProblemDefinition, ProblemInput } from "@workspace/problems";
 // These inputs are server-only. Public content contains examples, never full suites.
 export const privateSuites: Record<ProblemDefinition["kind"], ProblemInput[]> =

@@ -1,3 +1,4 @@
+import "server-only";
 import { getDb } from "@workspace/db";
 import type { ExecutionAction, ExecutionResult } from "@workspace/problems";
 

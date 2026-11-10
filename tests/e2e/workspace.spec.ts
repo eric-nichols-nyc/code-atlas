@@ -176,14 +176,20 @@ test("JavaScript navigation supports mobile keyboard and route changes", async (
   ).toBe(true);
 });
 
-test("API health works and protected endpoints fail closed", async ({
+test("Next route health works and protected endpoints fail closed", async ({
   request,
 }) => {
-  const health = await request.get("http://127.0.0.1:4000/health");
+  const health = await request.get("/api/health");
   expect(health.status()).toBe(200);
-  expect(await health.json()).toEqual({ status: "ok", service: "api" });
-  const profile = await request.get("http://127.0.0.1:4000/v1/me");
-  expect(profile.status()).toBe(503);
+  expect(await health.json()).toEqual({ status: "ok", service: "web" });
+  expect((await request.get("/api/me")).status()).toBe(503);
+  expect(
+    (
+      await request.post("/api/problems/javascript.sleep/run", {
+        data: { code: "async function sleep(){}", inputs: [10] },
+      })
+    ).status(),
+  ).toBe(503);
 });
 
 for (const { origin, setup, navigationLabel } of [
@@ -356,8 +362,5 @@ test("withholds account progress before authentication is configured", async ({
         data: { flagged: true },
       })
     ).status(),
-  ).toBe(503);
-  expect(
-    (await request.get("http://127.0.0.1:4000/v1/practice-progress")).status(),
   ).toBe(503);
 });

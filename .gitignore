@@ -15,3 +15,5 @@ next-env.d.ts
 packages/db/src/generated/
 work/
 outputs/
+
+.workers/

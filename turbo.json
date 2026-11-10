@@ -4,7 +4,13 @@
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**", "dist/**"],
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**",
+        "!.next/dev/**",
+        "dist/**",
+        ".workers/**"
+      ],
       "env": [
         "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY",
         "NEXT_PUBLIC_CLERK_SIGN_IN_URL",
@@ -47,16 +53,9 @@
   },
   "globalPassThroughEnv": [
     "CLERK_SECRET_KEY",
-    "CLERK_PUBLISHABLE_KEY",
-    "CLERK_AUTHORIZED_PARTIES",
-    "ADMIN_USER_IDS",
     "DATABASE_URL",
     "DIRECT_URL",
-    "PORT",
-    "HOST",
-    "CORS_ORIGINS",
     "CI",
-    "CLERK_TEST_USER_EMAIL",
-    "API_URL"
+    "CLERK_TEST_USER_EMAIL"
   ]
 }
