@@ -1,12 +1,12 @@
-import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { type ReactNode, Suspense } from "react";
 import { AuthSetup } from "@/components/auth-setup";
 import { isAuthConfigured } from "@/lib/auth";
+import { getVerifiedUserId } from "@/lib/auth/server";
 
 export async function AuthScreen({ children }: { children: ReactNode }) {
   if (!isAuthConfigured()) return <AuthSetup />;
-  const { userId } = await auth();
+  const userId = await getVerifiedUserId();
   if (userId) redirect("/dashboard");
 
   return (

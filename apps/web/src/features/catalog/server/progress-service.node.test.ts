@@ -23,14 +23,14 @@ beforeEach(() => vi.clearAllMocks());
 it("uses the verified owner for every operation and no data access for empty identity", async () => {
   await expect(service.list("")).rejects.toThrow("Verified identity");
   expect(db.user.upsert).not.toHaveBeenCalled();
-  await service.list("clerk-owner");
+  await service.list("neon-owner");
   expect(db.user.upsert).toHaveBeenCalledWith(
-    expect.objectContaining({ where: { clerkUserId: "clerk-owner" } }),
+    expect.objectContaining({ where: { neonUserId: "neon-owner" } }),
   );
   expect(db.practiceProgress.findMany).toHaveBeenCalledWith(
     expect.objectContaining({ where: { userId: "internal-owner" } }),
   );
-  await service.read("clerk-owner", "javascript.sleep");
+  await service.read("neon-owner", "javascript.sleep");
   expect(db.practiceProgress.findUnique).toHaveBeenCalledWith(
     expect.objectContaining({
       where: {
@@ -44,7 +44,7 @@ it("uses the verified owner for every operation and no data access for empty ide
 });
 it("imports idempotently without converting browser completion into solved status", async () => {
   await service.importLegacy(
-    "clerk-owner",
+    "neon-owner",
     ["javascript.sleep"],
     ["javascript.counter"],
   );
@@ -90,7 +90,7 @@ it("saves failed/Run sources but only an accepted complete Submit marks solved",
   ] as const) {
     db.practiceProgress.updateMany.mockClear();
     await service.recordExecution(
-      "clerk-owner",
+      "neon-owner",
       "javascript.sleep",
       "source",
       started,
@@ -106,7 +106,7 @@ it("saves failed/Run sources but only an accepted complete Submit marks solved",
   }
   db.practiceProgress.updateMany.mockClear();
   await service.recordExecution(
-    "clerk-owner",
+    "neon-owner",
     "javascript.sleep",
     "correct",
     started,

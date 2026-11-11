@@ -34,11 +34,11 @@ lifecycle and native integration MUST remain separate from learning and practice
 
 ### III. Enforce identity and authorization on the server
 
-Every protected page, Route Handler, Server Action, and API resource MUST verify its own Clerk
+Every protected page, Route Handler, Server Action, and API resource MUST verify its own Neon Auth
 session and required authorization before accessing protected data or executing learner code.
-The Next.js proxy initializes Clerk; it does not replace resource-level authorization. API endpoints
+The Next.js proxy handles Neon Auth cookies and redirects; it does not replace resource-level authorization. API endpoints
 MUST use App Router Route Handlers under `apps/web/src/app/api`. Protected handlers MUST verify
-Clerk identity through the shared server boundary, validate origins and payloads, and call
+Neon Auth identity through the shared server boundary, validate origins and payloads, and call
 feature-owned server services directly. Ownership MUST come from verified identity, not client input.
 
 Future administrative resources MUST enforce server-side admin authorization with default denial.
@@ -136,7 +136,7 @@ learning experience; its requirements remain open. Later subjects include Algori
 Do not treat a practice problem as a guided lesson or require visualization to judge a solution.
 
 The installed baseline is pnpm, Turborepo, TypeScript, one Next.js application with App Router APIs,
-shared shadcn UI, Clerk, CodeMirror, QuickJS, trusted MDX, Prisma for Neon, Biome, Vitest,
+shared shadcn UI, Neon Auth, CodeMirror, QuickJS, trusted MDX, Prisma for Neon, Biome, Vitest,
 Playwright, and web bundle analysis. There is currently no admin or Electron app. Preserve the
 application/package boundaries unless a feature brief records the rationale and impact of a change.
 Review bundle analysis for significant client dependencies and load specialized editors on demand.
@@ -188,4 +188,9 @@ private test handling and worker isolation. See `docs/features/nextjs-api.md` fo
 Amendment 2.2.1 refreshes the published problem inventory after adding generator practice;
 the execution, authorization and persistence principles are unchanged.
 
-**Version**: 2.2.1 | **Ratified**: 2026-11-07 | **Last Amended**: 2026-11-10
+Amendment 2.3.0 replaces Clerk with Neon Managed Better Auth at the user's request.
+Verified Neon sessions own application progress through unique `neonUserId` records.
+The development cutover starts fresh on an isolated database branch; email matching and
+automatic imports from the old identity are excluded. Server authorization and judging isolation remain mandatory.
+
+**Version**: 2.3.0 | **Ratified**: 2026-11-07 | **Last Amended**: 2026-11-11

@@ -46,8 +46,12 @@ function NavLink(props: GlobalNavLinkProps) {
 
 export function SiteNav({ authConfigured }: { authConfigured: boolean }) {
   const pathname = usePathname();
-  // The public landing and focused workspaces provide their own navigation.
-  if (pathname === "/" || /^\/javascript\/practice\/[^/]+\/?$/.test(pathname))
+  // Landing, authentication and focused workspaces omit the global navigation.
+  if (
+    pathname === "/" ||
+    /^\/sign-(?:in|up)(?:\/|$)/.test(pathname) ||
+    /^\/javascript\/practice\/[^/]+\/?$/.test(pathname)
+  )
     return null;
   const inJavaScript =
     pathname === "/javascript" || pathname.startsWith("/javascript/");

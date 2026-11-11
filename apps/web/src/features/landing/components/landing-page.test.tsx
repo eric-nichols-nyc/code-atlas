@@ -4,7 +4,7 @@ import { beforeEach, expect, it, vi } from "vitest";
 const state = vi.hoisted(() => ({ configured: true }));
 const session = vi.hoisted(() => vi.fn());
 vi.mock("@/lib/auth", () => ({ isAuthConfigured: () => state.configured }));
-vi.mock("@clerk/nextjs/server", () => ({ auth: session }));
+vi.mock("@/lib/auth/server", () => ({ getVerifiedUserId: session }));
 
 import HomePage from "@/app/page";
 
@@ -21,7 +21,7 @@ it.each([
   "routes the primary action with auth configured=%s, identity=%s",
   async (configured, userId, href) => {
     state.configured = configured;
-    session.mockResolvedValue({ userId });
+    session.mockResolvedValue(userId);
     render(await HomePage());
     const hero = screen.getByRole("region", {
       name: "Know the concept. Write the code.",

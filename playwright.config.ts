@@ -2,8 +2,8 @@ import { defineConfig, devices } from "@playwright/test";
 
 // The starter smoke suite deliberately exercises the credentials-pending state.
 const noCredentials = {
-  NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: "",
-  CLERK_SECRET_KEY: "",
+  NEON_AUTH_BASE_URL: "",
+  NEON_AUTH_COOKIE_SECRET: "",
   DATABASE_URL: "",
 };
 

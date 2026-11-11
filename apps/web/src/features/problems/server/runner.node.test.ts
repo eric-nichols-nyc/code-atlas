@@ -22,7 +22,8 @@ describe("isolated Fibonacci generator judging", () => {
     expect(result.cases[0]?.actual).toEqual([]);
     expect(result.cases[1]?.actual).toEqual([0]);
     expect(result.cases[2]?.actual).toHaveLength(50);
-    expect(result.cases[2]?.actual?.at(-1)).toBe(7778742049);
+    const prefix = result.cases[2]?.actual;
+    expect(Array.isArray(prefix) ? prefix.at(-1) : undefined).toBe(7778742049);
   });
   it("submits the full private suite and redacts hidden diagnostics", async () => {
     const result = await executeProblem({ ...job, action: "submit" });

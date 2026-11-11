@@ -35,7 +35,7 @@ test("web dashboard remains in setup mode before credentials", async ({
 });
 
 test("global navigation follows the active web route", async ({ page }) => {
-  await page.goto("/sign-in");
+  await page.goto("/javascript/practice");
   const navigation = page.getByRole("navigation", { name: "Main navigation" });
   await expect(
     navigation.getByRole("link", { name: "Home", exact: true }),
@@ -292,16 +292,17 @@ for (const { origin, setup, navigationLabel } of [
       .click();
     await expect(page).toHaveURL(`${origin}/sign-in`);
     await expect(page.getByText(setup, { exact: true })).toBeVisible();
+    await expect(navigation).toHaveCount(0);
+    await page.goto(`${origin}/dashboard`);
     await navigation
       .getByRole("link", { name: "Sign up", exact: true })
       .click();
     await expect(page).toHaveURL(`${origin}/sign-up`);
     await expect(page.getByText(setup, { exact: true })).toBeVisible();
+    await expect(navigation).toHaveCount(0);
   });
 
-  test(`${origin} resolves nested Clerk authentication routes`, async ({
-    page,
-  }) => {
+  test(`${origin} resolves nested authentication routes`, async ({ page }) => {
     for (const path of [
       "/sign-in/verify-email-address",
       "/sign-up/verify-email-address",
@@ -309,6 +310,9 @@ for (const { origin, setup, navigationLabel } of [
       const response = await page.goto(`${origin}${path}`);
       expect(response?.status()).toBe(200);
       await expect(page.getByText(setup, { exact: true })).toBeVisible();
+      await expect(
+        page.getByRole("navigation", { name: "Main navigation" }),
+      ).toHaveCount(0);
     }
   });
 }
@@ -319,8 +323,10 @@ for (const path of [
   "/javascript/practice",
   "/javascript/practice/sleep",
   "/javascript/practice/counter",
+  "/javascript/practice/curry",
   "/javascript/practice/debounce",
   "/javascript/practice/filter-elements-from-array",
+  "/javascript/practice/flatten-nested-array",
   "/javascript/practice/fibonacci-generator",
   "/javascript/practice/delay-the-resolution-of-each-promise",
   "/javascript/practice/scope-and-shadowing",
@@ -369,4 +375,21 @@ test("withholds account progress before authentication is configured", async ({
       })
     ).status(),
   ).toBe(503);
+});
+
+for (const path of ["/forgot-password", "/reset-password", "/verify-email"]) {
+  test(`${path} remains available before auth configuration`, async ({
+    page,
+  }) => {
+    const response = await page.goto(path);
+    expect(response?.status()).toBe(200);
+    await expect(
+      page.getByText("Authentication setup", { exact: true }),
+    ).toBeVisible();
+  });
+}
+test("auth API fails explicitly before credentials", async ({ request }) => {
+  const response = await request.get("/api/auth/get-session");
+  expect(response.status()).toBe(503);
+  expect(response.headers()["cache-control"]).toBe("no-store");
 });

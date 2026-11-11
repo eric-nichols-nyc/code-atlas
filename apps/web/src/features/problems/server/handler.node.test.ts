@@ -12,8 +12,8 @@ const state = vi.hoisted(() => ({
   userId: "owner-a" as string | null,
 }));
 vi.mock("@/lib/auth", () => ({ isAuthConfigured: () => state.configured }));
-vi.mock("@clerk/nextjs/server", () => ({
-  auth: async () => ({ userId: state.userId }),
+vi.mock("@/lib/auth/server", () => ({
+  getVerifiedUserId: async () => state.userId,
 }));
 const progress = {
   recordExecution: vi.fn(async () => true),

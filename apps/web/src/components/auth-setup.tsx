@@ -16,12 +16,12 @@ export function AuthSetup() {
         <CardHeader>
           <CardTitle>Authentication setup</CardTitle>
           <CardDescription>
-            Sign-in will be available once Clerk is connected.
+            Sign-in will be available once Neon Auth is connected.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <p>
-            Add your Clerk keys using the project README, then restart the app.
+            Configure Neon Auth using the project README, then restart the app.
           </p>
         </CardContent>
         <CardFooter>

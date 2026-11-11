@@ -1,10 +1,10 @@
-import { SignIn } from "@clerk/nextjs";
 import { AuthScreen } from "@/components/auth-screen";
+import { AuthForm } from "@/features/auth/components/auth-form";
 
-export default function SignInPage() {
+export default function AuthPage() {
   return (
     <AuthScreen>
-      <SignIn routing="path" path="/sign-in" />
+      <AuthForm initialView="sign-in" />
     </AuthScreen>
   );
 }

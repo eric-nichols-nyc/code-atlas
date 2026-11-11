@@ -1,14 +1,43 @@
 import {
   counterProblem,
+  curryProblem,
   debounceProblem,
   delayEachPromiseProblem,
   fibonacciGeneratorProblem,
   filterArrayProblem,
+  flattenNestedArrayProblem,
   publicProblems,
   validRunInputs,
 } from "@workspace/problems";
 import { expect, it } from "vitest";
 import { inputDraft, parseInputDraft } from "./input-drafts";
+
+it("round-trips nested arrays and rejects malformed or unsupported JSON", () => {
+  const draft = inputDraft({ arr: [0, [1, [0]], []] });
+  expect(parseInputDraft(flattenNestedArrayProblem, draft)).toEqual({
+    arr: [0, [1, [0]], []],
+  });
+  expect(
+    parseInputDraft(flattenNestedArrayProblem, { ...draft, json: "[]" }),
+  ).toEqual({ arr: [] });
+  for (const json of ["bad", "{}", "[null]", "[true]", '["1"]', "[1.5]"])
+    expect(
+      parseInputDraft(flattenNestedArrayProblem, { ...draft, json }),
+    ).toBeUndefined();
+});
+
+it("validates editable curry callback and groups without requiring a numeric field", () => {
+  const draft = inputDraft({ fn: "sum3", groups: [[], [1], [2, 3]] });
+  expect(parseInputDraft(curryProblem, draft)).toEqual({
+    fn: "sum3",
+    groups: [[], [1], [2, 3]],
+  });
+  for (const json of ["bad", "[]", "[[1]]", "[[1,2,3],[]]"])
+    expect(parseInputDraft(curryProblem, { ...draft, json })).toBeUndefined();
+  expect(
+    parseInputDraft(curryProblem, { ...draft, callback: "source" }),
+  ).toBeUndefined();
+});
 
 it("validates editable Promise descriptors, including zero and empty inputs", () => {
   expect(

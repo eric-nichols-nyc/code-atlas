@@ -1,4 +1,3 @@
-import { auth } from "@clerk/nextjs/server";
 import { findProblem } from "@workspace/problems";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -7,6 +6,7 @@ import { javascriptPracticeCatalog } from "@/content/javascript/practice/catalog
 import { problemStatements } from "@/content/javascript/practice/statements";
 import { ProblemExperience } from "@/features/problems/components/problem-experience";
 import { isAuthConfigured } from "@/lib/auth";
+import { learnerStorageId, requirePageLearner } from "@/lib/auth/server";
 export const metadata: Metadata = { title: "JavaScript Practice | Code Atlas" };
 export default async function ProblemPage({
   params,
@@ -14,7 +14,7 @@ export default async function ProblemPage({
   params: Promise<{ problemSlug: string }>;
 }) {
   if (!isAuthConfigured()) return <AuthSetup />;
-  const session = await auth.protect();
+  const userId = await requirePageLearner();
   const { problemSlug } = await params;
   const problem = findProblem(problemSlug);
   const entry = javascriptPracticeCatalog.find(
@@ -24,7 +24,7 @@ export default async function ProblemPage({
   if (!problem || !entry || !loadStatement) notFound();
   const { default: Statement } = await loadStatement();
   return (
-    <ProblemExperience problem={problem} learnerId={session?.userId}>
+    <ProblemExperience problem={problem} learnerId={learnerStorageId(userId)}>
       <Statement />
     </ProblemExperience>
   );

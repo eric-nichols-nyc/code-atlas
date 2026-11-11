@@ -1,4 +1,3 @@
-import { ClerkProvider } from "@clerk/nextjs";
 import { ThemeProvider } from "@workspace/ui/components/theme-provider";
 import type { Metadata } from "next";
 import { SiteNav } from "@/components/site-nav";
@@ -25,17 +24,5 @@ export default function RootLayout({
       </body>
     </html>
   );
-  return authConfigured ? (
-    <ClerkProvider
-      signInUrl="/sign-in"
-      signUpUrl="/sign-up"
-      signInForceRedirectUrl="/dashboard"
-      signUpForceRedirectUrl="/dashboard"
-      afterSignOutUrl="/"
-    >
-      {content}
-    </ClerkProvider>
-  ) : (
-    content
-  );
+  return content;
 }

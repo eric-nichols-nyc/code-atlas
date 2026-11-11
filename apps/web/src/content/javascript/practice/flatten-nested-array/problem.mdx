@@ -1,0 +1,15 @@
+Write `flatten(arr)` to return every number from a nested array in one new array.
+
+Visit values from **left to right** and remove every nesting level. Preserve duplicates, negative numbers and zero. Empty arrays contribute no values.
+
+```javascript
+flatten([1, [2, [3, 4]], 5]); // [1, 2, 3, 4, 5]
+flatten([[], [0, [-2, 0]], []]); // [0, -2, 0]
+flatten([]); // []
+```
+
+Keep the original array and all its nested arrays unchanged. Return a new array even when the input is already flat or empty.
+
+Implement the traversal yourself: **`Array.prototype.flat` and `flatMap` are disabled** for this exercise. Use `Array.isArray` to recognize nested arrays, then explore recursion or an explicit stack.
+
+The test panel accepts `arr` as a JSON array. Only integer values and arrays are supported, with at most 20 array levels including the outer array and 1000 array/number nodes total. Flatten every level; there is no depth argument.

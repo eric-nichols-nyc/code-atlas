@@ -11,17 +11,19 @@ import {
   SelectValue,
 } from "@workspace/ui/components/select";
 import { useProblemSession } from "../state/problem-session";
+import { CurryCaseFields } from "./curry-case-fields";
 export function CaseInputFields({ index }: { index: number }) {
   const s = useProblemSession();
   const draft = s.inputs[index];
   if (!draft) return null;
   const kind = s.problem.kind;
+  if (kind === "curry") return <CurryCaseFields index={index} />;
   const predicate = filterPredicates.find(
     (item) => item.id === draft.predicate,
   );
   return (
     <div className="flex min-w-0 flex-col gap-4">
-      {kind !== "filter-array" && (
+      {kind !== "filter-array" && kind !== "flatten-array" && (
         <div>
           <Label htmlFor="primary-input" className="mb-2 font-mono text-xs">
             {kind === "counter"
@@ -80,6 +82,7 @@ export function CaseInputFields({ index }: { index: number }) {
       )}
       {(kind === "debounce" ||
         kind === "filter-array" ||
+        kind === "flatten-array" ||
         kind === "delay-all") && (
         <div>
           <Label htmlFor="json-input" className="mb-2 font-mono text-xs">
@@ -102,7 +105,9 @@ export function CaseInputFields({ index }: { index: number }) {
               ? 'JSON schedule, e.g. [{"t":50,"inputs":[1]}]. Times are milliseconds.'
               : kind === "delay-all"
                 ? 'JSON function descriptors, e.g. [{"t":30,"value":1}]. Each original fulfills after t milliseconds.'
-                : "JSON integer array. Empty arrays are allowed."}
+                : kind === "flatten-array"
+                  ? "Nested JSON integer array. Empty arrays are allowed; at most 20 array levels and 1000 total array/number nodes."
+                  : "JSON integer array. Empty arrays are allowed."}
           </p>
         </div>
       )}

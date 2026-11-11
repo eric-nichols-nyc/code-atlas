@@ -5,7 +5,10 @@ import DashboardPage from "@/app/dashboard/page";
 const state = vi.hoisted(() => ({ configured: true }));
 const protect = vi.hoisted(() => vi.fn());
 vi.mock("@/lib/auth", () => ({ isAuthConfigured: () => state.configured }));
-vi.mock("@clerk/nextjs/server", () => ({ auth: { protect } }));
+vi.mock("@/lib/auth/server", () => ({
+  requirePageLearner: protect,
+  learnerStorageId: (id: string) => `neon:${id}`,
+}));
 
 beforeEach(() => {
   state.configured = true;

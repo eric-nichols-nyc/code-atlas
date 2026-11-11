@@ -29,7 +29,6 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.6.6",
-    "@clerk/testing": "2.2.55",
     "@playwright/test": "1.65.0",
     "@testing-library/dom": "10.4.1",
     "@testing-library/jest-dom": "^6.9.1",

@@ -13,12 +13,14 @@ Start with the [README quick start](../README.md#quick-start).
 | `/javascript/practice`                                      | Searchable table with Recommended, Closures, Arrays, Generators and Async categories, plus difficulty filtering |
 | `/javascript/practice/sleep`                                | Protected coding workspace with real Run/Submit                                                                 |
 | `/javascript/practice/counter`                              | Protected Counter workspace with editable start/call count and real Run/Submit                                  |
+| `/javascript/practice/curry`                                | Medium Closures workspace with supplied callbacks, editable argument groups, and isolated Run/Submit            |
 | `/javascript/practice/debounce`                             | Medium Async problem with a deterministic timer judge                                                           |
 | `/javascript/practice/delay-the-resolution-of-each-promise` | Medium Async problem with editable Promise descriptors and deterministic fulfillment timing                     |
 | `/javascript/practice/filter-elements-from-array`           | Easy Arrays problem with editable array/callback cases                                                          |
+| `/javascript/practice/flatten-nested-array`                 | Medium Arrays problem with editable nested JSON and isolated traversal judging                                  |
 | `/javascript/practice/fibonacci-generator`                  | Easy Generators problem with an editable count and isolated iterator judging                                    |
 | `/javascript/learn`                                         | Protected coming-soon page; Learn requirements are deferred                                                     |
-| `/sign-in`, `/sign-up`                                      | Clerk catch-all authentication routes; completed authentication redirects to Dashboard                          |
+| `/sign-in`, `/sign-up`                                      | Neon Auth catch-all authentication routes; completed authentication redirects to Dashboard                      |
 
 JavaScript catalog and Learn pages use centered Learn/Practice navigation, with Dashboard beside
 Code Atlas for returning to the subject picker. Learn/Practice have book/code icons and text-only hover states. Individual problem pages use a focused workspace
@@ -39,7 +41,7 @@ The workspace provides:
 - A local CodeMirror JavaScript editor with Reset code, theme, and disabled Share icons in its header.
 - Run and Submit below the editor; Testcase and Test Result beneath that.
 - Resizable description/editor/tools columns and an editor/results split. Closing tools releases space.
-- Flag toggles and solved indicators in the table. Records belong to the verified Clerk user and persist across sessions/devices. Older browser completions are retained separately as unverified history.
+- Flag toggles and solved indicators in the table. Records belong to the verified Neon Auth user and persist across sessions/devices. Older browser completions are retained separately as unverified history.
 - A narrow-screen reading layout with a tools drawer. Source, editor state, inputs, expanded help,
   and results survive responsive changes.
 - Category icons use distinct theme colors. Difficulty labels use green for Easy, amber for Medium, and red for Hard.
@@ -53,17 +55,18 @@ Submissions view, Problems button, or Reset layout action. An accepted Submit re
 Copy the relevant example only if its local destination does not already exist. Keep real keys
 in ignored environment files; committed examples contain empty credential values.
 
-| Example                    | Local destination     | Purpose                                                        |
-| -------------------------- | --------------------- | -------------------------------------------------------------- |
-| `apps/web/.env.example`    | `apps/web/.env.local` | Clerk keys/auth routes and server-only Neon runtime connection |
-| `packages/db/.env.example` | `packages/db/.env`    | Prisma CLI pooled/direct connections for migrations            |
+| Example                    | Local destination     | Purpose                                                         |
+| -------------------------- | --------------------- | --------------------------------------------------------------- |
+| `apps/web/.env.example`    | `apps/web/.env.local` | Neon Auth URL/cookie secret and server-only database connection |
+| `packages/db/.env.example` | `packages/db/.env`    | Prisma CLI pooled/direct connections for migrations             |
 
-1. Set web `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY` from the same Clerk application.
-2. Retain the example sign-in/sign-up routes and Dashboard redirect settings.
-3. Set server-only `DATABASE_URL` in `apps/web/.env.local` for account progress and saved source.
-4. Restart Next.js after environment changes. Rebuild after changing public frontend keys.
+1. Enable Neon Managed Better Auth on an isolated Neon development branch.
+2. Set server-only `NEON_AUTH_BASE_URL` to that branch's Auth URL.
+3. Generate `NEON_AUTH_COOKIE_SECRET` with `openssl rand -base64 32` (minimum 32 characters).
+4. Set `DATABASE_URL` for the same branch in `apps/web/.env.local`; configure the database package separately for migrations.
+5. Restart Next.js after environment changes. Keep localhost allowed in the branch's Auth configuration.
 
-The Next.js proxy initializes Clerk. Every protected page and Route Handler verifies its own session
+The Next.js proxy uses the official Neon Auth SDK for session cookies, OAuth and redirects. Every protected page and Route Handler verifies its own session
 before accessing data or executing code. API handlers also reject foreign request origins and bound
 payload sizes. Sign-in/sign-up redirect to Dashboard and sign-out returns home. Judging needs no
 external judge key. Missing auth configuration returns 503 and a missing session returns 401.
@@ -77,24 +80,24 @@ second application, token-forwarding origin or CORS configuration.
 
 Root `package.json` is the source of truth for scripts.
 
-| Command                                       | Purpose                                                                  |
-| --------------------------------------------- | ------------------------------------------------------------------------ |
-| `pnpm dev`                                    | Build shared dependencies/worker and run Next.js development             |
-| `pnpm build` / `pnpm start`                   | Build all workspaces / start production servers after building           |
-| `pnpm lint` / `pnpm lint:fix`                 | Biome checks / safe fixes                                                |
-| `pnpm format`                                 | Format supported files                                                   |
-| `pnpm typecheck`                              | Root and workspace TypeScript checks                                     |
-| `pnpm test` / `pnpm test:watch`               | Build shared packages/worker and run Vitest / watch                      |
-| `pnpm test:coverage`                          | Build shared packages/worker and run Vitest coverage                     |
-| `pnpm test:e2e` / `pnpm test:e2e:ui`          | Credential-free production Playwright smoke tests / test UI              |
-| `pnpm test:e2e:auth`                          | Optional authenticated suite with a dedicated Clerk development identity |
-| `pnpm --filter @workspace/web content:check`  | Validate the current practice catalog and public definitions             |
-| `pnpm --filter @workspace/web worker:build`   | Compile the isolated worker/adapters to ignored `.workers/`              |
-| `pnpm analyze`                                | Webpack bundle-analysis build for the web app                            |
-| `pnpm db:generate`                            | Generate Prisma Client without connecting to a database                  |
-| `pnpm db:migrate --name <name>`               | Create/apply a development migration once models and credentials exist   |
-| `pnpm db:deploy` / `pnpm db:studio`           | Apply committed migrations / open Prisma Studio                          |
-| `pnpm specify version` / `pnpm specify check` | Inspect the optional pinned Spec Kit CLI and available tools             |
+| Command                                       | Purpose                                                                      |
+| --------------------------------------------- | ---------------------------------------------------------------------------- |
+| `pnpm dev`                                    | Build shared dependencies/worker and run Next.js development                 |
+| `pnpm build` / `pnpm start`                   | Build all workspaces / start production servers after building               |
+| `pnpm lint` / `pnpm lint:fix`                 | Biome checks / safe fixes                                                    |
+| `pnpm format`                                 | Format supported files                                                       |
+| `pnpm typecheck`                              | Root and workspace TypeScript checks                                         |
+| `pnpm test` / `pnpm test:watch`               | Build shared packages/worker and run Vitest / watch                          |
+| `pnpm test:coverage`                          | Build shared packages/worker and run Vitest coverage                         |
+| `pnpm test:e2e` / `pnpm test:e2e:ui`          | Credential-free production Playwright smoke tests / test UI                  |
+| `pnpm test:e2e:auth`                          | Optional authenticated suite with a dedicated Neon Auth development identity |
+| `pnpm --filter @workspace/web content:check`  | Validate the current practice catalog and public definitions                 |
+| `pnpm --filter @workspace/web worker:build`   | Compile the isolated worker/adapters to ignored `.workers/`                  |
+| `pnpm analyze`                                | Webpack bundle-analysis build for the web app                                |
+| `pnpm db:generate`                            | Generate Prisma Client without connecting to a database                      |
+| `pnpm db:migrate --name <name>`               | Create/apply a development migration once models and credentials exist       |
+| `pnpm db:deploy` / `pnpm db:studio`           | Apply committed migrations / open Prisma Studio                              |
+| `pnpm specify version` / `pnpm specify check` | Inspect the optional pinned Spec Kit CLI and available tools                 |
 
 ## Where the code lives
 
@@ -154,7 +157,7 @@ Current content ownership is deliberate:
 `features/learning` currently owns the reusable adaptive layout and tools panel; its name does not
 make the current practice experience a guided Learn lesson.
 
-All six published problems have separate server-owned judging contracts.
+All eight published problems have separate server-owned judging contracts.
 Register new definitions, catalog entries, trusted MDX loaders and a matching private test suite/adapter;
 the content validator checks that the published catalog agrees with those public definitions.
 Adding MDX alone does not create a runnable problem.
@@ -167,7 +170,7 @@ Future Learn content is a separate feature. Reuse the shared workspace where its
 | Next Route Handler                        | Access and behavior                                              |
 | ----------------------------------------- | ---------------------------------------------------------------- |
 | `GET /api/health`                         | Public service health                                            |
-| `GET /api/me`                             | Verified Clerk identity                                          |
+| `GET /api/me`                             | Verified Neon Auth identity                                      |
 | `GET /api/practice-progress`              | Current learner's flags, solved status and legacy history        |
 | `GET /api/practice-progress/:problemId`   | Current learner's saved source and problem progress              |
 | `PATCH /api/practice-progress/:problemId` | Change the current learner's flag only                           |
@@ -176,12 +179,12 @@ Future Learn content is a separate feature. Reuse the shared workspace where its
 | `POST /api/problems/:problemId/submit`    | Execute the server-selected suite                                |
 
 Routes live in `apps/web/src/app/api/**/route.ts` and use the Node.js runtime. Thin handlers compose
-feature-owned server code, which verifies Clerk identity before execution or database access.
+feature-owned server code, which verifies Neon Auth identity before execution or database access.
 Server services use `server-only` boundaries. UI code uses the same-origin `/api` URLs.
 
 The execution service runs QuickJS WebAssembly inside a disposable Node Worker. Guest memory, stack, CPU, timers,
 console output, concurrency, and wall time are bounded. Learner code has no Node module, filesystem,
-DOM, or network access. The adapters support single-file JavaScript for these six problems, not a general Node runtime.
+DOM, or network access. The adapters support single-file JavaScript for these eight problems, not a general Node runtime.
 Sleep measures elapsed time. Counter checks returned numeric sequences and independent closure state;
 its editable `calls` field is the number of invocations. Debounce runs guest timers on a deterministic
 clock with documented same-time ordering. Filter supplies a selectable callback, checks truthy
@@ -191,6 +194,11 @@ and checks independent state. The generator itself takes no arguments.
 Delay the Resolution of Each Promise checks wrapper creation, immediate original invocation,
 preserved values/order and an extra fulfillment delay on the same deterministic clock. See its
 [feature brief](../docs/features/delay-each-promise.md) for the original exercise and research sources.
+Curry collects grouped arguments, checks reusable partial functions and zero-arity
+callbacks, and returns a numeric result. See its [feature brief](features/javascript-curry.md).
+Flatten Nested Array traverses every array level while preserving order, duplicates,
+zero and input contents; `flat` and `flatMap` are disabled. See its
+[feature brief](features/javascript-flatten-nested-array.md).
 Hidden inputs, outputs and logs remain private.
 
 Run uses editable visible cases; Submit ignores client-supplied cases and uses the full private suite.
@@ -205,11 +213,22 @@ leave judging usable with an explicit unsaved status and a per-learner browser c
 ## Database
 
 Prisma 7 and the Neon adapter live in packages/db. User links an internal ID to a unique
-clerkUserId. PracticeProgress has one row per user/problem, with flagged, solvedAt, lastCode,
-codeUpdatedAt, legacyCompleted, and timestamps. Users are created lazily from verified Clerk
-identity on their first practice-data request. Passwords/profile management remain in Clerk;
-problem content and private suites remain in files. Only Next server modules import Prisma;
-client components consume authenticated Route Handlers.
+`neonUserId`. PracticeProgress has one row per user/problem, with flagged, solvedAt, lastCode,
+codeUpdatedAt, legacyCompleted, and timestamps. Users are created lazily from the server-verified
+Neon Auth session on their first practice-data request. Neon Managed Better Auth owns passwords
+and sessions in its managed `neon_auth` schema; Prisma owns only application tables. Do not add
+Prisma auth tables or a self-hosted Better Auth server. Problem content and private suites remain
+in files. Only Next server modules import Prisma; clients use authenticated Route Handlers.
+
+The migration renames the old identity column/index to `neonUserId`. For this development cutover,
+the user approved clearing the old app user and progress on the isolated `feature/neon-auth`
+database branch before applying it. No accounts are linked by email. Provider-qualified browser
+keys (`neon:<userId>`) keep old local backups separate. Parent branches remain untouched.
+Sign up again through Neon Auth. This does not delete the hosted Clerk account or service.
+
+Email/password and shared development Google OAuth are enabled on the current development branch.
+Password recovery and verification use email codes. Production email, verification policy, trusted
+origins and private OAuth credentials require configuration before a production cutover.
 
 Configure pooled `DATABASE_URL` and optional direct `DIRECT_URL` in `packages/db/.env` for CLI use.
 Prisma prefers `DIRECT_URL` for migrations and otherwise uses `DATABASE_URL`. Each server app that
@@ -231,7 +250,7 @@ normal builds do not require database credentials.
 
 `packages/ui` exports source components and semantic Tailwind theme tokens. Web compiles the shared
 source directly. Use the existing Buttons, Accordion, Tabs, Sheet, resizable primitives, GlobalNav,
-and theme controls before adding alternatives. Routes and Clerk decisions remain in app-owned adapters.
+and theme controls before adding alternatives. Routes and Neon Auth decisions remain in app-owned adapters.
 
 ```tsx
 import { Button } from "@workspace/ui/components/button";
@@ -260,7 +279,7 @@ pnpm build
 
 The web build includes content validation. Vitest covers contracts, real runner behavior, API policy,
 workspace interactions, catalog logic, and shared navigation. UI tests use jsdom/Testing Library;
-Route Handler tests use standard Request/Response objects with mocked Clerk identity and real
+Route Handler tests use standard Request/Response objects with mocked Neon Auth identity and real
 worker tests. Documentation-only edits need formatting and link checks, not a full build.
 
 The [CI workflow](../.github/workflows/ci.yml) runs on pull requests targeting `main` and pushes
@@ -274,7 +293,7 @@ Stop conflicting development servers before running it. Install Chromium once if
 
 ```sh
 pnpm exec playwright install chromium
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY= CLERK_SECRET_KEY= CLERK_PUBLISHABLE_KEY= DATABASE_URL= pnpm build
+NEON_AUTH_BASE_URL= NEON_AUTH_COOKIE_SECRET= DATABASE_URL= DIRECT_URL= pnpm build
 pnpm test:e2e
 ```
 
@@ -282,11 +301,15 @@ The smoke configuration clears credentials and starts its own Next.js server. It
 navigation, themes, mobile behavior, auth routes, health, and protected setup boundaries. It does not
 verify real sign-in, authenticated judging, or database access. Reports/traces are ignored.
 
-Authenticated automation is optional and remains unverified at the user's request. It requires Clerk
-**development** keys and `CLERK_TEST_USER_EMAIL` for a dedicated existing development learner without
-MFA/session tasks. The config reads ignored `.env.test.local` and web environment files. Free
-port 3000 because the suite builds/starts its own Next.js server. Run `pnpm test:e2e:auth` when that identity is ready. Manual signed-in browser review is recorded
-in the feature brief and does not count as authenticated automated coverage.
+Authenticated automation is optional and remains unverified at the user's request. Configure
+an isolated development branch and a dedicated existing Neon Auth learner using
+`NEON_TEST_USER_EMAIL` and `NEON_TEST_USER_PASSWORD` in ignored `.env.test.local`.
+The config also reads the web environment file. Free port 3000 because the suite builds/starts
+its own Next.js server. Run `pnpm test:e2e:auth` when that identity is ready. It writes practice
+progress to that test account; never point it at a personal account or production database.
+The setup signs in through the actual form and saves ignored `.auth/learner.json` session state.
+Auth setup disables traces, video and screenshots to keep login details out of artifacts.
+Manual browser review does not count as authenticated automated coverage.
 
 ## Deployment and future work
 
@@ -323,10 +346,10 @@ validated interfaces. Browser tests cannot establish packaged desktop behavior.
 | -------------------------------------- | ----------------------------------------------------------------------- |
 | Unsupported runtime                    | Match `.nvmrc` and the pinned pnpm version                              |
 | Dev/test server cannot bind            | Check port 3000 and stop the conflicting process                        |
-| Protected page shows setup information | Configure both web Clerk keys and restart                               |
-| Run/Submit is unavailable              | Check `/api/health`, Clerk session and the compiled worker              |
-| API returns 401                        | Verify the Clerk session                                                |
-| API returns 503                        | Check Clerk configuration or runner availability                        |
+| Protected page shows setup information | Configure the Neon Auth URL and cookie secret, then restart             |
+| Run/Submit is unavailable              | Check `/api/health`, Neon Auth session and the compiled worker          |
+| API returns 401                        | Verify the Neon Auth session                                            |
+| API returns 503                        | Check Neon Auth configuration or runner availability                    |
 | Database URL is missing                | Configure the consuming server app, not only the Prisma CLI environment |
 | Playwright browser is missing          | Run `pnpm exec playwright install chromium`                             |
 | Smoke tests fail to start              | Build without credentials and free port 3000                            |

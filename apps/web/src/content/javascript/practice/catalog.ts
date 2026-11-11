@@ -1,18 +1,22 @@
 import {
   counterProblem,
+  curryProblem,
   debounceProblem,
   delayEachPromiseProblem,
   fibonacciGeneratorProblem,
   filterArrayProblem,
+  flattenNestedArrayProblem,
   sleepProblem,
 } from "@workspace/problems";
 import type { PracticeEntry } from "../../../features/catalog/lib/practice-catalog";
 export const javascriptPracticeCatalog = [
   { problem: sleepProblem, order: 65 },
   { problem: counterProblem, order: 10 },
+  { problem: curryProblem, order: 15 },
   { problem: debounceProblem, order: 30 },
   { problem: delayEachPromiseProblem, order: 35 },
   { problem: filterArrayProblem, order: 20 },
+  { problem: flattenNestedArrayProblem, order: 25 },
   { problem: fibonacciGeneratorProblem, order: 40 },
 ].map<PracticeEntry>(({ problem, order }) => ({
   id: problem.id,

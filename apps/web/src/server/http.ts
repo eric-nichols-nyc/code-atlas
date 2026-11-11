@@ -1,6 +1,6 @@
 import "server-only";
-import { auth } from "@clerk/nextjs/server";
 import { isAuthConfigured } from "@/lib/auth";
+import { getVerifiedUserId } from "@/lib/auth/server";
 
 export function json(value: unknown, status = 200) {
   return Response.json(value, {
@@ -13,13 +13,17 @@ export function json(value: unknown, status = 200) {
 export async function requireLearner(request: Request) {
   if (!isAuthConfigured())
     return json({ error: "Authentication is not configured." }, 503);
-  const session = await auth();
-  if (!session.userId)
-    return json({ error: "Sign in to access this resource." }, 401);
+  let userId: string | null;
+  try {
+    userId = await getVerifiedUserId();
+  } catch {
+    return json({ error: "Authentication is temporarily unavailable." }, 503);
+  }
+  if (!userId) return json({ error: "Sign in to access this resource." }, 401);
   const origin = request.headers.get("origin");
   if (origin && origin !== new URL(request.url).origin)
     return json({ error: "This request origin is not allowed." }, 403);
-  return session.userId;
+  return userId;
 }
 
 export async function readJson(

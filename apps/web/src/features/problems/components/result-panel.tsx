@@ -135,13 +135,15 @@ export function ResultPanel() {
                               <>
                                 <dt>Expected</dt>
                                 <dd className="max-h-32 overflow-auto [overflow-wrap:anywhere]">
-                                  {c.expected
+                                  {c.expected !== undefined
                                     ? JSON.stringify(c.expected)
                                     : "—"}
                                 </dd>
                                 <dt>Output</dt>
                                 <dd className="max-h-32 overflow-auto [overflow-wrap:anywhere]">
-                                  {c.actual ? JSON.stringify(c.actual) : "—"}
+                                  {c.actual !== undefined
+                                    ? JSON.stringify(c.actual)
+                                    : "—"}
                                 </dd>
                               </>
                             )}

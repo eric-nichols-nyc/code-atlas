@@ -13,7 +13,6 @@
     "worker:build": "tsc -p tsconfig.worker.json"
   },
   "dependencies": {
-    "@clerk/nextjs": "7.9.25",
     "@codemirror/autocomplete": "6.20.4",
     "@codemirror/commands": "6.11.1",
     "@codemirror/lang-javascript": "6.2.5",
@@ -23,6 +22,7 @@
     "@lezer/highlight": "1.2.5",
     "@mdx-js/loader": "3.1.1",
     "@mdx-js/react": "3.1.1",
+    "@neon/auth": "0.8.2",
     "@next/mdx": "16.4.5",
     "@workspace/db": "workspace:*",
     "@workspace/problems": "workspace:*",

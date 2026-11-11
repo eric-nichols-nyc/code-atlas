@@ -1,15 +1,15 @@
-import { auth } from "@clerk/nextjs/server";
 import { Button } from "@workspace/ui/components/button";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { AuthSetup } from "@/components/auth-setup";
 import { isAuthConfigured } from "@/lib/auth";
+import { requirePageLearner } from "@/lib/auth/server";
 
 export const metadata: Metadata = { title: "JavaScript Learn | Code Atlas" };
 
 export default async function JavaScriptLearnPage() {
   if (!isAuthConfigured()) return <AuthSetup />;
-  await auth.protect();
+  await requirePageLearner();
   return (
     <main className="mx-auto flex w-full max-w-[1200px] min-w-0 flex-1 flex-col gap-7 px-5 py-8 md:px-6 md:py-10">
       <header className="flex max-w-2xl flex-col gap-3">

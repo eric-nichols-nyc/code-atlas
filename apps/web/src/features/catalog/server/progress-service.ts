@@ -11,34 +11,34 @@ const summary = {
 const detail = { ...summary, lastCode: true, codeUpdatedAt: true } as const;
 
 export function createProgressService(database = getDb) {
-  const user = async (clerkUserId: string) => {
-    if (!clerkUserId) throw new Error("Verified identity required");
+  const user = async (neonUserId: string) => {
+    if (!neonUserId) throw new Error("Verified identity required");
     const db = database();
     const owner = await db.user.upsert({
-      where: { clerkUserId },
-      create: { clerkUserId },
-      update: { clerkUserId },
+      where: { neonUserId },
+      create: { neonUserId },
+      update: { neonUserId },
       select: { id: true },
     });
     return { db, userId: owner.id };
   };
   return {
-    async list(clerkUserId: string) {
-      const { db, userId } = await user(clerkUserId);
+    async list(neonUserId: string) {
+      const { db, userId } = await user(neonUserId);
       return db.practiceProgress.findMany({
         where: { userId },
         select: summary,
       });
     },
-    async read(clerkUserId: string, problemId: string) {
-      const { db, userId } = await user(clerkUserId);
+    async read(neonUserId: string, problemId: string) {
+      const { db, userId } = await user(neonUserId);
       return db.practiceProgress.findUnique({
         where: { userId_problemId: { userId, problemId } },
         select: detail,
       });
     },
-    async flag(clerkUserId: string, problemId: string, flagged: boolean) {
-      const { db, userId } = await user(clerkUserId);
+    async flag(neonUserId: string, problemId: string, flagged: boolean) {
+      const { db, userId } = await user(neonUserId);
       return db.practiceProgress.upsert({
         where: { userId_problemId: { userId, problemId } },
         create: { userId, problemId, flagged },
@@ -47,11 +47,11 @@ export function createProgressService(database = getDb) {
       });
     },
     async importLegacy(
-      clerkUserId: string,
+      neonUserId: string,
       flagged: string[],
       solved: string[],
     ) {
-      const { db, userId } = await user(clerkUserId);
+      const { db, userId } = await user(neonUserId);
       const ids = [...new Set([...flagged, ...solved])];
       if (ids.length) {
         await db.$transaction([
@@ -78,14 +78,14 @@ export function createProgressService(database = getDb) {
       });
     },
     async recordExecution(
-      clerkUserId: string,
+      neonUserId: string,
       problemId: string,
       code: string,
       startedAt: Date,
       action: ExecutionAction,
       result?: ExecutionResult,
     ) {
-      const { db, userId } = await user(clerkUserId);
+      const { db, userId } = await user(neonUserId);
       await db.practiceProgress.upsert({
         where: { userId_problemId: { userId, problemId } },
         create: { userId, problemId, lastCode: code, codeUpdatedAt: startedAt },

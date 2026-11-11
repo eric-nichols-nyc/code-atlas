@@ -9,6 +9,20 @@ import type {
 } from "@workspace/problems";
 import { getQuickJS, type QuickJSHandle } from "quickjs-emscripten";
 
+const curryAdapterPath = import.meta.url.endsWith(".ts")
+  ? "./adapters/curry.ts"
+  : "./adapters/curry.js";
+const { curryHarness, judgeCurry }: typeof import("./adapters/curry.js") =
+  await import(curryAdapterPath);
+const flattenAdapterPath = import.meta.url.endsWith(".ts")
+  ? "./adapters/flatten-nested-array.ts"
+  : "./adapters/flatten-nested-array.js";
+const {
+  flattenHarness,
+  judgeFlatten,
+}: typeof import("./adapters/flatten-nested-array.js") = await import(
+  flattenAdapterPath
+);
 const debounceAdapterPath = import.meta.url.endsWith(".ts")
   ? "./adapters/debounce.ts"
   : "./adapters/debounce.js";
@@ -92,6 +106,8 @@ async function runCase(test: Work["cases"][number]): Promise<CaseResult> {
   let arrayCheck: QuickJSHandle | undefined;
   let generatorCheck: QuickJSHandle | undefined;
   let promiseDelayCheck: QuickJSHandle | undefined;
+  let curryCheck: QuickJSHandle | undefined;
+  let flattenCheck: QuickJSHandle | undefined;
   let promise: QuickJSHandle | undefined;
   const enter = <T>(call: () => T): T => {
     const start = performance.now();
@@ -295,6 +311,25 @@ async function runCase(test: Work["cases"][number]): Promise<CaseResult> {
       return result("runtime-error", "The guest could not initialize.");
     }
     arrayCheck = arrayIntrinsic.value;
+    if (work.problemId === "javascript.flatten-nested-array") {
+      const harness = enter(() => ctx.evalCode(flattenHarness, "judge.js"));
+      if (harness.error) {
+        harness.dispose();
+        return result(
+          "runtime-error",
+          "The flatten judge could not initialize.",
+        );
+      }
+      flattenCheck = harness.value;
+    }
+    if (work.problemId === "javascript.curry") {
+      const harness = enter(() => ctx.evalCode(curryHarness, "judge.js"));
+      if (harness.error) {
+        harness.dispose();
+        return result("runtime-error", "The curry judge could not initialize.");
+      }
+      curryCheck = harness.value;
+    }
     if (work.problemId === "javascript.delay-the-resolution-of-each-promise") {
       const harness = enter(() =>
         ctx.evalCode(promiseDelayHarness, "judge.js"),
@@ -347,6 +382,26 @@ async function runCase(test: Work["cases"][number]): Promise<CaseResult> {
       errorText,
       exceeded: () => interrupted || cpu > 250,
     };
+    if (work.problemId === "javascript.flatten-nested-array") {
+      if (
+        typeof test.input === "number" ||
+        !("arr" in test.input) ||
+        !flattenCheck
+      )
+        return result("runtime-error", "Invalid nested-array input.");
+      const outcome = judgeFlatten(test.input, guest, flattenCheck);
+      return result(outcome.verdict, outcome.message, undefined, outcome);
+    }
+    if (work.problemId === "javascript.curry") {
+      if (
+        typeof test.input === "number" ||
+        !("groups" in test.input) ||
+        !curryCheck
+      )
+        return result("runtime-error", "Invalid curry input.");
+      const outcome = judgeCurry(test.input, guest, curryCheck, test.hidden);
+      return result(outcome.verdict, outcome.message, undefined, outcome);
+    }
     if (work.problemId === "javascript.delay-the-resolution-of-each-promise") {
       if (
         typeof test.input === "number" ||
@@ -385,7 +440,11 @@ async function runCase(test: Work["cases"][number]): Promise<CaseResult> {
       return result(outcome.verdict, outcome.message, undefined, outcome);
     }
     if (work.problemId === "javascript.filter-elements-from-array") {
-      if (typeof test.input === "number" || !("arr" in test.input))
+      if (
+        typeof test.input === "number" ||
+        !("arr" in test.input) ||
+        !("predicate" in test.input)
+      )
         return result("runtime-error", "Invalid filter input.");
       const outcome = judgeFilter(test.input, guest);
       return result(outcome.verdict, outcome.message, undefined, outcome);
@@ -601,6 +660,8 @@ async function runCase(test: Work["cases"][number]): Promise<CaseResult> {
     arrayCheck?.dispose();
     generatorCheck?.dispose();
     promiseDelayCheck?.dispose();
+    curryCheck?.dispose();
+    flattenCheck?.dispose();
     fn?.dispose();
     ctx.dispose();
     rt.dispose();
