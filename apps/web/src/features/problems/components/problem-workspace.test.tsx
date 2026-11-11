@@ -1,7 +1,9 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import {
   counterProblem,
+  curryProblem,
   type ExecutionResult,
+  flattenNestedArrayProblem,
   type ProblemDefinition,
   sleepProblem,
 } from "@workspace/problems";
@@ -54,6 +56,85 @@ function Workspace({
   );
 }
 afterEach(() => vi.unstubAllGlobals());
+it("runs edited nested arrays and validates unsupported values before making a request", async () => {
+  const fetch = vi.fn(async (_url: string, _init?: RequestInit) =>
+    Response.json({
+      ...accepted,
+      total: 1,
+      passed: 1,
+      cases: [
+        {
+          id: "case-1",
+          passed: true,
+          verdict: "accepted",
+          hidden: false,
+          input: { arr: [0, [1, [0]]] },
+          expected: [0, 1, 0],
+          actual: [0, 1, 0],
+          message: "Correct.",
+          logs: [],
+        },
+      ],
+    }),
+  );
+  vi.stubGlobal("fetch", fetch);
+  render(<Workspace problem={flattenNestedArrayProblem} />);
+  expect(screen.queryByRole("combobox", { name: "fn =" })).toBeNull();
+  fireEvent.change(screen.getByLabelText("arr ="), {
+    target: { value: "[null]" },
+  });
+  fireEvent.click(screen.getByRole("button", { name: "Run" }));
+  expect(await screen.findByRole("alert")).toHaveTextContent(
+    flattenNestedArrayProblem.inputError,
+  );
+  expect(fetch).not.toHaveBeenCalled();
+  fireEvent.change(screen.getByLabelText("arr ="), {
+    target: { value: "[0,[1,[0]]]" },
+  });
+  fireEvent.click(screen.getByRole("button", { name: "Run" }));
+  await screen.findByText("Accepted", { selector: "h2" });
+  expect(fetch.mock.calls[0]?.[0]).toBe(
+    "/api/problems/javascript.flatten-nested-array/run",
+  );
+  expect(
+    JSON.parse(fetch.mock.calls[0]?.[1]?.body as string).inputs[0],
+  ).toEqual({ arr: [0, [1, [0]]] });
+  expect(screen.getAllByText("[0,1,0]", { selector: "dd" })).toHaveLength(2);
+});
+it("runs edited curry groups and renders numeric zero for both expected and actual output", async () => {
+  const input = { fn: "sum3", groups: [[0], [0, 0]] };
+  const fetch = vi.fn(async (_url: string, _init?: RequestInit) =>
+    Response.json({
+      ...accepted,
+      total: 1,
+      passed: 1,
+      cases: [
+        {
+          id: "case-1",
+          passed: true,
+          verdict: "accepted",
+          hidden: false,
+          input,
+          expected: 0,
+          actual: 0,
+          message: "Correct.",
+          logs: [],
+        },
+      ],
+    }),
+  );
+  vi.stubGlobal("fetch", fetch);
+  render(<Workspace problem={curryProblem} />);
+  expect(screen.getByRole("combobox", { name: "fn =" })).toBeVisible();
+  fireEvent.change(screen.getByLabelText("groups ="), {
+    target: { value: "[[0],[0,0]]" },
+  });
+  fireEvent.click(screen.getByRole("button", { name: "Run" }));
+  await screen.findByText("Accepted", { selector: "h2" });
+  const sent = JSON.parse(fetch.mock.calls[0]?.[1]?.body as string);
+  expect(sent.inputs[0]).toEqual(input);
+  expect(screen.getAllByText("0", { selector: "dd" })).toHaveLength(2);
+});
 describe("real coding workspace", () => {
   it("shows an editable problem and results without visualization or checkpoint", () => {
     render(<Workspace />);

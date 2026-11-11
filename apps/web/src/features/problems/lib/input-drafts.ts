@@ -8,10 +8,13 @@ export interface InputDraft {
   calls: string;
   json: string;
   predicate: string;
+  callback?: string;
 }
 export function inputDraft(input: ProblemInput): InputDraft {
   const base = { value: "", calls: "", json: "", predicate: "greaterThan10" };
   if (typeof input === "number") return { ...base, value: String(input) };
+  if ("groups" in input)
+    return { ...base, json: JSON.stringify(input.groups), callback: input.fn };
   if ("ms" in input)
     return {
       ...base,
@@ -25,7 +28,7 @@ export function inputDraft(input: ProblemInput): InputDraft {
     return {
       ...base,
       json: JSON.stringify(input.arr),
-      predicate: input.predicate,
+      ...("predicate" in input ? { predicate: input.predicate } : {}),
     };
   return { ...base, value: String(input.t), json: JSON.stringify(input.calls) };
 }
@@ -34,10 +37,19 @@ export function parseInputDraft(
   draft: InputDraft,
 ): ProblemInput | undefined {
   try {
-    if (problem.kind !== "filter-array" && !draft.value.trim())
+    if (
+      problem.kind !== "filter-array" &&
+      problem.kind !== "curry" &&
+      problem.kind !== "flatten-array" &&
+      !draft.value.trim()
+    )
       return undefined;
     let input: unknown;
     if (problem.kind === "delay") input = Number(draft.value);
+    else if (problem.kind === "flatten-array")
+      input = { arr: JSON.parse(draft.json) };
+    else if (problem.kind === "curry")
+      input = { fn: draft.callback, groups: JSON.parse(draft.json) };
     else if (problem.kind === "delay-all")
       input = { ms: Number(draft.value), functions: JSON.parse(draft.json) };
     else if (problem.kind === "fibonacci-generator")

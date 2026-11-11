@@ -7,11 +7,11 @@ const state = vi.hoisted(() => ({
   userId: null as string | null,
 }));
 vi.mock("@/lib/auth", () => ({ isAuthConfigured: () => state.configured }));
-vi.mock("@clerk/nextjs/server", () => ({
-  auth: async () => ({ userId: state.userId }),
+vi.mock("@/lib/auth/server", () => ({
+  getVerifiedUserId: async () => state.userId,
 }));
 
-it("keeps health public while every protected profile read verifies Clerk identity", async () => {
+it("keeps health public while every protected profile read verifies Neon identity", async () => {
   expect(await health().json()).toEqual({ status: "ok", service: "web" });
   const request = new Request("http://localhost:3000/api/me");
   expect((await me(request)).status).toBe(503);

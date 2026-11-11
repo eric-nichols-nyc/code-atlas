@@ -12,7 +12,7 @@ datasource db {
 
 model User {
   id          String             @id @default(cuid())
-  clerkUserId String             @unique @db.VarChar(160)
+  neonUserId String             @unique @db.VarChar(160)
   createdAt   DateTime           @default(now()) @db.Timestamptz(3)
   updatedAt   DateTime           @updatedAt @db.Timestamptz(3)
   progress    PracticeProgress[]

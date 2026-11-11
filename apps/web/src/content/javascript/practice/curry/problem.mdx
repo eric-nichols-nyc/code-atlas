@@ -1,0 +1,26 @@
+Write `curry(fn)` to turn a function into one that accepts its arguments across multiple calls.
+
+Keep collecting arguments in their original order. If fewer than `fn.length` arguments have arrived, return another function. Once enough arguments have arrived, call `fn` exactly once with **all** collected arguments and return its result.
+
+```javascript
+function sum3(a, b, c) { return a + b + c; }
+
+curry(sum3)(1)(2)(3);   // 6
+curry(sum3)(1, 2)(3);   // 6
+curry(sum3)(1, 2, 3);   // 6
+curry(sum3)()(1)()(2, 3); // 6
+```
+
+Empty calls should preserve any collected arguments. If `fn.length` is zero, the first call executes `fn`, even when that call has no arguments. When a final call supplies extra arguments, forward them too.
+
+Partial functions must be reusable. Calling one branch must not change the arguments remembered by another:
+
+```javascript
+const addOne = curry(sum3)(1);
+addOne(2, 3); // 6
+addOne(4, 5); // 10
+```
+
+In the test panel, select a supplied `fn` and edit `groups` as JSON. Each inner array represents one call: `[[1], [2, 3]]` means `(1)(2, 3)`. The final group must be the first to reach `fn.length`; no calls follow a completed numeric result. The callback source is shown beneath the selector.
+
+This exercise covers synchronous positional arguments and closures. Placeholders, `this` binding, default/rest parameter inference, and async callbacks can wait for another problem.

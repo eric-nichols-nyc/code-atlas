@@ -1,6 +1,7 @@
 export function isAuthConfigured() {
   return Boolean(
-    process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY &&
-      process.env.CLERK_SECRET_KEY,
+    process.env.NEON_AUTH_BASE_URL &&
+      process.env.NEON_AUTH_COOKIE_SECRET &&
+      process.env.NEON_AUTH_COOKIE_SECRET.length >= 32,
   );
 }

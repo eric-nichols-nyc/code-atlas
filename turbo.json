@@ -11,14 +11,7 @@
         "dist/**",
         ".workers/**"
       ],
-      "env": [
-        "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY",
-        "NEXT_PUBLIC_CLERK_SIGN_IN_URL",
-        "NEXT_PUBLIC_CLERK_SIGN_UP_URL",
-        "NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL",
-        "NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL",
-        "ANALYZE"
-      ]
+      "env": ["ANALYZE", "NEON_AUTH_BASE_URL"]
     },
     "dev": {
       "dependsOn": ["^build"],
@@ -52,10 +45,11 @@
     }
   },
   "globalPassThroughEnv": [
-    "CLERK_SECRET_KEY",
     "DATABASE_URL",
     "DIRECT_URL",
     "CI",
-    "CLERK_TEST_USER_EMAIL"
+    "NEON_AUTH_COOKIE_SECRET",
+    "NEON_TEST_USER_EMAIL",
+    "NEON_TEST_USER_PASSWORD"
   ]
 }

@@ -1,4 +1,5 @@
 import { counterProblem } from "./problems/counter.js";
+import { curryFunctions, curryProblem } from "./problems/curry.js";
 import { debounceProblem } from "./problems/debounce.js";
 import { delayEachPromiseProblem } from "./problems/delay-each-promise.js";
 import { fibonacciGeneratorProblem } from "./problems/fibonacci-generator.js";
@@ -6,9 +7,15 @@ import {
   filterArrayProblem,
   filterPredicates,
 } from "./problems/filter-array.js";
+import {
+  flattenNestedArrayProblem,
+  MAX_FLATTEN_DEPTH,
+  MAX_FLATTEN_NODES,
+} from "./problems/flatten-nested-array.js";
 import { sleepProblem } from "./problems/sleep.js";
 import {
   type ExecutionResult,
+  type NestedArray,
   type ProblemDefinition,
   type ProblemInput,
   type Verdict,
@@ -18,18 +25,25 @@ import {
 export * from "./types.js";
 export {
   counterProblem,
+  curryFunctions,
+  curryProblem,
   debounceProblem,
   delayEachPromiseProblem,
   fibonacciGeneratorProblem,
   filterArrayProblem,
   filterPredicates,
+  flattenNestedArrayProblem,
+  MAX_FLATTEN_DEPTH,
+  MAX_FLATTEN_NODES,
   sleepProblem,
 };
 export const publicProblems = [
   sleepProblem,
   counterProblem,
+  curryProblem,
   debounceProblem,
   filterArrayProblem,
+  flattenNestedArrayProblem,
   fibonacciGeneratorProblem,
   delayEachPromiseProblem,
 ];
@@ -53,6 +67,23 @@ const numericArray = (value: unknown, max: number): value is number[] =>
   Array.isArray(value) &&
   value.length <= max &&
   value.every((n) => integer(n, -1e9, 1e9));
+export function validNestedArray(value: unknown): value is NestedArray {
+  if (!Array.isArray(value)) return false;
+  const pending: { value: unknown; depth: number }[] = [{ value, depth: 1 }];
+  let nodes = 1;
+  while (pending.length) {
+    const current = pending.pop();
+    if (!current) break;
+    if (Array.isArray(current.value)) {
+      if (current.depth > MAX_FLATTEN_DEPTH) return false;
+      for (const child of current.value) {
+        if (++nodes > MAX_FLATTEN_NODES) return false;
+        pending.push({ value: child, depth: current.depth + 1 });
+      }
+    } else if (!integer(current.value, -1e9, 1e9)) return false;
+  }
+  return true;
+}
 export function validProblemInput(
   problem: ProblemDefinition,
   value: unknown,
@@ -62,7 +93,34 @@ export function validProblemInput(
   const input = value as Record<string, unknown>;
   if (problem.kind === "fibonacci-generator")
     return Object.keys(input).length === 1 && integer(input.count, 0, 50);
+  if (problem.kind === "flatten-array")
+    return Object.keys(input).length === 1 && validNestedArray(input.arr);
   if (Object.keys(input).length !== 2) return false;
+  if (problem.kind === "curry") {
+    const callback = curryFunctions.find((item) => item.id === input.fn);
+    if (
+      !callback ||
+      !Array.isArray(input.groups) ||
+      input.groups.length < 1 ||
+      input.groups.length > 10
+    )
+      return false;
+    let count = 0;
+    for (const [index, group] of input.groups.entries()) {
+      if (
+        !Array.isArray(group) ||
+        !group.every((value) => integer(value, -1000, 1000))
+      )
+        return false;
+      count += group.length;
+      if (
+        count > 12 ||
+        (index < input.groups.length - 1 && count >= callback.arity)
+      )
+        return false;
+    }
+    return count >= callback.arity;
+  }
   if (problem.kind === "delay-all")
     return (
       integer(input.ms, 0, 1000) &&
@@ -114,12 +172,14 @@ export function validRunInputs(
 }
 export function formatProblemInput(input: ProblemInput) {
   if (typeof input === "number") return `millis = ${input}`;
+  if ("groups" in input)
+    return `fn = ${input.fn}, groups = ${JSON.stringify(input.groups)}`;
   if ("ms" in input)
     return `ms = ${input.ms}, functions = ${JSON.stringify(input.functions)}`;
   if ("count" in input) return `count = ${input.count}`;
   if ("n" in input) return `n = ${input.n}, calls = ${input.calls}`;
   if ("arr" in input)
-    return `arr = ${JSON.stringify(input.arr)}, fn = ${input.predicate}`;
+    return `arr = ${JSON.stringify(input.arr)}${"predicate" in input ? `, fn = ${input.predicate}` : ""}`;
   return `t = ${input.t}, calls = ${JSON.stringify(input.calls)}`;
 }
 export function isExecutionResult(value: unknown): value is ExecutionResult {

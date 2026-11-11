@@ -1,5 +1,9 @@
 import "server-only";
-import type { ProblemDefinition, ProblemInput } from "@workspace/problems";
+import type {
+  NestedArray,
+  ProblemDefinition,
+  ProblemInput,
+} from "@workspace/problems";
 // These inputs are server-only. Public content contains examples, never full suites.
 export const privateSuites: Record<ProblemDefinition["kind"], ProblemInput[]> =
   {
@@ -60,6 +64,16 @@ export const privateSuites: Record<ProblemDefinition["kind"], ProblemInput[]> =
       { n: -1, calls: 3 },
       { n: 10, calls: 4 },
       { n: 0, calls: 5 },
+    ],
+    curry: [
+      { fn: "identity", groups: [[-9, 4]] },
+      { fn: "constant", groups: [[]] },
+      { fn: "subtract3", groups: [[20], [], [3], [2]] },
+      { fn: "sum3", groups: [[-10, 4], [6]] },
+      { fn: "countArgs", groups: [[1], [2, 3, 4, 5]] },
+      { fn: "product4", groups: [[-2], [0, 3], [4]] },
+      { fn: "sum3", groups: [[1, 2, 3, 1000]] },
+      { fn: "sum3", groups: [[], [], [7], [], [-8, 9]] },
     ],
     "fibonacci-generator": [
       { count: 1 },
@@ -125,6 +139,30 @@ export const privateSuites: Record<ProblemDefinition["kind"], ProblemInput[]> =
       {
         arr: Array.from({ length: 1000 }, (_, i) => i - 500),
         predicate: "plusOne",
+      },
+    ],
+    "flatten-array": [
+      { arr: [0, [-2, 0], [5, [-2]]] },
+      { arr: [[], [[]], [[[]]]] },
+      { arr: [7, 7, -1, 0] },
+      { arr: [[1000000000], [-1000000000]] },
+      { arr: [9, [3, [8, 3]], 1] },
+      {
+        arr: Array.from({ length: 19 }).reduce<NestedArray>(
+          (arr) => [arr],
+          [-3, 0, 2],
+        ),
+      },
+      { arr: Array.from({ length: 999 }, (_, i) => (i % 11) - 5) },
+      {
+        arr: [
+          [
+            [[], 4],
+            [[], [4, 0]],
+          ],
+          [],
+          -7,
+        ],
       },
     ],
   };

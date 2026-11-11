@@ -56,7 +56,14 @@ test("landing stays within the viewport in both themes and exposes only publishe
   const problems = page.getByRole("list", {
     name: "Published JavaScript problems",
   });
-  await expect(problems.getByRole("link")).toHaveCount(6);
+  await expect(problems.getByRole("link")).toHaveCount(8);
+  await expect(
+    problems.getByRole("link", { name: /^Flatten Nested Array/ }),
+  ).toHaveAttribute("href", "/javascript/practice/flatten-nested-array");
+  await expect(problems.getByRole("link", { name: /^Curry/ })).toHaveAttribute(
+    "href",
+    "/javascript/practice/curry",
+  );
   await expect(
     problems.getByRole("link", { name: /^Fibonacci Generator/ }),
   ).toHaveAttribute("href", "/javascript/practice/fibonacci-generator");

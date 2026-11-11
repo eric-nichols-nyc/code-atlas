@@ -1,7 +1,7 @@
-import { auth } from "@clerk/nextjs/server";
 import type { Metadata } from "next";
 import { LandingPage } from "@/features/landing/components/landing-page";
 import { isAuthConfigured } from "@/lib/auth";
+import { getVerifiedUserId } from "@/lib/auth/server";
 
 export const metadata: Metadata = {
   title: "Code Atlas — Know the concept. Write the code.",
@@ -10,6 +10,8 @@ export const metadata: Metadata = {
 };
 
 export default async function HomePage() {
-  const userId = isAuthConfigured() ? (await auth()).userId : null;
+  const userId = isAuthConfigured()
+    ? await getVerifiedUserId().catch(() => null)
+    : null;
   return <LandingPage startHref={userId ? "/dashboard" : "/sign-in"} />;
 }

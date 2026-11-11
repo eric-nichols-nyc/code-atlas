@@ -48,18 +48,6 @@
 }
 
 :root {
-  --clerk-color-background: var(--card);
-  --clerk-color-foreground: var(--foreground);
-  --clerk-color-primary: var(--primary);
-  --clerk-color-primary-foreground: var(--primary-foreground);
-  --clerk-color-muted: var(--muted);
-  --clerk-color-muted-foreground: var(--muted-foreground);
-  --clerk-color-input: var(--background);
-  --clerk-color-input-foreground: var(--foreground);
-  --clerk-color-border: var(--border);
-  --clerk-color-ring: var(--ring);
-  --clerk-font-family: var(--font-sans);
-  --clerk-border-radius: var(--radius);
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);

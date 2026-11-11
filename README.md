@@ -6,7 +6,7 @@ Code Atlas helps developers practice JavaScript through hands-on coding challeng
 real execution feedback, and progress that follows their account. JavaScript practice
 is available now; guided learning and additional subjects are planned.
 
-Built with Next.js, React, TypeScript, CodeMirror, QuickJS, Clerk, Neon PostgreSQL,
+Built with Next.js, React, TypeScript, CodeMirror, QuickJS, Neon Auth, Neon PostgreSQL,
 Prisma, and Turborepo.
 
 ## Preview
@@ -18,7 +18,7 @@ The coding workspace brings the problem, editor, and test cases together in resi
 <details>
 <summary>View the practice catalog and landing page</summary>
 
-Browse six challenges by topic, search, or difficulty, with account-backed flags and solved status.
+Browse eight challenges by topic, search, or difficulty, with account-backed flags and solved status.
 
 ![JavaScript practice catalog with categories, difficulty filtering, search, and progress indicators](docs/images/practice-catalog.jpg)
 
@@ -58,7 +58,7 @@ feedback, and improve.**
   suite that includes private cases. Only an accepted Submit marks a problem solved.
 - **Persistent progress:** Flag problems and restore the latest code saved after Run or
   Submit, regardless of verdict. Unsaved editor changes remain in memory.
-- **Account ownership:** Clerk handles authentication; Prisma and Neon store each learner's
+- **Account ownership:** Neon Auth handles authentication; Prisma and Neon store each learner's
   progress behind authenticated Next.js APIs.
 - **Isolated execution:** QuickJS WebAssembly runs in disposable Node.js Workers with
   resource limits. Learner code has no application filesystem, Node module, or network access.
@@ -68,7 +68,9 @@ feedback, and improve.**
 | Challenge                            | Difficulty | Concept                             |
 | ------------------------------------ | ---------- | ----------------------------------- |
 | Counter                              | Easy       | Closures                            |
+| Curry                                | Medium     | Closures and partial application    |
 | Filter Elements from Array           | Easy       | Arrays and callbacks                |
+| Flatten Nested Array                 | Medium     | Arrays and recursive traversal      |
 | Debounce                             | Medium     | Timers and async behavior           |
 | Delay the Resolution of Each Promise | Medium     | Promises and fulfillment timing     |
 | Fibonacci Generator                  | Easy       | Generators and iterator state       |
@@ -89,7 +91,7 @@ pnpm dev
 ```
 
 Open <http://localhost:3000>. The public landing page runs without credentials.
-Signing in and using Run/Submit require Clerk; saving progress also requires Neon.
+Signing in and using Run/Submit require Neon Auth; saving progress also requires Neon.
 
 ### Enable accounts and saved progress
 
@@ -97,11 +99,13 @@ Copy these examples only when the local destination does not already exist:
 
 | Example                    | Local destination     | Configuration                                                       |
 | -------------------------- | --------------------- | ------------------------------------------------------------------- |
-| `apps/web/.env.example`    | `apps/web/.env.local` | Clerk keys, auth routes, and runtime `DATABASE_URL`                 |
+| `apps/web/.env.example`    | `apps/web/.env.local` | Neon Auth URL, cookie secret, and runtime `DATABASE_URL`            |
 | `packages/db/.env.example` | `packages/db/.env`    | Neon `DATABASE_URL` and optional direct `DIRECT_URL` for migrations |
 
-Use Clerk publishable and secret keys from the same application. Keep the example
-Dashboard redirects. Environment files containing real credentials stay ignored.
+Enable Managed Better Auth on your Neon development branch. Set `NEON_AUTH_BASE_URL`
+to its Auth URL and generate `NEON_AUTH_COOKIE_SECRET` with `openssl rand -base64 32`
+(at least 32 characters). Use that same branch for `DATABASE_URL`. All three values
+are server-only. Environment files containing real credentials stay ignored.
 
 With your Neon development database configured, generate the client and apply the
 committed migrations:
@@ -124,10 +128,10 @@ stay on the server, and learner code runs in an isolated QuickJS worker.
 %%{init: {"look": "classic", "fontFamily": "Arial", "themeVariables": {"fontFamily": "Arial, sans-serif", "fontSize": "14px"}, "flowchart": {"nodeSpacing": 18, "rankSpacing": 30, "curve": "linear", "padding": 12, "wrappingWidth": 220}}}%%
 flowchart LR
     Browser["Browser<br/>React · CodeMirror"]
-    Clerk["Clerk<br/>Authentication"]
+    Auth["Neon Auth<br/>Authentication"]
 
     subgraph Next["Next.js application"]
-        Routes["Pages + API routes<br/>Clerk + input validation"]
+        Routes["Pages + API routes<br/>Neon Auth + input validation"]
         Judge["Code execution<br/>Private tests + QuickJS"]
         Progress["Account progress<br/>Flags · solved · last code"]
 
@@ -136,7 +140,7 @@ flowchart LR
     end
 
     Browser --> Routes
-    Clerk -.-> Routes
+    Auth -.-> Routes
     Progress --> Neon[("Neon Postgres<br/>Prisma")]
 
     style Next fill:transparent,stroke:#94a3b8,stroke-width:1px,font-family:Arial
@@ -144,12 +148,12 @@ flowchart LR
     classDef client fill:#f1f5f9,stroke:#94a3b8,color:#0f172a
     classDef app fill:#eff6ff,stroke:#60a5fa,color:#1e3a5f
     classDef data fill:#fffbeb,stroke:#d4a72c,color:#713f12
-    class Browser,Clerk client
+    class Browser,Auth client
     class Routes,Judge,Progress app
     class Neon data
 ```
 
-Protected pages and APIs verify Clerk identity. Problem content stays in source files;
+Protected pages and APIs verify Neon Auth identity. Problem content stays in source files;
 Neon stores flags, verified solved status, and the latest executed code.
 
 ## Development checks
@@ -167,7 +171,7 @@ Vitest covers unit and integration behavior.
 
 `pnpm test:e2e` runs the production Playwright smoke suite after a credential-free
 build, with port 3000 available. Optional authenticated automation requires a dedicated
-Clerk development test user and remains unverified. See [verification instructions](docs/development.md#verification)
+Neon Auth development test user and remains unverified. See [verification instructions](docs/development.md#verification)
 and the [full command list](docs/development.md#commands).
 
 ## What's next

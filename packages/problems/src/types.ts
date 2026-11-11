@@ -32,8 +32,23 @@ export interface FilterInput {
   arr: number[];
   predicate: FilterPredicate;
 }
+export type NestedArray = (number | NestedArray)[];
+export interface FlattenInput {
+  arr: NestedArray;
+}
 export interface GeneratorInput {
   count: number;
+}
+export type CurryFunction =
+  | "sum3"
+  | "product4"
+  | "subtract3"
+  | "identity"
+  | "constant"
+  | "countArgs";
+export interface CurryInput {
+  fn: CurryFunction;
+  groups: number[][];
 }
 export interface TimedValue {
   t: number;
@@ -48,9 +63,11 @@ export type ProblemInput =
   | CounterInput
   | DebounceInput
   | FilterInput
+  | FlattenInput
   | GeneratorInput
+  | CurryInput
   | PromiseDelayInput;
-export type ProblemOutput = number[] | DebounceCall[] | TimedValue[];
+export type ProblemOutput = number | number[] | DebounceCall[] | TimedValue[];
 export interface CaseResult {
   id: string;
   passed: boolean;
@@ -97,9 +114,11 @@ export interface ProblemDefinition {
   kind:
     | "delay"
     | "counter"
+    | "curry"
     | "debounce"
     | "delay-all"
     | "filter-array"
+    | "flatten-array"
     | "fibonacci-generator";
   inputError: string;
   title: string;

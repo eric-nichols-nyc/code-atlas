@@ -1,20 +1,18 @@
 import { existsSync } from "node:fs";
 import { defineConfig, devices } from "@playwright/test";
 
-// Dedicated development identity only; this suite never borrows a real-user session.
+// Use an isolated Neon branch and dedicated test account, never a personal session.
 for (const path of [".env.test.local", "apps/web/.env.local"]) {
   if (existsSync(path)) process.loadEnvFile(path);
 }
-const publishable = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
-const secret = process.env.CLERK_SECRET_KEY;
-if (!publishable?.startsWith("pk_test_") || !secret?.startsWith("sk_test_")) {
+if (!process.env.NEON_AUTH_BASE_URL || !process.env.NEON_AUTH_COOKIE_SECRET) {
   throw new Error(
-    "Authenticated tests require development Clerk keys in ignored environment files.",
+    "Authenticated tests require Neon Auth in ignored environment files.",
   );
 }
-if (!process.env.CLERK_TEST_USER_EMAIL) {
+if (!process.env.NEON_TEST_USER_EMAIL || !process.env.NEON_TEST_USER_PASSWORD) {
   throw new Error(
-    "Set CLERK_TEST_USER_EMAIL to a dedicated existing development learner (no MFA/session tasks). No tests ran.",
+    "Set NEON_TEST_USER_EMAIL and NEON_TEST_USER_PASSWORD for a dedicated development learner. No tests ran.",
   );
 }
 export default defineConfig({
@@ -22,17 +20,19 @@ export default defineConfig({
   fullyParallel: false,
   workers: 1,
   reporter: [["list"], ["html", { open: "never" }]],
-  use: { baseURL: "http://localhost:3000", trace: "retain-on-failure" },
+  use: {
+    baseURL: "http://localhost:3000",
+    trace: "off",
+    screenshot: "off",
+    video: "off",
+  },
   projects: [
     { name: "auth-setup", testMatch: /auth\.setup\.ts/ },
     {
       name: "authenticated-chromium",
       testMatch: /learning\.spec\.ts/,
       dependencies: ["auth-setup"],
-      use: {
-        ...devices["Desktop Chrome"],
-        storageState: ".clerk/learner.json",
-      },
+      use: { ...devices["Desktop Chrome"], storageState: ".auth/learner.json" },
     },
   ],
   webServer: {
@@ -42,8 +42,8 @@ export default defineConfig({
     reuseExistingServer: false,
     timeout: 180000,
     env: {
-      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: publishable,
-      CLERK_SECRET_KEY: secret,
+      NEON_AUTH_BASE_URL: process.env.NEON_AUTH_BASE_URL,
+      NEON_AUTH_COOKIE_SECRET: process.env.NEON_AUTH_COOKIE_SECRET,
     },
   },
 });

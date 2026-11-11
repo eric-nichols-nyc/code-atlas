@@ -76,20 +76,20 @@ On desktop, utilities sit immediately before the account actions, placing the th
 Files: `apps/web/src/components/nav-auth.tsx`, `apps/admin/src/components/nav-auth.tsx`, and each app's `auth-screen.tsx` and `auth-setup.tsx`.
 Last updated: 2026-11-09.
 
-| Property        | Pattern                                                |
-| --------------- | ------------------------------------------------------ |
-| Background      | Inherited `bg-background`; setup cards use `bg-card`   |
-| Text            | Shared Button/Card typography and semantic colors      |
-| Auth spacing    | `px-6 py-16`; centered within the remaining page space |
-| Account spacing | GlobalNav actions use `gap-2`                          |
-| Sign-in link    | Button `ghost` variant                                 |
-| Sign-up link    | Default Button variant                                 |
-| Loading avatar  | Shared Skeleton with `rounded-full` and status text    |
-| Profile menu    | Clerk UserButton with its built-in avatar and fallback |
-| Focus and hover | Shared Button variants and Clerk's account controls    |
-| Shadow          | Shared Card or Clerk defaults                          |
+| Property        | Pattern                                                         |
+| --------------- | --------------------------------------------------------------- |
+| Background      | Inherited `bg-background`; setup cards use `bg-card`            |
+| Text            | Shared Button/Card typography and semantic colors               |
+| Auth spacing    | `px-6 py-16`; centered within the remaining page space          |
+| Account spacing | GlobalNav actions use `gap-2`                                   |
+| Sign-in link    | Button `ghost` variant                                          |
+| Sign-up link    | Default Button variant                                          |
+| Loading avatar  | Shared Skeleton with `rounded-full` and status text             |
+| Profile menu    | Shared Avatar + DropdownMenu with initials fallback             |
+| Focus and hover | Shared Button variants and shared DropdownMenu account controls |
+| Shadow          | Shared Card and DropdownMenu tokens                             |
 
-Keep Clerk and session decisions in app-owned components passed through GlobalNav's actions slot. Resolve the session before choosing signed-in or signed-out controls. Mount one account menu in the global navigation; page bodies use it for profile management and sign-out. Auth screens share the same centering and loading pattern, and send active sessions to the dashboard.
+Keep Neon Auth and session decisions in app-owned components passed through GlobalNav's actions slot. Resolve the session before choosing signed-in or signed-out controls. Mount one account menu in the global navigation; page bodies use it for account identity and sign-out. Auth screens share the same centering and loading pattern, and send active sessions to the dashboard.
 
 ## Public home page
 
@@ -110,9 +110,9 @@ Last updated: 2026-11-10.
 | Focus / hover  | Shared Button variants                                                                                                                      |
 
 Use semantic section headings. The public home page has no GlobalNav. Resolve the
-hero's Start practicing destination from verified Clerk identity on the server:
+hero's Start practicing destination from verified Neon Auth identity on the server:
 signed-in learners go directly to `/dashboard`; other visitors go to `/sign-in`.
-Missing Clerk configuration uses the sign-in route without attempting session
+Missing Neon Auth configuration uses the sign-in route without attempting session
 access. Keep the hero to branding, headline, description and one action; omit the
 Try an example button and the three benefit labels. Other page sections keep their
 existing Counter/practice links. List published problems from catalog metadata
@@ -171,7 +171,7 @@ Last updated: 2026-11-09.
 | Selection               | Radio items with a visible indicator and `aria-checked` state            |
 | Typography              | Shared menu label and item typography                                    |
 | Focus / hover           | Shared Button and DropdownMenu states; Escape and selection return focus |
-| Clerk surfaces          | Native `--clerk-*` variables reference the same semantic tokens          |
+| Neon Auth surfaces      | Shared Card, Field, Input, Button and Avatar use semantic tokens         |
 
 Wrap each app once with the shared next-themes provider. Keep the trigger stable during hydration and disable it until mounted. Persist the preference across routes and reloads; System tracks OS appearance. Do not add page-specific forced themes or nested dark wrappers. Keep the control in GlobalNav's always-visible utilities slot on small screens. Disable transitions while switching to avoid mismatched color fades.
 
@@ -390,6 +390,14 @@ Both timing fields allow 0–1000ms, and an empty descriptor array is valid. Reu
 the existing Input controls and inline validation feedback.
 Fibonacci Generator uses a single count field (0–50), with supporting text clarifying
 that it controls `.next()` calls and is not an argument to the learner's function.
+Curry reuses the supplied-callback Select and source preview, followed by a labeled
+JSON `groups` Input. Each inner array represents one call; supporting text shows
+the selected callback's arity and explains that only the final group completes it.
+Keep the controls inside the scrollable results pane. Numeric expected/actual
+outputs use explicit undefined checks so a valid zero is displayed as `0`.
+Flatten Nested Array reuses the labeled JSON `arr` Input without a callback selector
+or numeric field. Its help text states the 20-level and 1000-node limits, and
+invalid nesting/value types use the existing inline Run validation feedback.
 
 ## Account progress and saved code
 
@@ -401,3 +409,16 @@ Loading saved code, Saved to account, Unsaved edits, and Not saved to account; R
 Run/Submit save the submitted source, while later typing stays unsaved. Restoring a delayed response must
 never replace typing or Reset. Flag controls disable during initial loading and their own write; account
 errors retain browser backups and expose Retry progress. Keep verdicts separate from save status.
+
+## Neon Auth forms
+
+Sign-in and sign-up, including their nested routes, omit GlobalNav. Other application
+pages retain their existing navigation.
+
+Use one app-owned AuthForm for sign-in, sign-up, password reset and email verification.
+Center a shared Card (`max-w-md`) in AuthScreen. Use Field/FieldLabel with Input,
+a full-width primary submit, inline alert/status feedback, and an outlined Google action.
+Pending operations disable form controls. Password recovery uses an email code.
+Keep SDK calls and session decisions in the app, and all colors in semantic tokens.
+The account avatar uses initials when no image is available; its DropdownMenu provides
+identity and sign-out, including explicit failure feedback.

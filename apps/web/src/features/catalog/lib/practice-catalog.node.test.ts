@@ -13,15 +13,15 @@ describe("practice categories", () => {
         id: "recommended",
         label: "Recommended",
         heading: "Recommended problems",
-        count: 6,
+        count: 8,
       },
       {
         id: "closures",
         label: "Closures",
         heading: "Closures problems",
-        count: 1,
+        count: 2,
       },
-      { id: "arrays", label: "Arrays", heading: "Arrays problems", count: 1 },
+      { id: "arrays", label: "Arrays", heading: "Arrays problems", count: 2 },
       {
         id: "generators",
         label: "Generators",
@@ -36,7 +36,9 @@ describe("practice categories", () => {
       ),
     ).toEqual([
       "counter",
+      "curry",
       "filter-elements-from-array",
+      "flatten-nested-array",
       "debounce",
       "delay-the-resolution-of-each-promise",
       "fibonacci-generator",

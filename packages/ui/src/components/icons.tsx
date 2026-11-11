@@ -10,6 +10,7 @@ export {
   FlagIcon,
   LayersIcon,
   LayoutDashboardIcon,
+  LogOutIcon,
   NotebookPenIcon,
   Repeat2Icon,
   RotateCcwIcon,

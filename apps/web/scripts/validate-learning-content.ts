@@ -28,7 +28,10 @@ for (const p of publicProblems)
     !p.samples.every(
       (x) =>
         validProblemInput(p, x.input) &&
-        (p.kind === "delay" || Array.isArray(x.expected)),
+        (p.kind === "delay" ||
+          (p.kind === "curry"
+            ? typeof x.expected === "number" && Number.isFinite(x.expected)
+            : Array.isArray(x.expected))),
     ) ||
     !p.constraints.length
   )

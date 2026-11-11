@@ -41,8 +41,8 @@ it("clears an empty query result back to the practice problems", () => {
   });
   expect(screen.getByRole("status")).toHaveTextContent("0 problems");
   fireEvent.click(screen.getByRole("button", { name: "Clear search" }));
-  expect(screen.getAllByRole("row")).toHaveLength(7);
-  expect(screen.getByRole("status")).toHaveTextContent("6 problems");
+  expect(screen.getAllByRole("row")).toHaveLength(9);
+  expect(screen.getByRole("status")).toHaveTextContent("8 problems");
 });
 
 it("opens the canonical practice problem without listing planned learning topics", () => {
@@ -93,7 +93,7 @@ it("lists Sleep in both Recommended and Async and searches within the selected c
   expect(screen.getByRole("link", { name: /Sleep/ })).toBeVisible();
 });
 
-it("opens Counter from its Closures category", () => {
+it("opens Counter and Curry from their Closures category", () => {
   render(<JavaScriptPractice catalog={javascriptPracticeCatalog} />);
   fireEvent.mouseDown(screen.getByRole("tab", { name: "Closures" }), {
     button: 0,
@@ -104,7 +104,11 @@ it("opens Counter from its Closures category", () => {
     "/javascript/practice/counter",
   );
   expect(screen.queryByRole("link", { name: "Sleep" })).toBeNull();
-  expect(screen.getByRole("status")).toHaveTextContent("1 problem");
+  expect(screen.getByRole("link", { name: "Curry" })).toHaveAttribute(
+    "href",
+    "/javascript/practice/curry",
+  );
+  expect(screen.getByRole("status")).toHaveTextContent("2 problems");
 });
 
 it("opens Fibonacci Generator from Generators and searches within that category", () => {
@@ -135,7 +139,7 @@ it("filters by difficulty and clears filters without leaving the selected catego
   fireEvent.keyDown(screen.getByRole("combobox", { name: "Difficulty" }), {
     key: "Enter",
   });
-  fireEvent.click(await screen.findByRole("option", { name: "Medium" }));
+  fireEvent.click(await screen.findByRole("option", { name: "Hard" }));
   expect(screen.getByText("No problems match your filters.")).toBeVisible();
   expect(screen.queryByRole("link", { name: "Counter" })).toBeNull();
   fireEvent.click(screen.getByRole("button", { name: "Clear filters" }));
@@ -301,4 +305,30 @@ it("retains an offline flag and retries account synchronization", async () => {
     "title",
     "Flagged in your account — click to unflag",
   );
+});
+
+it("finds Flatten Nested Array under Arrays and intersects search with Medium", async () => {
+  render(<JavaScriptPractice catalog={javascriptPracticeCatalog} />);
+  expect(
+    screen.getByRole("link", { name: "Flatten Nested Array" }),
+  ).toBeVisible();
+  fireEvent.mouseDown(screen.getByRole("tab", { name: "Arrays" }), {
+    button: 0,
+    ctrlKey: false,
+  });
+  expect(screen.getByRole("status")).toHaveTextContent("2 problems");
+  fireEvent.keyDown(screen.getByRole("combobox", { name: "Difficulty" }), {
+    key: "Enter",
+  });
+  fireEvent.click(await screen.findByRole("option", { name: "Medium" }));
+  fireEvent.change(screen.getByRole("searchbox", { name: "Search problems" }), {
+    target: { value: "nested" },
+  });
+  expect(
+    screen.getByRole("link", { name: "Flatten Nested Array" }),
+  ).toHaveAttribute("href", "/javascript/practice/flatten-nested-array");
+  expect(
+    screen.queryByRole("link", { name: "Filter Elements from Array" }),
+  ).toBeNull();
+  expect(screen.getByRole("status")).toHaveTextContent("1 problem");
 });

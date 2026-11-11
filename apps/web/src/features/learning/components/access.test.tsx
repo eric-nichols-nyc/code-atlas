@@ -4,7 +4,10 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const state = vi.hoisted(() => ({ configured: true }));
 const protect = vi.hoisted(() => vi.fn());
 vi.mock("@/lib/auth", () => ({ isAuthConfigured: () => state.configured }));
-vi.mock("@clerk/nextjs/server", () => ({ auth: { protect } }));
+vi.mock("@/lib/auth/server", () => ({
+  requirePageLearner: protect,
+  learnerStorageId: (id: string) => `neon:${id}`,
+}));
 
 import JavaScriptLearnPage from "@/app/javascript/learn/page";
 import JavaScriptPracticePage from "@/app/javascript/practice/page";
@@ -12,6 +15,7 @@ import JavaScriptPracticePage from "@/app/javascript/practice/page";
 beforeEach(() => {
   state.configured = true;
   protect.mockReset();
+  protect.mockResolvedValue("test-neon-user");
 });
 describe.each([
   ["Practice", JavaScriptPracticePage],
@@ -39,7 +43,7 @@ describe("authorized JavaScript sections", () => {
       "href",
       "/javascript/practice/sleep",
     );
-    expect(screen.getByRole("status")).toHaveTextContent("6 problems");
+    expect(screen.getByRole("status")).toHaveTextContent("8 problems");
   });
   it("reserves Learn without publishing lessons or coding controls", async () => {
     render(await JavaScriptLearnPage());

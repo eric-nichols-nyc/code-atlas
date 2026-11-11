@@ -7,8 +7,8 @@ import { describe, expect, it, vi } from "vitest";
 import type { ProgressService } from "@/features/catalog/server/progress-service";
 
 vi.mock("@/lib/auth", () => ({ isAuthConfigured: () => true }));
-vi.mock("@clerk/nextjs/server", () => ({
-  auth: async () => ({ userId: "promise-delay-test-owner" }),
+vi.mock("@/lib/auth/server", () => ({
+  getVerifiedUserId: async () => "promise-delay-test-owner",
 }));
 
 import { createExecutionHandler } from "./handler";

@@ -1,25 +1,25 @@
-import { clerkMiddleware } from "@clerk/nextjs/server";
-import {
-  type NextFetchEvent,
-  type NextRequest,
-  NextResponse,
-} from "next/server";
+import { NextResponse } from "next/server";
 import { isAuthConfigured } from "@/lib/auth";
+import { getAuth } from "@/lib/auth/server";
 
-// Protected resources verify auth themselves before accessing data.
-const authenticate = clerkMiddleware({
-  signInUrl: "/sign-in",
-  signUpUrl: "/sign-up",
-});
-
-export default function proxy(request: NextRequest, event: NextFetchEvent) {
-  if (!isAuthConfigured()) return NextResponse.next();
-  return authenticate(request, event);
-}
+// Use the SDK's cookie/OAuth handling. APIs enforce their own sessions and JSON
+// responses; public setup pages remain usable before credentials are supplied.
+const proxy = isAuthConfigured()
+  ? getAuth().middleware({
+      loginUrl: "/sign-in",
+      publicRoutes: [
+        "/",
+        "/sign-in",
+        "/sign-up",
+        "/forgot-password",
+        "/reset-password",
+        "/verify-email",
+        "/api",
+      ],
+    })
+  : () => NextResponse.next();
+export default proxy;
 
 export const config = {
-  matcher: [
-    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
-    "/(api|trpc)(.*)",
-  ],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
 };
