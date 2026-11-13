@@ -1,0 +1,11 @@
+Implement `memoize(fn)` to return a function that remembers earlier results.
+
+Each call receives a list of integer arguments. On its first occurrence, call `fn` with those arguments and cache the returned number. On later occurrences of the same ordered argument list, return the cached number without invoking `fn` again. Argument order and argument count are part of the key, even when two different calls happen to produce the same result.
+
+Keep zero-valued results cached. Every invocation of `memoize` must create an independent cache, even when the same callback is wrapped twice. Constructing a wrapper must not call `fn` yet.
+
+Choose the supplied `sum`, `product` or `subtract` callback and edit the JSON `calls` list. Each inner array becomes one call. `sum` and `product` accept empty argument lists, returning 0 and 1 respectively; `subtract` takes exactly two arguments.
+
+Your solution returns a function, not an object. The runner collects the wrapper's results into `values` and counts how many times the underlying callback actually ran as `callCount`. Submit checks both the returned values and correct cache reuse.
+
+Implement the wrapper for synchronous numeric callbacks generally; the supplied callbacks are examples. Object arguments, asynchronous functions and `this` binding are outside the exercise.

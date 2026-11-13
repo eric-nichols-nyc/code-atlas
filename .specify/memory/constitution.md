@@ -29,7 +29,7 @@ Trusted authored prose belongs in subject content folders, separate from renderi
 Extract additional packages only when real consumers need a stable shared interface.
 
 Subjects MUST reuse common catalog, workspace, and navigation capabilities through explicit
-interfaces. Add progress or other shared capabilities when required by a feature. Future Electron
+interfaces. Add progress or other shared capabilities when required by a feature. Electron
 lifecycle and native integration MUST remain separate from learning and practice logic.
 
 ### III. Enforce identity and authorization on the server
@@ -48,7 +48,7 @@ Prisma imports MUST stay in server code; call `getDb()` at request time after au
 required authorization. Keep real credentials in ignored environment files or deployment secrets;
 track only empty credential examples.
 
-Future Electron native capabilities MUST use narrow, validated interfaces with isolated,
+Electron native capabilities MUST use narrow, validated interfaces with isolated,
 sandboxed rendering. Renderers MUST NOT receive unrestricted Node.js access or server secrets.
 
 ### IV. Validate behavior at the appropriate boundary
@@ -129,7 +129,7 @@ where applicable.
 
 ## Technology and UI constraints
 
-Code Atlas targets the web and a future Electron app. JavaScript is the first subject and
+Code Atlas targets the web and an online Electron app. JavaScript is the first subject and
 Practice is the current delivery focus. `/javascript/practice` owns the catalog and
 `/javascript/practice/<problem>` owns a coding workspace. `/javascript/learn` is a separate future
 learning experience; its requirements remain open. Later subjects include Algorithms and React JS.
@@ -137,13 +137,15 @@ Do not treat a practice problem as a guided lesson or require visualization to j
 
 The installed baseline is pnpm, Turborepo, TypeScript, one Next.js application with App Router APIs,
 shared shadcn UI, Neon Auth, CodeMirror, QuickJS, trusted MDX, Prisma for Neon, Biome, Vitest,
-Playwright, and web bundle analysis. There is currently no admin or Electron app. Preserve the
+Playwright, Electron, and web bundle analysis. There is currently no admin app. `apps/desktop`
+owns native lifecycle and loads the existing Next.js origin. Auth, progress and judging stay
+on the server; desktop packages MUST exclude backend code and credentials. Preserve the
 application/package boundaries unless a feature brief records the rationale and impact of a change.
 Review bundle analysis for significant client dependencies and load specialized editors on demand.
 
 Sleep, Counter, Debounce, Filter Elements from Array and Fibonacci Generator are published practice problems. Account
 flags, solved status and latest Run/Submit source persist in Neon. Additional problems, connected
-AI tutoring, saved notes, individual submission history and desktop delivery require working slices.
+AI tutoring, saved notes, individual submission history and further desktop delivery require working slices.
 External reference sites provide interaction evidence and design input; their dependencies,
 styles, and source organization do not become project requirements.
 
@@ -193,4 +195,9 @@ Verified Neon sessions own application progress through unique `neonUserId` reco
 The development cutover starts fresh on an isolated database branch; email matching and
 automatic imports from the old identity are excluded. Server authorization and judging isolation remain mandatory.
 
-**Version**: 2.3.0 | **Ratified**: 2026-11-07 | **Last Amended**: 2026-11-11
+Amendment 2.4.0 adds an online Electron client and local unsigned macOS review build.
+The user chose the existing Next.js backend. Renderers remain sandboxed with no Node/native
+bridge. Neon identity, account ownership and QuickJS isolation remain server responsibilities.
+Offline operation, native OAuth handoff and signed distribution require separate scope.
+
+**Version**: 2.4.0 | **Ratified**: 2026-11-07 | **Last Amended**: 2026-11-13

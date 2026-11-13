@@ -1,4 +1,5 @@
 import {
+  chunkArrayProblem,
   counterProblem,
   curryProblem,
   debounceProblem,
@@ -6,6 +7,10 @@ import {
   fibonacciGeneratorProblem,
   filterArrayProblem,
   flattenNestedArrayProblem,
+  functionCompositionProblem,
+  mapArrayProblem,
+  memoizeProblem,
+  reduceArrayProblem,
   sleepProblem,
 } from "@workspace/problems";
 import type { PracticeEntry } from "../../../features/catalog/lib/practice-catalog";
@@ -13,6 +18,11 @@ export const javascriptPracticeCatalog = [
   { problem: sleepProblem, order: 65 },
   { problem: counterProblem, order: 10 },
   { problem: curryProblem, order: 15 },
+  { problem: functionCompositionProblem, order: 16 },
+  { problem: memoizeProblem, order: 17 },
+  { problem: mapArrayProblem, order: 26 },
+  { problem: reduceArrayProblem, order: 27 },
+  { problem: chunkArrayProblem, order: 28 },
   { problem: debounceProblem, order: 30 },
   { problem: delayEachPromiseProblem, order: 35 },
   { problem: filterArrayProblem, order: 20 },

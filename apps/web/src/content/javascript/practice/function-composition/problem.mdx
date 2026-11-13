@@ -1,0 +1,7 @@
+Implement `compose(functions)` to return a function that combines a sequence of numeric functions.
+
+For a list `[first, second, third]`, the returned function should calculate `first(second(third(x)))`. Begin with the last function and pass each result toward the first. Invoke each listed function exactly once per call.
+
+An empty list represents the identity function: calling it with `x` returns `x` unchanged. The returned function must work on repeated calls, and composing another list must not interfere with it. Keep the supplied list intact rather than consuming or reversing it in place.
+
+In the test panel, edit the ordered JSON list of names (`addOne`, `double`, `negate`) and the input `x`. These names select real supplied callbacks; implement composition for the functions rather than special-casing their names.

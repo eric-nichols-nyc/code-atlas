@@ -29,9 +29,19 @@ for (const p of publicProblems)
       (x) =>
         validProblemInput(p, x.input) &&
         (p.kind === "delay" ||
-          (p.kind === "curry"
+          (["curry", "reduce-array", "function-composition"].includes(p.kind)
             ? typeof x.expected === "number" && Number.isFinite(x.expected)
-            : Array.isArray(x.expected))),
+            : p.kind === "memoize"
+              ? Boolean(
+                  x.expected &&
+                    !Array.isArray(x.expected) &&
+                    typeof x.expected === "object" &&
+                    "values" in x.expected &&
+                    Array.isArray(x.expected.values) &&
+                    "callCount" in x.expected &&
+                    Number.isInteger(x.expected.callCount),
+                )
+              : Array.isArray(x.expected))),
     ) ||
     !p.constraints.length
   )

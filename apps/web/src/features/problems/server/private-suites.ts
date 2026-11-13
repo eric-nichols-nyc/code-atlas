@@ -7,6 +7,88 @@ import type {
 // These inputs are server-only. Public content contains examples, never full suites.
 export const privateSuites: Record<ProblemDefinition["kind"], ProblemInput[]> =
   {
+    "map-array": [
+      { arr: [], transform: "double" },
+      { arr: [0, -1, 2, -10000, 10000], transform: "square" },
+      { arr: [9, 9, 9, 9], transform: "addIndex" },
+      { arr: [3, 0, -5], transform: "zero" },
+      { arr: [-7, 0, 12], transform: "negate" },
+      {
+        arr: Array.from({ length: 1000 }, (_, i) => i - 500),
+        transform: "addIndex",
+      },
+      { arr: [0], transform: "double" },
+      { arr: [1, 2, 3], transform: "double" },
+    ],
+    "reduce-array": [
+      { nums: [], reducer: "sum", init: 42 },
+      { nums: [0], reducer: "subtract", init: 0 },
+      { nums: [1, 4, -2, 10], reducer: "subtract", init: 100 },
+      { nums: [-10, -3, -20], reducer: "max", init: -100 },
+      { nums: [0, -2, 3, 4, 7], reducer: "countEven", init: 5 },
+      { nums: [10000, -10000, 0], reducer: "sum", init: -1000000000 },
+      {
+        nums: Array.from({ length: 1000 }, (_, i) => i - 500),
+        reducer: "sum",
+        init: 1000000000,
+      },
+      { nums: [], reducer: "max", init: -1000000000 },
+    ],
+    "chunk-array": [
+      { arr: [], size: 1 },
+      { arr: [0], size: 1000 },
+      { arr: [1, 2, 3, 4, 5], size: 2 },
+      { arr: [1, 2, 3, 4], size: 2 },
+      { arr: [7, 7, -1, 0, -1], size: 1 },
+      { arr: [-1000000000, 1000000000], size: 3 },
+      { arr: Array.from({ length: 1000 }, (_, i) => i - 500), size: 17 },
+      { arr: Array.from({ length: 1000 }, (_, i) => i), size: 1000 },
+    ],
+    "function-composition": [
+      { functions: [], x: 0 },
+      { functions: [], x: -10000 },
+      { functions: ["double", "addOne"], x: 3 },
+      { functions: ["addOne", "double"], x: 3 },
+      { functions: ["negate", "addOne", "double"], x: -5 },
+      { functions: ["negate", "negate"], x: 0 },
+      {
+        functions: Array.from({ length: 10 }, () => "double" as const),
+        x: 10000,
+      },
+      { functions: ["addOne"], x: -1 },
+    ],
+    memoize: [
+      { fn: "sum", calls: [] },
+      { fn: "sum", calls: [[], [], [0], [0]] },
+      { fn: "sum", calls: [[1, 2], [12], [1, 2], [1, 2, 0]] },
+      { fn: "product", calls: [[0, 7], [0, 7], [], [], [-2, 3]] },
+      {
+        fn: "subtract",
+        calls: [
+          [5, 2],
+          [2, 5],
+          [5, 2],
+          [0, 0],
+          [0, 0],
+        ],
+      },
+      {
+        fn: "sum",
+        calls: [
+          [-100, 100],
+          [100, -100],
+          [-100, 100],
+        ],
+      },
+      {
+        fn: "product",
+        calls: [
+          [100, 100, 100, 100],
+          [-100, 100, -100, 100],
+        ],
+      },
+      { fn: "sum", calls: Array.from({ length: 100 }, (_, i) => [i % 5, 0]) },
+    ],
     delay: [1, 15, 40, 125, 333, 500, 750, 1000],
     "delay-all": [
       {

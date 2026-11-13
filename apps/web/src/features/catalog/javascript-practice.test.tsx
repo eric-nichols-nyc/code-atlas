@@ -41,8 +41,8 @@ it("clears an empty query result back to the practice problems", () => {
   });
   expect(screen.getByRole("status")).toHaveTextContent("0 problems");
   fireEvent.click(screen.getByRole("button", { name: "Clear search" }));
-  expect(screen.getAllByRole("row")).toHaveLength(9);
-  expect(screen.getByRole("status")).toHaveTextContent("8 problems");
+  expect(screen.getAllByRole("row")).toHaveLength(14);
+  expect(screen.getByRole("status")).toHaveTextContent("13 problems");
 });
 
 it("opens the canonical practice problem without listing planned learning topics", () => {
@@ -108,7 +108,7 @@ it("opens Counter and Curry from their Closures category", () => {
     "href",
     "/javascript/practice/curry",
   );
-  expect(screen.getByRole("status")).toHaveTextContent("2 problems");
+  expect(screen.getByRole("status")).toHaveTextContent("4 problems");
 });
 
 it("opens Fibonacci Generator from Generators and searches within that category", () => {
@@ -316,7 +316,7 @@ it("finds Flatten Nested Array under Arrays and intersects search with Medium", 
     button: 0,
     ctrlKey: false,
   });
-  expect(screen.getByRole("status")).toHaveTextContent("2 problems");
+  expect(screen.getByRole("status")).toHaveTextContent("5 problems");
   fireEvent.keyDown(screen.getByRole("combobox", { name: "Difficulty" }), {
     key: "Enter",
   });

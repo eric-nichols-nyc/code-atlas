@@ -1,0 +1,4 @@
+interface:
+  display_name: "Feature Improvements"
+  short_description: "Improve existing Code Atlas features with focused checks"
+  default_prompt: "Use $feature-improvements to improve an existing Code Atlas feature, reuse its brief, update its success criteria, implement the change, and verify the result."

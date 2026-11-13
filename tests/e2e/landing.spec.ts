@@ -56,7 +56,18 @@ test("landing stays within the viewport in both themes and exposes only publishe
   const problems = page.getByRole("list", {
     name: "Published JavaScript problems",
   });
-  await expect(problems.getByRole("link")).toHaveCount(8);
+  await expect(problems.getByRole("link")).toHaveCount(13);
+  for (const [title, slug] of [
+    ["Map Array", "map-array"],
+    ["Reduce Array", "reduce-array"],
+    ["Chunk Array", "chunk-array"],
+    ["Function Composition", "function-composition"],
+    ["Memoize", "memoize"],
+  ]) {
+    await expect(
+      problems.getByRole("link", { name: new RegExp(`^${title}`) }),
+    ).toHaveAttribute("href", `/javascript/practice/${slug}`);
+  }
   await expect(
     problems.getByRole("link", { name: /^Flatten Nested Array/ }),
   ).toHaveAttribute("href", "/javascript/practice/flatten-nested-array");

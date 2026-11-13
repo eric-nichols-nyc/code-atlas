@@ -5,6 +5,13 @@ export default defineConfig({
   test: {
     projects: [
       {
+        test: {
+          name: "desktop",
+          environment: "node",
+          include: ["apps/desktop/src/**/*.test.ts"],
+        },
+      },
+      {
         resolve: {
           alias: {
             "@": fileURLToPath(new URL("./apps/web/src", import.meta.url)),

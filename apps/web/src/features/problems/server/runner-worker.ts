@@ -53,6 +53,41 @@ const {
   promiseDelayAdapterPath
 );
 
+const adapterExtension = import.meta.url.endsWith(".ts") ? "ts" : "js";
+const {
+  mapArrayHarness,
+  judgeMapArray,
+}: typeof import("./adapters/map-array.js") = await import(
+  `./adapters/map-array.${adapterExtension}`
+);
+const {
+  reduceArrayHarness,
+  judgeReduceArray,
+}: typeof import("./adapters/reduce-array.js") = await import(
+  `./adapters/reduce-array.${adapterExtension}`
+);
+const {
+  chunkArrayHarness,
+  judgeChunkArray,
+}: typeof import("./adapters/chunk-array.js") = await import(
+  `./adapters/chunk-array.${adapterExtension}`
+);
+const {
+  compositionHarness,
+  judgeComposition,
+}: typeof import("./adapters/function-composition.js") = await import(
+  `./adapters/function-composition.${adapterExtension}`
+);
+const { memoizeHarness, judgeMemoize }: typeof import("./adapters/memoize.js") =
+  await import(`./adapters/memoize.${adapterExtension}`);
+const additionalHarnesses: Record<string, string> = {
+  "javascript.map-array": mapArrayHarness,
+  "javascript.reduce-array": reduceArrayHarness,
+  "javascript.chunk-array": chunkArrayHarness,
+  "javascript.function-composition": compositionHarness,
+  "javascript.memoize": memoizeHarness,
+};
+
 interface Work {
   problemId: string;
   entryFunction: string;
@@ -108,6 +143,7 @@ async function runCase(test: Work["cases"][number]): Promise<CaseResult> {
   let promiseDelayCheck: QuickJSHandle | undefined;
   let curryCheck: QuickJSHandle | undefined;
   let flattenCheck: QuickJSHandle | undefined;
+  let additionalCheck: QuickJSHandle | undefined;
   let promise: QuickJSHandle | undefined;
   const enter = <T>(call: () => T): T => {
     const start = performance.now();
@@ -354,6 +390,18 @@ async function runCase(test: Work["cases"][number]): Promise<CaseResult> {
       }
       generatorCheck = harness.value;
     }
+    const additionalSource = additionalHarnesses[work.problemId];
+    if (additionalSource) {
+      const harness = enter(() => ctx.evalCode(additionalSource, "judge.js"));
+      if (harness.error) {
+        harness.dispose();
+        return result(
+          "runtime-error",
+          "The problem judge could not initialize.",
+        );
+      }
+      additionalCheck = harness.value;
+    }
     const compiled = enter(() =>
       ctx.evalCode(
         `${work.code}\n;typeof ${work.entryFunction} === "function" ? ${work.entryFunction} : undefined;`,
@@ -382,6 +430,26 @@ async function runCase(test: Work["cases"][number]): Promise<CaseResult> {
       errorText,
       exceeded: () => interrupted || cpu > 250,
     };
+    if (additionalCheck && typeof test.input !== "number") {
+      const input = test.input;
+      const outcome =
+        work.problemId === "javascript.map-array" && "transform" in input
+          ? judgeMapArray(input, guest, additionalCheck)
+          : work.problemId === "javascript.reduce-array" && "nums" in input
+            ? judgeReduceArray(input, guest, additionalCheck)
+            : work.problemId === "javascript.chunk-array" && "size" in input
+              ? judgeChunkArray(input, guest, additionalCheck)
+              : work.problemId === "javascript.function-composition" &&
+                  "x" in input
+                ? judgeComposition(input, guest, additionalCheck)
+                : work.problemId === "javascript.memoize" &&
+                    "fn" in input &&
+                    "calls" in input
+                  ? judgeMemoize(input, guest, additionalCheck)
+                  : undefined;
+      if (!outcome) return result("runtime-error", "Invalid problem input.");
+      return result(outcome.verdict, outcome.message, undefined, outcome);
+    }
     if (work.problemId === "javascript.flatten-nested-array") {
       if (
         typeof test.input === "number" ||
@@ -662,6 +730,7 @@ async function runCase(test: Work["cases"][number]): Promise<CaseResult> {
     promiseDelayCheck?.dispose();
     curryCheck?.dispose();
     flattenCheck?.dispose();
+    additionalCheck?.dispose();
     fn?.dispose();
     ctx.dispose();
     rt.dispose();

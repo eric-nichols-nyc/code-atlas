@@ -13,6 +13,33 @@ export interface InputDraft {
 export function inputDraft(input: ProblemInput): InputDraft {
   const base = { value: "", calls: "", json: "", predicate: "greaterThan10" };
   if (typeof input === "number") return { ...base, value: String(input) };
+  if ("x" in input)
+    return {
+      ...base,
+      value: String(input.x),
+      json: JSON.stringify(input.functions),
+    };
+  if ("nums" in input)
+    return {
+      ...base,
+      value: String(input.init),
+      json: JSON.stringify(input.nums),
+      callback: input.reducer,
+    };
+  if ("fn" in input && "calls" in input)
+    return { ...base, json: JSON.stringify(input.calls), callback: input.fn };
+  if ("transform" in input)
+    return {
+      ...base,
+      json: JSON.stringify(input.arr),
+      callback: input.transform,
+    };
+  if ("size" in input)
+    return {
+      ...base,
+      json: JSON.stringify(input.arr),
+      value: String(input.size),
+    };
   if ("groups" in input)
     return { ...base, json: JSON.stringify(input.groups), callback: input.fn };
   if ("ms" in input)
@@ -38,6 +65,8 @@ export function parseInputDraft(
 ): ProblemInput | undefined {
   try {
     if (
+      problem.kind !== "map-array" &&
+      problem.kind !== "memoize" &&
       problem.kind !== "filter-array" &&
       problem.kind !== "curry" &&
       problem.kind !== "flatten-array" &&
@@ -45,7 +74,21 @@ export function parseInputDraft(
     )
       return undefined;
     let input: unknown;
-    if (problem.kind === "delay") input = Number(draft.value);
+    if (problem.kind === "map-array")
+      input = { arr: JSON.parse(draft.json), transform: draft.callback };
+    else if (problem.kind === "reduce-array")
+      input = {
+        nums: JSON.parse(draft.json),
+        reducer: draft.callback,
+        init: Number(draft.value),
+      };
+    else if (problem.kind === "chunk-array")
+      input = { arr: JSON.parse(draft.json), size: Number(draft.value) };
+    else if (problem.kind === "function-composition")
+      input = { functions: JSON.parse(draft.json), x: Number(draft.value) };
+    else if (problem.kind === "memoize")
+      input = { fn: draft.callback, calls: JSON.parse(draft.json) };
+    else if (problem.kind === "delay") input = Number(draft.value);
     else if (problem.kind === "flatten-array")
       input = { arr: JSON.parse(draft.json) };
     else if (problem.kind === "curry")

@@ -6,7 +6,7 @@ Code Atlas helps developers practice JavaScript through hands-on coding challeng
 real execution feedback, and progress that follows their account. JavaScript practice
 is available now; guided learning and additional subjects are planned.
 
-Built with Next.js, React, TypeScript, CodeMirror, QuickJS, Neon Auth, Neon PostgreSQL,
+Built with Next.js, Electron, React, TypeScript, CodeMirror, QuickJS, Neon Auth, Neon PostgreSQL,
 Prisma, and Turborepo.
 
 ## Preview
@@ -18,7 +18,7 @@ The coding workspace brings the problem, editor, and test cases together in resi
 <details>
 <summary>View the practice catalog and landing page</summary>
 
-Browse eight challenges by topic, search, or difficulty, with account-backed flags and solved status.
+Browse thirteen challenges by topic, search, or difficulty, with account-backed flags and solved status.
 
 ![JavaScript practice catalog with categories, difficulty filtering, search, and progress indicators](docs/images/practice-catalog.jpg)
 
@@ -65,16 +65,21 @@ feedback, and improve.**
 
 ### Available challenges
 
-| Challenge                            | Difficulty | Concept                             |
-| ------------------------------------ | ---------- | ----------------------------------- |
-| Counter                              | Easy       | Closures                            |
-| Curry                                | Medium     | Closures and partial application    |
-| Filter Elements from Array           | Easy       | Arrays and callbacks                |
-| Flatten Nested Array                 | Medium     | Arrays and recursive traversal      |
-| Debounce                             | Medium     | Timers and async behavior           |
-| Delay the Resolution of Each Promise | Medium     | Promises and fulfillment timing     |
-| Fibonacci Generator                  | Easy       | Generators and iterator state       |
-| Sleep                                | Easy       | Promises and asynchronous execution |
+| Challenge                            | Difficulty | Concept                                |
+| ------------------------------------ | ---------- | -------------------------------------- |
+| Counter                              | Easy       | Closures                               |
+| Curry                                | Medium     | Closures and partial application       |
+| Function Composition                 | Easy       | Higher-order functions and closures    |
+| Memoize                              | Medium     | Closures and cached results            |
+| Filter Elements from Array           | Easy       | Arrays and callbacks                   |
+| Map Array                            | Easy       | Arrays and transformation callbacks    |
+| Reduce Array                         | Easy       | Arrays and accumulator callbacks       |
+| Chunk Array                          | Easy       | Array grouping and non-mutating copies |
+| Flatten Nested Array                 | Medium     | Arrays and recursive traversal         |
+| Debounce                             | Medium     | Timers and async behavior              |
+| Delay the Resolution of Each Promise | Medium     | Promises and fulfillment timing        |
+| Fibonacci Generator                  | Easy       | Generators and iterator state          |
+| Sleep                                | Easy       | Promises and asynchronous execution    |
 
 Each challenge includes a description, examples, constraints, starter code, hints,
 a solution, and server-controlled evaluation.
@@ -121,13 +126,13 @@ for auth behavior, connection details, and troubleshooting.
 
 ## System architecture
 
-One Next.js application serves pages and same-origin API Route Handlers. Privileged services
+The browser and Electron client use one Next.js application serving pages and same-origin API Route Handlers. Privileged services
 stay on the server, and learner code runs in an isolated QuickJS worker.
 
 ```mermaid
 %%{init: {"look": "classic", "fontFamily": "Arial", "themeVariables": {"fontFamily": "Arial, sans-serif", "fontSize": "14px"}, "flowchart": {"nodeSpacing": 18, "rankSpacing": 30, "curve": "linear", "padding": 12, "wrappingWidth": 220}}}%%
 flowchart LR
-    Browser["Browser<br/>React · CodeMirror"]
+    Browser["Browser / Electron<br/>React · CodeMirror"]
     Auth["Neon Auth<br/>Authentication"]
 
     subgraph Next["Next.js application"]
@@ -156,6 +161,24 @@ flowchart LR
 Protected pages and APIs verify Neon Auth identity. Problem content stays in source files;
 Neon stores flags, verified solved status, and the latest executed code.
 
+## Desktop app
+
+Run Code Atlas in its own desktop window:
+
+```sh
+pnpm desktop:dev
+```
+
+This starts the local web server when needed and opens Electron. Accounts, Run/Submit,
+and progress use the same backend as the website. Desktop has its own sign-in session;
+use email and password. Google sign-in is available in the browser version.
+
+`pnpm desktop:package:local` creates an unsigned Mac app in `apps/desktop/release/`.
+Keep `pnpm dev` running when opening that local app. For other computers, package with
+your deployed URL: `CODE_ATLAS_DESKTOP_URL=https://your-code-atlas.example pnpm desktop:package`.
+Server credentials stay on the server. Offline use and signed distribution are deferred.
+See the [desktop guide](docs/development.md#electron-desktop).
+
 ## Development checks
 
 ```sh
@@ -177,7 +200,7 @@ and the [full command list](docs/development.md#commands).
 ## What's next
 
 Guided Learn content, additional JavaScript and algorithm challenges, connected AI
-tutoring, saved notes, submission history, and an Electron desktop app are planned.
+tutoring, saved notes, submission history, and signed desktop distribution are planned.
 AI and notes controls currently show placeholders. Hosted deployment is not yet configured.
 
 ## Documentation

@@ -12,7 +12,7 @@ import { Field, FieldGroup, FieldLabel } from "@workspace/ui/components/field";
 import { Input } from "@workspace/ui/components/input";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { type FormEvent, useId, useState } from "react";
+import { type FormEvent, useId, useState, useSyncExternalStore } from "react";
 import { authClient } from "@/lib/auth/client";
 
 type View =
@@ -36,6 +36,11 @@ const actions: Record<View, string> = {
   "verify-email": "Verify email",
 };
 
+// Presentation only: identity and authorization always come from Neon on the server.
+const subscribeToDesktop = () => () => {};
+const desktopSnapshot = () => navigator.userAgent.includes("CodeAtlasDesktop/");
+const serverDesktopSnapshot = () => false;
+
 function signInError(error: { code?: string; message?: string }) {
   return error.code === "INVALID_EMAIL_OR_PASSWORD" ||
     error.code === "invalid_credentials"
@@ -44,6 +49,11 @@ function signInError(error: { code?: string; message?: string }) {
 }
 
 export function AuthForm({ initialView }: { initialView: View }) {
+  const desktop = useSyncExternalStore(
+    subscribeToDesktop,
+    desktopSnapshot,
+    serverDesktopSnapshot,
+  );
   const router = useRouter();
   const id = useId();
   const [view, setView] = useState(initialView);
@@ -157,6 +167,7 @@ export function AuthForm({ initialView }: { initialView: View }) {
     }
   }
   async function google() {
+    if (desktop) return;
     setPending(true);
     setError("");
     try {
@@ -276,17 +287,23 @@ export function AuthForm({ initialView }: { initialView: View }) {
             </Button>
           </FieldGroup>
         </form>
-        {(view === "sign-in" || view === "sign-up") && (
-          <Button
-            type="button"
-            variant="outline"
-            className="w-full"
-            onClick={google}
-            disabled={pending}
-          >
-            Continue with Google
-          </Button>
-        )}
+        {(view === "sign-in" || view === "sign-up") &&
+          (desktop ? (
+            <p className="text-sm text-muted-foreground">
+              Use email and password in the desktop app. Google sign-in is
+              available in the browser version.
+            </p>
+          ) : (
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full"
+              onClick={google}
+              disabled={pending}
+            >
+              Continue with Google
+            </Button>
+          ))}
         {view === "verify-email" && (
           <Button
             type="button"

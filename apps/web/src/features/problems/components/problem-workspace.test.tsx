@@ -1,10 +1,17 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import {
+  chunkArrayProblem,
   counterProblem,
   curryProblem,
   type ExecutionResult,
   flattenNestedArrayProblem,
+  functionCompositionProblem,
+  mapArrayProblem,
+  memoizeProblem,
   type ProblemDefinition,
+  type ProblemInput,
+  type ProblemOutput,
+  reduceArrayProblem,
   sleepProblem,
 } from "@workspace/problems";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -373,3 +380,104 @@ it("discards an old learner's editor session when the account changes", () => {
     "false",
   );
 });
+
+const expansionExamples: {
+  problem: ProblemDefinition;
+  input: ProblemInput;
+  expected: ProblemOutput;
+  label: string;
+  json: string;
+  numeric?: { label: string; value: string };
+}[] = [
+  {
+    problem: mapArrayProblem,
+    input: { arr: [0, 2], transform: "double" },
+    expected: [0, 4],
+    label: "arr =",
+    json: "[0,2]",
+  },
+  {
+    problem: reduceArrayProblem,
+    input: { nums: [1, -1], reducer: "sum", init: 0 },
+    expected: 0,
+    label: "nums =",
+    json: "[1,-1]",
+    numeric: { label: "init =", value: "0" },
+  },
+  {
+    problem: chunkArrayProblem,
+    input: { arr: [0, 1, 2], size: 2 },
+    expected: [[0, 1], [2]],
+    label: "arr =",
+    json: "[0,1,2]",
+    numeric: { label: "size =", value: "2" },
+  },
+  {
+    problem: functionCompositionProblem,
+    input: { functions: [], x: 0 },
+    expected: 0,
+    label: "functions =",
+    json: "[]",
+    numeric: { label: "x =", value: "0" },
+  },
+  {
+    problem: memoizeProblem,
+    input: { fn: "sum", calls: [[0], [0]] },
+    expected: { values: [0, 0], callCount: 1 },
+    label: "calls =",
+    json: "[[0],[0]]",
+  },
+];
+it.each(expansionExamples)(
+  "runs edited $problem.title cases and renders the real result shape",
+  async ({ problem, input, expected, label, json, numeric }) => {
+    const fetch = vi.fn(async (_url: string, _init?: RequestInit) =>
+      Response.json({
+        ...accepted,
+        total: 1,
+        passed: 1,
+        cases: [
+          {
+            id: "case-1",
+            passed: true,
+            verdict: "accepted",
+            input,
+            expected,
+            actual: expected,
+            message: "Correct.",
+            logs: [],
+            hidden: false,
+          },
+        ],
+      }),
+    );
+    vi.stubGlobal("fetch", fetch);
+    render(<Workspace problem={problem} />);
+    fireEvent.change(screen.getByLabelText(label), {
+      target: { value: "[null]" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Run" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      problem.inputError,
+    );
+    expect(fetch).not.toHaveBeenCalled();
+    fireEvent.change(screen.getByLabelText(label), { target: { value: json } });
+    if (numeric)
+      fireEvent.change(screen.getByLabelText(numeric.label), {
+        target: { value: numeric.value },
+      });
+    fireEvent.change(
+      screen.getByRole("textbox", { name: "JavaScript solution" }),
+      { target: { value: problem.solution } },
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Run" }));
+    await screen.findByText("Accepted", { selector: "h2" });
+    expect(fetch.mock.calls[0]?.[0]).toBe(`/api/problems/${problem.id}/run`);
+    const body = JSON.parse(fetch.mock.calls[0]?.[1]?.body as string);
+    expect(body.code).toBe(problem.solution);
+    expect(body.inputs[0]).toEqual(input);
+    expect(
+      screen.getAllByText(JSON.stringify(expected), { exact: true }).length,
+    ).toBeGreaterThanOrEqual(2);
+  },
+);
