@@ -84,6 +84,11 @@ it("bounds source and JSON and validates all current problem inputs before sched
   expect((await post(req(), context("other"))).status).toBe(404);
   for (const [id, inputs] of [
     ["javascript.sleep", [0]],
+    ["javascript.map-array", [{ arr: [1], transform: "unknown" }]],
+    ["javascript.reduce-array", [{ nums: [1], reducer: "sum", init: null }]],
+    ["javascript.chunk-array", [{ arr: [1], size: 0 }]],
+    ["javascript.function-composition", [{ functions: ["unknown"], x: 0 }]],
+    ["javascript.memoize", [{ fn: "subtract", calls: [[1]] }]],
     ["javascript.counter", [{ n: 0, calls: 1001 }]],
     ["javascript.debounce", [{ t: -1, calls: [] }]],
     ["javascript.fibonacci-generator", [{ count: 51 }]],

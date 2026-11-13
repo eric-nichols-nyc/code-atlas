@@ -1,6 +1,6 @@
 import { AuthApiError } from "@neon/auth/next";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { beforeEach, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { AuthForm } from "./auth-form";
 
 const client = vi.hoisted(() => ({
@@ -22,6 +22,7 @@ beforeEach(() => {
   vi.resetAllMocks();
   client.getSession.mockResolvedValue({ data: { user: { id: "neon-user" } } });
 });
+afterEach(() => vi.restoreAllMocks());
 function email() {
   fireEvent.change(screen.getByLabelText("Email", { exact: true }), {
     target: { value: "learner@example.com" },
@@ -133,6 +134,24 @@ it("keeps Google callbacks on the application dashboard", async () => {
       callbackURL: `${window.location.origin}/dashboard`,
     }),
   );
+});
+it("uses email login in Electron and explains the Google limitation", async () => {
+  vi.spyOn(navigator, "userAgent", "get").mockReturnValue(
+    "Chrome CodeAtlasDesktop/0.1",
+  );
+  client.signIn.email.mockResolvedValue({ error: null });
+  render(<AuthForm initialView="sign-in" />);
+  expect(
+    screen.queryByRole("button", { name: "Continue with Google" }),
+  ).not.toBeInTheDocument();
+  expect(
+    screen.getByText(/Use email and password in the desktop app/),
+  ).toBeInTheDocument();
+  email();
+  password();
+  submit("Sign in");
+  await waitFor(() => expect(replace).toHaveBeenCalledWith("/dashboard"));
+  expect(client.signIn.social).not.toHaveBeenCalled();
 });
 it("requests verification when sign-up has no session and finishes after the email code", async () => {
   client.signUp.email.mockResolvedValue({ error: null });

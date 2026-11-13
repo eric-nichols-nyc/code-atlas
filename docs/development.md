@@ -17,6 +17,11 @@ Start with the [README quick start](../README.md#quick-start).
 | `/javascript/practice/debounce`                             | Medium Async problem with a deterministic timer judge                                                           |
 | `/javascript/practice/delay-the-resolution-of-each-promise` | Medium Async problem with editable Promise descriptors and deterministic fulfillment timing                     |
 | `/javascript/practice/filter-elements-from-array`           | Easy Arrays problem with editable array/callback cases                                                          |
+| `/javascript/practice/map-array`                            | Easy Arrays problem with supplied transforms, original indices and a new output array                           |
+| `/javascript/practice/reduce-array`                         | Easy Arrays problem with a supplied reducer, editable init and accumulator-order judging                        |
+| `/javascript/practice/chunk-array`                          | Easy Arrays problem with editable group size and non-mutating nested-array output                               |
+| `/javascript/practice/function-composition`                 | Easy Closures problem with ordered function names, editable x and reusable right-to-left composition            |
+| `/javascript/practice/memoize`                              | Medium Closures problem with editable call sequences, cached values and underlying callback counts              |
 | `/javascript/practice/flatten-nested-array`                 | Medium Arrays problem with editable nested JSON and isolated traversal judging                                  |
 | `/javascript/practice/fibonacci-generator`                  | Easy Generators problem with an editable count and isolated iterator judging                                    |
 | `/javascript/learn`                                         | Protected coming-soon page; Learn requirements are deferred                                                     |
@@ -73,7 +78,7 @@ external judge key. Missing auth configuration returns 503 and a missing session
 
 Next.js and Prisma load their own local environment files. A database package `.env` does not configure
 Next.js. Only public configuration belongs in `NEXT_PUBLIC_` variables. Keep server secrets out of
-browser and future Electron bundles. Next Route Handlers call server services directly, without a
+browser and Electron bundles. Next Route Handlers call server services directly, without a
 second application, token-forwarding origin or CORS configuration.
 
 ## Commands
@@ -98,6 +103,11 @@ Root `package.json` is the source of truth for scripts.
 | `pnpm db:migrate --name <name>`               | Create/apply a development migration once models and credentials exist       |
 | `pnpm db:deploy` / `pnpm db:studio`           | Apply committed migrations / open Prisma Studio                              |
 | `pnpm specify version` / `pnpm specify check` | Inspect the optional pinned Spec Kit CLI and available tools                 |
+| `pnpm desktop:dev`                            | Start/reuse the local web server and open Electron                           |
+| `pnpm desktop:build` / `pnpm desktop:start`   | Compile desktop TypeScript / open against an already running server          |
+| `pnpm desktop:package:local`                  | Package an unsigned local-server app for this OS/architecture                |
+| `pnpm desktop:package`                        | Package for the configured hosted HTTPS origin                               |
+| `pnpm desktop:smoke`                          | Native renderer, navigation, session and connection-retry checks             |
 
 ## Where the code lives
 
@@ -106,6 +116,7 @@ A short ownership map replaces a full directory tree. Keep feature details in th
 | Location                                                        | Owns                                                                     |
 | --------------------------------------------------------------- | ------------------------------------------------------------------------ |
 | [Web routes](../apps/web/src/app)                               | Next.js pages, layouts, and authenticated web API adapters               |
+| [Desktop app](../apps/desktop)                                  | Electron lifecycle, session, navigation policy and packaging             |
 | [Web features](../apps/web/src/features)                        | Landing, catalog, dashboard, problem behavior/state and workspace layout |
 | [JavaScript content](../apps/web/src/content/javascript)        | Practice catalog and trusted problem MDX                                 |
 | [Problem server code](../apps/web/src/features/problems/server) | Private suites, execution policy and isolated worker                     |
@@ -157,7 +168,7 @@ Current content ownership is deliberate:
 `features/learning` currently owns the reusable adaptive layout and tools panel; its name does not
 make the current practice experience a guided Learn lesson.
 
-All eight published problems have separate server-owned judging contracts.
+All thirteen published problems have separate server-owned judging contracts.
 Register new definitions, catalog entries, trusted MDX loaders and a matching private test suite/adapter;
 the content validator checks that the published catalog agrees with those public definitions.
 Adding MDX alone does not create a runnable problem.
@@ -184,7 +195,7 @@ Server services use `server-only` boundaries. UI code uses the same-origin `/api
 
 The execution service runs QuickJS WebAssembly inside a disposable Node Worker. Guest memory, stack, CPU, timers,
 console output, concurrency, and wall time are bounded. Learner code has no Node module, filesystem,
-DOM, or network access. The adapters support single-file JavaScript for these eight problems, not a general Node runtime.
+DOM, or network access. The adapters support single-file JavaScript for these thirteen problems, not a general Node runtime.
 Sleep measures elapsed time. Counter checks returned numeric sequences and independent closure state;
 its editable `calls` field is the number of invocations. Debounce runs guest timers on a deterministic
 clock with documented same-time ordering. Filter supplies a selectable callback, checks truthy
@@ -199,6 +210,15 @@ callbacks, and returns a numeric result. See its [feature brief](features/javasc
 Flatten Nested Array traverses every array level while preserving order, duplicates,
 zero and input contents; `flat` and `flatMap` are disabled. See its
 [feature brief](features/javascript-flatten-nested-array.md).
+Map Array collects one supplied callback result per element and disables the guest `map`
+built-in. Reduce Array threads `init` through the reducer, checks callback invocation order/count,
+and disables `reduce`/`reduceRight`. Chunk Array preserves input while producing independent group
+arrays. Function Composition checks right-to-left order, identity and reusable closures. Memoize
+checks returned values and underlying callback `callCount`, including cached zero and distinct
+ordered argument lists. These five additions reuse the existing runtime and account data model;
+they introduce no authentication, database or layout changes. See the
+[practice expansion brief](features/javascript-practice-expansion.md) and
+[primary-source research](features/javascript-practice-research.md).
 Hidden inputs, outputs and logs remain private.
 
 Run uses editable visible cases; Submit ignores client-supplied cases and uses the full private suite.
@@ -335,10 +355,62 @@ The next work is to review account-backed practice data, then add content throug
 contracts. Learn, connected AI tutoring, editable/saved notes, submission history, and future
 administration require their own feature scope. There is currently no admin app.
 
-Electron remains planned: no desktop workspace, renderer packaging, installer, signing, updater, or
-offline sync exists. Decide hosted versus bundled rendering, operating systems/distribution, and offline
-requirements before implementing it. Server secrets stay on the server; native access must use narrow,
-validated interfaces. Browser tests cannot establish packaged desktop behavior.
+## Electron desktop
+
+The first desktop slice is an **online client** using the existing Next.js backend.
+`apps/desktop/src` owns Electron lifecycle and trust policy; the web application owns
+learning, Neon authentication, progress and isolated judging. There is no preload or
+IPC bridge. Node integration is disabled; context isolation, sandboxing and web security
+stay enabled. Permissions and downloads are denied except sanitized clipboard writes
+by the app origin. External HTTPS links open in the system browser; native popups and
+other-origin navigation cannot replace the app window.
+
+`pnpm desktop:dev` defaults to `http://localhost:3000`. It reuses a healthy Code Atlas
+server or starts `pnpm exec turbo run dev --filter=@workspace/web -- --webpack`. The desktop
+launcher uses Webpack for stable hot reload; this machine's Turbopack session repeatedly
+refreshed the page during native review. On exit it stops only
+the server it started. It refuses an occupied port belonging to an unready or different
+service. Normal `pnpm dev` / `pnpm start` still run only the web app.
+Set the public `CODE_ATLAS_DESKTOP_URL` environment variable to use another running server.
+HTTP is accepted only for explicit loopback development/local builds; hosted builds require HTTPS.
+
+`pnpm desktop:package:local` creates
+`apps/desktop/release/Code Atlas Local-darwin-arm64/Code Atlas Local.app` on Apple Silicon.
+Keep `pnpm dev` running when opening this local app. An unavailable server shows a
+connection screen with Try again; this does not provide offline practice.
+
+For other computers, deploy the Next.js backend, configure its Neon Auth trusted domain,
+and package with its public origin:
+
+```sh
+CODE_ATLAS_DESKTOP_URL=https://your-code-atlas.example pnpm desktop:package
+```
+
+The URL is fixed at packaging time; packaged apps ignore environment URL overrides.
+Packaging stages only three compiled desktop modules, package metadata and public
+connection configuration, then verifies the ASAR allowlist. No web source, `.env`, Prisma,
+private tests or server credentials enter the archive. The development Electron subprocess
+receives only platform environment settings and the public URL. Next.js loads its ignored
+credentials as usual.
+
+Cookies persist in a separate `persist:code-atlas` session. Local/development data uses
+the `Code Atlas Local` application-data directory; hosted packages use `Code Atlas`.
+Browser sign-in does not sign in Electron. Email/password and email-code flows reuse
+the Neon forms and server boundary. Google is omitted in desktop with an explanation;
+system-browser OAuth handoff is deferred. Opening the website does not transfer a session.
+See [Google's secure-browser policy](https://developers.google.com/identity/protocols/oauth2/policies#use_secure_browsers).
+
+`pnpm desktop:smoke` tests actual Electron preferences, renderer Node isolation,
+popups/external navigation, window session reuse, connection failure and repeated retry
+using an owned local fixture. Root `pnpm test` covers URL, permission and environment
+policy. CI builds desktop TypeScript without launching a GUI. Fixture cookies do not
+establish live Neon authentication or account persistence; native and browser reviews
+remain separate checks.
+
+The reviewed target is macOS Apple Silicon. Other OS packaging uses the current host
+but remains unverified. The app is unsigned, with no installer or updater. Hosted deployment,
+native Google OAuth, offline execution/sync, signing and notarization are later work.
+See the [desktop feature brief](features/electron-desktop.md) for actual verification.
 
 ## Troubleshooting
 

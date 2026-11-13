@@ -7,9 +7,9 @@
     "node": ">=24.11.0"
   },
   "scripts": {
-    "dev": "turbo run dev",
+    "dev": "turbo run dev --filter=@workspace/web",
     "build": "turbo run build",
-    "start": "turbo run start",
+    "start": "turbo run start --filter=@workspace/web",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "format": "biome format --write .",
@@ -25,7 +25,13 @@
     "db:deploy": "pnpm --filter @workspace/db db:deploy",
     "db:studio": "pnpm --filter @workspace/db db:studio",
     "specify": "uvx --from git+https://github.com/github/spec-kit.git@v1.3.2 specify",
-    "test:e2e:auth": "playwright test --config playwright.auth.config.ts"
+    "test:e2e:auth": "playwright test --config playwright.auth.config.ts",
+    "desktop:dev": "pnpm --filter @workspace/desktop dev",
+    "desktop:build": "pnpm --filter @workspace/desktop build",
+    "desktop:start": "pnpm --filter @workspace/desktop start",
+    "desktop:package": "pnpm --filter @workspace/desktop package",
+    "desktop:package:local": "pnpm --filter @workspace/desktop package:local",
+    "desktop:smoke": "pnpm --filter @workspace/desktop smoke"
   },
   "devDependencies": {
     "@biomejs/biome": "2.6.6",

@@ -58,6 +58,35 @@ export interface PromiseDelayInput {
   ms: number;
   functions: TimedValue[];
 }
+export type MapTransform = "double" | "addIndex" | "square" | "negate" | "zero";
+export interface MapArrayInput {
+  arr: number[];
+  transform: MapTransform;
+}
+export type ReduceFunction = "sum" | "subtract" | "max" | "countEven";
+export interface ReduceArrayInput {
+  nums: number[];
+  reducer: ReduceFunction;
+  init: number;
+}
+export interface ChunkArrayInput {
+  arr: number[];
+  size: number;
+}
+export type CompositionFunction = "addOne" | "double" | "negate";
+export interface CompositionInput {
+  functions: CompositionFunction[];
+  x: number;
+}
+export type MemoizeFunction = "sum" | "product" | "subtract";
+export interface MemoizeInput {
+  fn: MemoizeFunction;
+  calls: number[][];
+}
+export interface MemoizeOutput {
+  values: number[];
+  callCount: number;
+}
 export type ProblemInput =
   | number
   | CounterInput
@@ -66,8 +95,19 @@ export type ProblemInput =
   | FlattenInput
   | GeneratorInput
   | CurryInput
-  | PromiseDelayInput;
-export type ProblemOutput = number | number[] | DebounceCall[] | TimedValue[];
+  | PromiseDelayInput
+  | MapArrayInput
+  | ReduceArrayInput
+  | ChunkArrayInput
+  | CompositionInput
+  | MemoizeInput;
+export type ProblemOutput =
+  | number
+  | number[]
+  | number[][]
+  | MemoizeOutput
+  | DebounceCall[]
+  | TimedValue[];
 export interface CaseResult {
   id: string;
   passed: boolean;
@@ -119,7 +159,12 @@ export interface ProblemDefinition {
     | "delay-all"
     | "filter-array"
     | "flatten-array"
-    | "fibonacci-generator";
+    | "fibonacci-generator"
+    | "map-array"
+    | "reduce-array"
+    | "chunk-array"
+    | "function-composition"
+    | "memoize";
   inputError: string;
   title: string;
   summary: string;

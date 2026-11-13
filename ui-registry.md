@@ -422,3 +422,29 @@ Pending operations disable form controls. Password recovery uses an email code.
 Keep SDK calls and session decisions in the app, and all colors in semantic tokens.
 The account avatar uses initials when no image is available; its DropdownMenu provides
 identity and sign-out, including explicit failure feedback.
+
+## Additional JavaScript practice inputs
+
+Map Array, Reduce Array and Memoize use the existing supplied-callback Select with
+its source preview. Their labeled JSON fields are `arr`, `nums` and `calls`.
+Reduce adds numeric `init`; Chunk Array uses JSON `arr` and numeric `size`.
+Function Composition uses a JSON list of function IDs, the supplied functions'
+source preview and numeric `x`. Keep JSON help/bounds and validation inside the
+results pane, with shared Input/Label/Select controls and semantic tokens.
+Chunk outputs are nested arrays; Memoize outputs `{values,callCount}`. Reuse the
+existing bounded JSON result presentation, including valid zero and empty arrays.
+
+## Electron desktop frame and connection state
+
+`apps/desktop` wraps the existing web UI in a standard native window (1440×960 initial,
+360×600 minimum), retaining the title bar and native Edit/View/Window menus. Reuse all
+web layouts, shared components and semantic theme tokens; do not fork practice UI for desktop.
+The renderer receives no native bridge. Safe external HTTPS links use the system browser.
+Desktop sign-in uses the same form with email/password; replace Google with an explanatory
+muted paragraph. This is a presentation choice, never an authorization boundary.
+
+The server-unavailable screen is packaged native-shell HTML with no scripts: dark
+`#0e0e0e` background, `#f9f9f9` heading, `#a3a3a3` supporting text, a white Try again
+link styled as a button, and a visible keyboard focus ring. Keep it readable on narrow
+windows. Retry navigates to the configured origin. Do not imply offline execution or
+show an accepted/saved state without the server response.

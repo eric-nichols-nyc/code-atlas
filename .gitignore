@@ -18,3 +18,5 @@ work/
 outputs/
 
 .workers/
+
+apps/desktop/release/

@@ -12,11 +12,22 @@ import {
 } from "@workspace/ui/components/select";
 import { useProblemSession } from "../state/problem-session";
 import { CurryCaseFields } from "./curry-case-fields";
+import { ExpandedCaseFields } from "./expanded-case-fields";
 export function CaseInputFields({ index }: { index: number }) {
   const s = useProblemSession();
   const draft = s.inputs[index];
   if (!draft) return null;
   const kind = s.problem.kind;
+  if (
+    [
+      "map-array",
+      "reduce-array",
+      "chunk-array",
+      "function-composition",
+      "memoize",
+    ].includes(kind)
+  )
+    return <ExpandedCaseFields index={index} />;
   if (kind === "curry") return <CurryCaseFields index={index} />;
   const predicate = filterPredicates.find(
     (item) => item.id === draft.predicate,

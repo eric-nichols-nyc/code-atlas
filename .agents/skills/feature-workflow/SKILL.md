@@ -9,7 +9,11 @@ Read `AGENTS.md`, the relevant existing feature, and `ui-registry.md` for UI wor
 
 ## Decide the size
 
-For a small bug, copy edit or styling adjustment, implement and verify directly. For new behavior, keep one brief at `docs/features/<feature-name>.md`. Update the existing brief when revising the same capability. Aim for one page containing:
+For enhancements to an existing capability, use
+[feature-improvements](../feature-improvements/SKILL.md) to revise its current brief
+and verify the changed behavior. Use this workflow for new capabilities.
+
+For a small bug, copy edit or styling adjustment, implement and verify directly. For a new capability, keep one brief at `docs/features/<feature-name>.md`. Aim for one page containing:
 
 - Outcome and the first working example the user will review.
 - Included scope and explicit later work.
