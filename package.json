@@ -32,7 +32,8 @@
     "desktop:start": "pnpm --filter @workspace/desktop start",
     "desktop:package": "pnpm --filter @workspace/desktop package",
     "desktop:package:local": "pnpm --filter @workspace/desktop package:local",
-    "desktop:smoke": "pnpm --filter @workspace/desktop smoke"
+    "desktop:smoke": "pnpm --filter @workspace/desktop smoke",
+    "prototype:react": "turbo run build --filter=@workspace/db --filter=@workspace/problems && pnpm --filter @workspace/web worker:build && pnpm --filter @workspace/web exec next dev --port 3002"
   },
   "devDependencies": {
     "@biomejs/biome": "2.6.6",
