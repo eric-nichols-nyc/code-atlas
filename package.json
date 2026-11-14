@@ -26,6 +26,7 @@
     "db:studio": "pnpm --filter @workspace/db db:studio",
     "specify": "uvx --from git+https://github.com/github/spec-kit.git@v1.3.2 specify",
     "test:e2e:auth": "playwright test --config playwright.auth.config.ts",
+    "test:e2e:desktop:auth": "playwright test --config playwright.desktop-auth.config.ts",
     "desktop:dev": "pnpm --filter @workspace/desktop dev",
     "desktop:build": "pnpm --filter @workspace/desktop build",
     "desktop:start": "pnpm --filter @workspace/desktop start",

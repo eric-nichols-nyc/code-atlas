@@ -97,6 +97,7 @@ Root `package.json` is the source of truth for scripts.
 | `pnpm test:coverage`                          | Build shared packages/worker and run Vitest coverage                         |
 | `pnpm test:e2e` / `pnpm test:e2e:ui`          | Credential-free production Playwright smoke tests / test UI                  |
 | `pnpm test:e2e:auth`                          | Optional authenticated suite with a dedicated Neon Auth development identity |
+| `pnpm test:e2e:desktop:auth`                  | Authenticated Electron Run/Submit, full quit and account restore             |
 | `pnpm --filter @workspace/web content:check`  | Validate the current practice catalog and public definitions                 |
 | `pnpm --filter @workspace/web worker:build`   | Compile the isolated worker/adapters to ignored `.workers/`                  |
 | `pnpm analyze`                                | Webpack bundle-analysis build for the web app                                |
@@ -340,7 +341,7 @@ The smoke configuration clears credentials and starts its own Next.js server. It
 navigation, themes, mobile behavior, auth routes, health, and protected setup boundaries. It does not
 verify real sign-in, authenticated judging, or database access. Reports/traces are ignored.
 
-Authenticated automation is optional and remains unverified at the user's request. Configure
+Authenticated automation is optional. Configure
 an isolated development branch and a dedicated existing Neon Auth learner using
 `NEON_TEST_USER_EMAIL` and `NEON_TEST_USER_PASSWORD` in ignored `.env.test.local`.
 The config also reads the web environment file. Free port 3000 because the suite builds/starts
@@ -425,6 +426,39 @@ using an owned local fixture. Root `pnpm test` covers URL, permission and enviro
 policy. CI builds desktop TypeScript without launching a GUI. Fixture cookies do not
 establish live Neon authentication or account persistence; native and browser reviews
 remain separate checks.
+
+`pnpm test:e2e:desktop:auth` is a separate, opt-in live check. It reuses
+`playwright.auth.config.ts` environment loading and dedicated-learner requirements,
+also requires `DATABASE_URL`, and builds desktop TypeScript plus the production web app
+before starting its own server on **free port 3000**. It needs a graphical desktop
+session and the installed workspace Electron binary; on Linux a display server is required.
+Keep the Neon Auth URL, cookie secret and database on the same isolated development branch.
+
+The single Counter journey signs in through Electron's email/password form, runs edited
+visible inputs, verifies accepted Submit against the larger server suite, and checks
+confirmed account saves separately from verdicts. Unique source markers distinguish this
+run's saved code from previous data. Run must preserve the existing solved status. After
+Submit, the test adds unsaved typing, calls `app.quit()` through Playwright, verifies a clean
+process exit, launches a different process, and checks restored authentication, exact saved
+source, server progress and catalog solved status. It uses no mocked APIs or browser
+`storageState`. The dedicated learner's Counter source/solved progress remains changed;
+the test does not reset account records or touch notes.
+
+A test-only entry redirects the app-data root to a temporary directory before importing
+the real compiled `main.js`. The production entry still owns its persistent session and
+single-instance lock. Both launches use that directory, then remove it after quitting.
+Personal desktop profiles and browser sessions stay intact; Electron receives the existing
+allowlisted platform environment and public URL, without backend credentials or test login
+environment variables. Traces, screenshots and videos remain disabled as in the browser
+auth setup. Existing `desktop:smoke` remains credential-free and independent.
+
+This automated check runs compiled Electron against a production Next.js server. The
+packaged `.app` path still needs a signed-in native review: start the configured production
+server, open the local package, sign in to the dedicated learner, Run/Submit Counter and
+confirm saved feedback, use the native Quit command, reopen the package, and check the saved
+code and catalog solved status. Use a disposable macOS user/profile if the normal package
+contains personal drafts or a signed-in personal account. Merely closing a window does not
+exercise full Quit on macOS. Signing/distribution and other OS review remain deferred.
 
 The reviewed target is macOS Apple Silicon. Other OS packaging uses the current host
 but remains unverified. The app is unsigned, with no installer or updater. Hosted deployment,
