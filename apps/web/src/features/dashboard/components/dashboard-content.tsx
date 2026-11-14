@@ -12,7 +12,6 @@ import {
 import Link from "next/link";
 import { subjects } from "@/features/catalog/data/subjects";
 import { javascriptTopics } from "@/features/dashboard/data/topics";
-import { isReactPilotAvailable } from "@/features/react-sandbox/lib/availability";
 
 export function DashboardContent() {
   return (
@@ -38,7 +37,7 @@ export function DashboardContent() {
             Subjects to explore
           </h2>
           <p className="text-sm text-muted-foreground">
-            Explore JavaScript and Algorithms. More paths are on the way.
+            Explore JavaScript, Algorithms, and React.
           </p>
         </div>
         <div className="grid gap-4 lg:grid-cols-3 lg:gap-5">
@@ -71,19 +70,9 @@ export function DashboardContent() {
                 )}
               </CardContent>
               <CardFooter className="px-5 md:px-6">
-                {subject.id === "javascript" || subject.id === "algorithms" ? (
-                  <Button asChild className="w-full">
-                    <Link href={`/${subject.id}`}>Explore {subject.title}</Link>
-                  </Button>
-                ) : subject.id === "react" && isReactPilotAvailable() ? (
-                  <Button asChild className="w-full">
-                    <Link href="/react/practice">Explore {subject.title}</Link>
-                  </Button>
-                ) : (
-                  <Button variant="outline" disabled className="w-full">
-                    Coming soon
-                  </Button>
-                )}
+                <Button asChild className="w-full">
+                  <Link href={`/${subject.id}`}>Explore {subject.title}</Link>
+                </Button>
               </CardFooter>
             </Card>
           ))}

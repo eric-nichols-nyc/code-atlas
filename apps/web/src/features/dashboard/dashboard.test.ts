@@ -32,7 +32,7 @@ describe("learner dashboard", () => {
     expect(protect).toHaveBeenCalledOnce();
   });
 
-  it("shows the three text-only subjects with unavailable paths disabled", async () => {
+  it("shows all three text-only subjects with enabled destinations", async () => {
     render(await DashboardPage());
     expect(protect).toHaveBeenCalledOnce();
     expect(
@@ -43,14 +43,10 @@ describe("learner dashboard", () => {
         .getAllByRole("heading", { level: 3 })
         .map((heading) => heading.textContent),
     ).toEqual(["JavaScript", "Algorithms", "React JS"]);
-    for (const button of screen.getAllByRole("button", {
-      name: "Coming soon",
-    })) {
-      expect(button).toBeDisabled();
-    }
-    expect(screen.getAllByRole("button", { name: "Coming soon" })).toHaveLength(
-      1,
-    );
+    expect(screen.queryByRole("button", { name: "Coming soon" })).toBeNull();
+    expect(
+      screen.getByRole("link", { name: "Explore React JS" }),
+    ).toHaveAttribute("href", "/react");
     expect(screen.queryByRole("img")).toBeNull();
   });
 

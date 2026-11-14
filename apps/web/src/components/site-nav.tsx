@@ -74,17 +74,7 @@ const items: readonly GlobalNavItem[] = [
 function subjectItems(
   subject: "javascript" | "algorithms" | "react",
 ): readonly GlobalNavItem[] {
-  if (subject === "react")
-    return [
-      {
-        id: "practice",
-        label: "Practice",
-        href: "/react/practice",
-        icon: PracticeIcon,
-        appearance: "text",
-      },
-    ];
-  return [
+  const sections: GlobalNavItem[] = [
     {
       id: "learn",
       label: "Learn",
@@ -92,14 +82,16 @@ function subjectItems(
       icon: LearnIcon,
       appearance: "text",
     },
-    {
+  ];
+  if (subject !== "react" || isReactPilotAvailable())
+    sections.push({
       id: "practice",
       label: "Practice",
       href: `/${subject}/practice`,
       icon: PracticeIcon,
       appearance: "text",
-    },
-  ];
+    });
+  return sections;
 }
 const allSectionItems = [
   ...subjectItems("javascript"),
@@ -123,9 +115,7 @@ export function SiteNav({ authConfigured }: { authConfigured: boolean }) {
   )
     return null;
   const subject = (["javascript", "algorithms", "react"] as const).find(
-    (id) =>
-      (id !== "react" || isReactPilotAvailable()) &&
-      (pathname === `/${id}` || pathname.startsWith(`/${id}/`)),
+    (id) => pathname === `/${id}` || pathname.startsWith(`/${id}/`),
   );
   const navigationItems = subject ? subjectItems(subject) : [];
   const activeItem = [...items, ...navigationItems].find((item) =>

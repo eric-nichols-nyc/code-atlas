@@ -133,7 +133,10 @@ Code Atlas targets the web and an online Electron app. JavaScript is the first s
 Practice is the current delivery focus. `/javascript/practice` owns the catalog and
 `/javascript/practice/<problem>` owns a coding workspace. `/javascript/learn` owns a separate
 module catalog and read-only previews; individual guided-lesson requirements remain open.
-Algorithms follows the same Learn/Practice pattern with a copied Two Pointers preview and a Valid Anagram problem. React JS remains a later subject.
+Algorithms follows the same Learn/Practice pattern with a copied Two Pointers preview and a Valid Anagram problem.
+React Learn provides a Hooks catalog and an authored useEffect lifecycle preview;
+its separate React Practice pilot remains development-only. Learning examples do
+not execute learner code or persist completion.
 Do not treat a practice problem as a guided lesson or require visualization to judge a solution.
 
 The installed baseline is pnpm, Turborepo, TypeScript, one Next.js application with App Router APIs,
@@ -209,4 +212,8 @@ Amendment 2.4.2 enables Algorithms through shared subject catalogs, its copied T
 preview, and isolated Valid Anagram practice. Authorization, ownership, and execution limits
 remain unchanged; no database migration is required.
 
-**Version**: 2.4.2 | **Ratified**: 2026-11-07 | **Last Amended**: 2026-11-14
+Amendment 2.4.3 records the React Hooks learning catalog and useEffect lifecycle
+preview. Its read-only content does not expand sandbox execution, authorization,
+or persistence policy; the React Practice pilot remains development-only.
+
+**Version**: 2.4.3 | **Ratified**: 2026-11-07 | **Last Amended**: 2026-11-14
