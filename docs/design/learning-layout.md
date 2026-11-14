@@ -1,5 +1,9 @@
 # Code Atlas learning interface
 
+The delivered catalog and module-preview scope is described in
+[JavaScript learning](../features/javascript-learning.md). This earlier workspace
+design remains input for the later individual lesson experience.
+
 **Status:** Draft for approval · **Version:** 0.4 · **Date:** 2026-11-09
 
 **Canonical document:** `docs/design/learning-layout.md`

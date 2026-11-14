@@ -37,7 +37,7 @@ export function DashboardContent() {
             Subjects to explore
           </h2>
           <p className="text-sm text-muted-foreground">
-            Start with JavaScript. More paths are on the way.
+            Explore JavaScript and Algorithms. More paths are on the way.
           </p>
         </div>
         <div className="grid gap-4 lg:grid-cols-3 lg:gap-5">
@@ -70,9 +70,9 @@ export function DashboardContent() {
                 )}
               </CardContent>
               <CardFooter className="px-5 md:px-6">
-                {subject.id === "javascript" ? (
+                {subject.id === "javascript" || subject.id === "algorithms" ? (
                   <Button asChild className="w-full">
-                    <Link href="/javascript">Explore JavaScript</Link>
+                    <Link href={`/${subject.id}`}>Explore {subject.title}</Link>
                   </Button>
                 ) : (
                   <Button variant="outline" disabled className="w-full">

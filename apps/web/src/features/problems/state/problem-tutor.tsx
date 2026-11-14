@@ -62,6 +62,7 @@ function useTutorState() {
     currentTurns.current = update(currentTurns.current);
     setTurns(currentTurns.current);
   };
+  // Only Send/Retry starts a request; snapshot the latest code at action time.
   const send = async (retry?: TutorTurn) => {
     if (active.current) return;
     const session = currentProblem.current;
@@ -110,10 +111,12 @@ function useTutorState() {
         ? previous.map((item) => (item.id === retry.id ? turn : item))
         : [...previous, turn],
     );
+    // Retrying an earlier question must preserve any newer unsent draft.
     if (!retry) setDraft("");
     const update = (
       patch: Partial<TutorTurn> | ((turn: TutorTurn) => Partial<TutorTurn>),
     ) => {
+      // Late chunks from an old attempt cannot update its replacement.
       if (active.current?.id !== id) return;
       changeTurns((previous) =>
         previous.map((item) =>
@@ -178,6 +181,7 @@ function useTutorState() {
   };
 }
 const Context = createContext<ReturnType<typeof useTutorState> | null>(null);
+// Lives above panel remounts, inside the keyed learner/problem workspace.
 export function ProblemTutorSession({ children }: { children: ReactNode }) {
   const value = useTutorState();
   return <Context.Provider value={value}>{children}</Context.Provider>;

@@ -131,8 +131,9 @@ where applicable.
 
 Code Atlas targets the web and an online Electron app. JavaScript is the first subject and
 Practice is the current delivery focus. `/javascript/practice` owns the catalog and
-`/javascript/practice/<problem>` owns a coding workspace. `/javascript/learn` is a separate future
-learning experience; its requirements remain open. Later subjects include Algorithms and React JS.
+`/javascript/practice/<problem>` owns a coding workspace. `/javascript/learn` owns a separate
+module catalog and read-only previews; individual guided-lesson requirements remain open.
+Algorithms follows the same Learn/Practice pattern with a copied Two Pointers preview and a Valid Anagram problem. React JS remains a later subject.
 Do not treat a practice problem as a guided lesson or require visualization to judge a solution.
 
 The installed baseline is pnpm, Turborepo, TypeScript, one Next.js application with App Router APIs,
@@ -200,4 +201,12 @@ The user chose the existing Next.js backend. Renderers remain sandboxed with no 
 bridge. Neon identity, account ownership and QuickJS isolation remain server responsibilities.
 Offline operation, native OAuth handoff and signed distribution require separate scope.
 
-**Version**: 2.4.0 | **Ratified**: 2026-11-07 | **Last Amended**: 2026-11-13
+Amendment 2.4.1 clarifies Learn availability after adding its module catalog and
+read-only Two Pointers preview. Guided lesson requirements remain open; no principle,
+authorization rule, or persistence contract changes, and no migration is required.
+
+Amendment 2.4.2 enables Algorithms through shared subject catalogs, its copied Two Pointers
+preview, and isolated Valid Anagram practice. Authorization, ownership, and execution limits
+remain unchanged; no database migration is required.
+
+**Version**: 2.4.2 | **Ratified**: 2026-11-07 | **Last Amended**: 2026-11-14

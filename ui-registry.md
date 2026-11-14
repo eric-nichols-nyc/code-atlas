@@ -26,6 +26,13 @@ Primary text is `#f9f9f9`; supporting text is `#a3a3a3`. Keep these values in
 the shared theme and consume semantic classes throughout the app. Light theme
 keeps its existing palette. Difficulty and category accents retain their roles.
 
+Dark purple is an optional palette added on 2026-11-14: page/header `#110d1a`,
+panels `#181221`, overlays `#1e162b`, muted surfaces `#20172d`, secondary
+surfaces `#291e37`, hover/selection `#322442`, and borders `#30223f`.
+Primary actions use lavender `#c4a7f5` with deep plum labels; foreground
+`#f4eefb` and supporting text `#b8aacb` keep copy readable. The root
+`.dark-purple` class inherits dark semantic status/category colors and syntax roles.
+
 ## Buttons
 
 File: `packages/ui/src/components/button.tsx`.
@@ -68,6 +75,8 @@ Brand links use a decorative compass icon beside the text, aligned with `inline-
 The Code Atlas brand link returns to the app's home page. The web navigation uses Dashboard as their explicit route item, with no separate Home item.
 
 Consumers may supply `containerClassName` for the inner navigation width. The web app uses the full viewport width on every page. The optional `utilities` slot keeps controls such as the theme switcher visible even when the mobile route links are collapsed. Keep its DOM and visual order aligned with the brand, disclosure, and route links.
+
+The web header uses `sticky top-0 z-40` to stay visible during document scrolling. Its opaque `bg-background` keeps content readable beneath it; shared menus and dialogs retain their overlay stacking.
 
 On desktop, utilities sit immediately before the account actions, placing the theme switcher to the left of the avatar. Mobile retains an always-visible utility control beside the navigation disclosure. Responsive utility instances are mutually hidden so only one is visible and keyboard-reachable at a time.
 
@@ -160,20 +169,24 @@ Map Basics to blue, Functions to amber, and Async to rose in feature-owned metad
 ## Theme selection
 
 Files: `packages/ui/src/components/theme-provider.tsx`, `packages/ui/src/components/theme-switcher.tsx`, both app root layouts, and `packages/ui/src/styles/globals.css`.
-Last updated: 2026-11-09.
+Last updated: 2026-11-14.
 
-| Property                | Pattern                                                                  |
-| ----------------------- | ------------------------------------------------------------------------ |
-| Page and overlay colors | Existing semantic tokens; one `.dark` class on the document root         |
-| Default                 | Dark; saved Light, Dark, or System preference takes precedence           |
-| Trigger                 | Shared ghost Button, icon size, accessible name "Change theme"           |
-| Menu                    | Shared DropdownMenu surface, border, radius, padding, and shadow         |
-| Selection               | Radio items with a visible indicator and `aria-checked` state            |
-| Typography              | Shared menu label and item typography                                    |
-| Focus / hover           | Shared Button and DropdownMenu states; Escape and selection return focus |
-| Neon Auth surfaces      | Shared Card, Field, Input, Button and Avatar use semantic tokens         |
+| Property                | Pattern                                                                     |
+| ----------------------- | --------------------------------------------------------------------------- |
+| Page and overlay colors | Semantic tokens; root `.light`, `.dark`, or `.dark-purple` class            |
+| Default                 | Dark; saved Light, Dark, Dark purple, or System preference takes precedence |
+| Trigger                 | Shared ghost Button, icon size, accessible name "Change theme"              |
+| Menu                    | Shared DropdownMenu surface, border, radius, padding, and shadow            |
+| Selection               | Radio items with a visible indicator and `aria-checked` state               |
+| Typography              | Shared menu label and item typography                                       |
+| Focus / hover           | Shared Button and DropdownMenu states; Escape and selection return focus    |
+| Neon Auth surfaces      | Shared Card, Field, Input, Button and Avatar use semantic tokens            |
 
 Wrap each app once with the shared next-themes provider. Keep the trigger stable during hydration and disable it until mounted. Persist the preference across routes and reloads; System tracks OS appearance. Do not add page-specific forced themes or nested dark wrappers. Keep the control in GlobalNav's always-visible utilities slot on small screens. Disable transitions while switching to avoid mismatched color fades.
+
+Both dark palettes activate Tailwind's `dark` variant and CodeMirror's dark
+appearance. CSS owns `color-scheme` so custom palettes render native controls
+correctly before hydration and after switching from Light.
 
 ## Learning workspace and subject landing
 
@@ -197,7 +210,7 @@ The coding workspace puts a problem description on the left, editable JavaScript
 
 Shared learning panels use `learning-panel` (`bg-card`, `border`, `rounded-md`, no shadow),42px headers and16–20px inner padding. Problem headings use24/32px; prose14/23px. CodeMirror uses Menlo13/24px, semantic light/dark syntax roles and local assets. Default Tab exits the editor; Mod-Enter runs. Lazy editor loading reserves its space. Show Saved to account only after a successful database write/read; ordinary typing is Unsaved edits and latest verdicts remain session results.
 
-The problem description is continuous, with no left-panel tabs or Submissions view. Hints and Solution use shared Accordion rows; Testcase/Test Result retain shared line Tabs. Cases use shared Buttons and labeled numeric Input. Verdicts are server results with text labels, bounded diagnostics and explicit stale-code warnings. Hidden cases never expose private values/logs. Tutor uses the question-triggered chat described below; Notes uses the private note editor described below. Counter (Closures), Filter Elements from Array (Arrays), Debounce and Sleep (Async) are published practice problems. Learn remains future work.
+The problem description is continuous, with no left-panel tabs or Submissions view. Hints and Solution use shared Accordion rows; Testcase/Test Result retain shared line Tabs. Cases use shared Buttons and labeled numeric Input. Verdicts are server results with text labels, bounded diagnostics and explicit stale-code warnings. Hidden cases never expose private values/logs. Tutor uses the question-triggered chat described below; Notes uses the private note editor described below. Counter (Closures), Filter Elements from Array (Arrays), Debounce and Sleep (Async) are published practice problems. Learn has a module catalog and read-only Two Pointers preview; guided lessons remain future work.
 
 Feature CSS in `apps/web/src/app/globals.css` owns viewport containment and editor layout; shared primitives/tokens remain in UI. Split mode contains document scrolling; route exit removes the root mode attribute and restores ordinary scrolling. Sheets disable animation for reduced-motion preferences.
 
@@ -215,7 +228,7 @@ Last updated: 2026-11-09.
 | Header appearance | Existing background/border, Button text/focus states and `px-6 py-3`; no new colors, shadow or decoration                              |
 | Placement         | `itemsAlign="center"` uses equal side columns; brand and Dashboard left, section links at the viewport center, utilities/account right |
 | Mobile            | Existing disclosure in document flow; Escape restores focus, selecting a route closes the menu                                         |
-| Availability      | Learn opens a clearly labeled coming-soon page; Interview remains deferred                                                             |
+| Availability      | Learn opens a module catalog with a Two Pointers preview; Interview remains deferred                                                   |
 
 For `/javascript` and descendants, the app supplies Learn / Practice as centered section links and Dashboard as a
 leading link beside Code Atlas. Problem routes `/javascript/practice/<problem>` omit the global header and use a compact Back link to Practice. Other
@@ -224,7 +237,7 @@ the shared UI package. The page body does not duplicate section links.
 
 JavaScript owns `/javascript/practice` and `/javascript/learn`; `/javascript` opens Practice.
 Practice lists coding problems only; problem rows open canonical
-`/javascript/practice/<problem>` links. Learn curriculum remains unspecified. Page and workspace
+`/javascript/practice/<problem>` links. Learn lists module previews; individual lesson design remains unspecified. Page and workspace
 breadcrumbs are removed; the Back link returns to Practice.
 Keep route navigation as semantic links, not state-only tabs. Preserve the shared theme
 and responsive workspace behavior. Old `/learn/javascript` links redirect to Practice.
@@ -503,3 +516,128 @@ stream delta. Indicate changed code beside its earlier answer. Preserve partial 
 with stopped/failed feedback and an explicit Retry with current code action. Empty,
 loading, limit, configuration and sign-in states retain source/questions and never
 claim that code was executed or saved. Closing the mobile drawer restores its trigger.
+
+## JavaScript learning catalog and module preview
+
+Files: `features/learning/components/javascript-learn.tsx`,
+`learning-module-overview.tsx`, and `learning-module-overview.module.css`.
+Last updated: 2026-11-14.
+
+| Property           | Pattern                                                                                                    |
+| ------------------ | ---------------------------------------------------------------------------------------------------------- |
+| Catalog surface    | Match Practice: semantic `bg-card`, shared border, `rounded-md`, no shadow                                 |
+| Catalog typography | Same 28/36px mobile and 40/50px desktop heading; 20/28px table heading                                     |
+| Categories         | Existing vertical panel Tabs, 45px triggers, semantic Recommended/Arrays icons and real module counts      |
+| Controls and rows  | Practice toolbar spacing, square search/select corners, right-aligned live result count, 58px striped rows |
+| Learning labels    | Module / Difficulty / Topic / Lesson outlines; no account flag or solved column                            |
+| Preview panels     | `bg-card border rounded-md p-5`, no shadow; shared Badge and ghost small Back to Learn Button              |
+| Prose              | Existing MDX 14/23px body and muted foreground; inline code uses shared semantic tokens                    |
+| Example            | Menlo 13/24px, 16px padding, shared muted background and border, 6px radius; local horizontal scrolling    |
+| Focus and hover    | Shared controls and title-link focus ring/underline; no custom accent palette                              |
+
+Use Practice's 1920px catalog maximum, 56px desktop gutters, 280px sidebar,
+and 24px gap. Stack categories below 1024px; group topic under difficulty below
+640px and retain a compact outline count. Keep filter state above category
+content and preserve it across theme/width changes. Counts refer to published
+modules and authored outlines, not completed lessons. Two Pointers is a module
+preview with a guided code example and no bottom lesson-outline section. Learn
+stays active on previews and global navigation remains visible. The preview uses a 1200px maximum reading
+surface with 28px section gaps; contain code scrolling within its bordered panel.
+Authored lesson diagrams use block images with a 100% maximum width, automatic
+height, 16px vertical margins, and a 6px radius. Keep their original aspect ratio
+and descriptive alternative text; the supplied diagrams retain their own light canvas.
+Inline lesson links use an underline with a 3px offset and the shared ring token
+for visible keyboard focus, keeping the surrounding prose typography.
+
+## Guided code walkthroughs
+
+Files: `features/learning/components/code-walkthrough.tsx`,
+`code-walkthrough-client.tsx`, and `code-walkthrough.module.css`.
+Last updated: 2026-11-14.
+
+Embed the example inside the existing module reading panel. Use a 6px-radius
+bordered card, a 16px header, a muted code surface, and a 16px-padded explanation.
+Code uses Menlo 13/24px with decorative line numbers; preserve source whitespace
+and contain horizontal scrolling within its focusable surface. Prepare syntax on
+the server and consume the existing keyword/string/number/comment theme variables.
+Active lines have a foreground leading border and semantic accent background;
+inactive lines retain readable foreground color. Exclude this owned surface from
+ordinary MDX pre/code styling.
+
+Use one DOM tree with code and explanation beside each other at 760px of component
+width, stacked below that. Keep a visible Step n of total label, a polite atomic
+explanation, decorative progress dots, and shared small Previous/Next/Restart
+Buttons. Previous and Restart disable at the start; Next disables at the end.
+Keep normal keyboard focus and a visible ring on the scrollable source. There is
+no autoplay or animation. Step position belongs to each mounted example and survives
+theme/width changes. Describe conceptual branches without implying execution or
+saved completion. Authored source and explanations live in content, separately
+from the learning-owned renderer; content checking validates their line references.
+
+## Prepared array visualizations
+
+Files: `features/learning/components/two-pointer-visualization*.tsx`,
+`two-pointer-visualization.module.css`, `step-controls.tsx`, and shared `slider.tsx`.
+Last updated: 2026-11-14.
+
+Keep prepared sample runs separate from conceptual code explanations, using the
+same walkthrough header, card border/radius, 16px body gutters, and shared small
+Previous/Next/Restart controls. A shared semantic Slider provides deterministic
+scrubbing with a visible Example step label and accessible Step n of total value.
+Slider thumbs retain identity as values change and use existing Radix dependencies.
+
+Render array cells as an accessible ordered list with value/index/pointer labels.
+Use neutral semantic surfaces: left has a solid outline, right a dashed outline,
+both have explicit text/arrows, discarded values are struck through but readable,
+and a matching pair uses primary/primary-foreground. The five-cell example fits
+320px without horizontal page scrolling. Keep the comparison, narrative, source
+references, and result synchronized with the selected snapshot. Announce one polite
+atomic explanation per step. No autoplay or motion is needed. Each instance owns
+visit-only state that survives theme/width changes and resets on remount/reload.
+
+## Route and navigation loading
+
+Files: `apps/web/src/components/route-loading.tsx`, `site-nav.tsx`, and the global,
+Learn, and Practice `loading.tsx` entry points. Last updated: 2026-11-14.
+
+Use the shared Skeleton and LoaderCircle icon with semantic accent/muted colors.
+Loading pages keep catalog gutters and show a visible 14px destination label with
+a 20px spinner, followed by three decorative skeleton blocks with 20px gaps.
+The main is busy and the label is a polite status. Hide decorative skeletons from
+assistive technology. Reduced motion stops pulse and rotation.
+
+While a navigation Link is pending, replace its existing icon in the same slot
+with a spinner and announce Loading plus the destination. Preserve its accessible
+name, width, focus ring, and enabled state. Next owns pending state and automatic
+prefetching; do not add route timers or minimum loading durations.
+On mobile, portal a secondary status Badge at bottom center while pending so it
+stays visible after the navigation disclosure closes. Use the shared Badge's
+surface/type, 12px horizontal / 8px vertical padding, an 8px gap, and a decorative
+spinner. It accepts no pointer input and disappears with Next's pending state.
+
+## Subject-aware catalogs and Algorithms string cases
+
+Files: `features/learning/components/javascript-learn.tsx`,
+`learning-module-overview.tsx`, `features/catalog/components/javascript-practice.tsx`,
+`components/site-nav.tsx`, and `features/problems/components/anagram-case-fields.tsx`.
+Last updated: 2026-11-14.
+
+Learn and Practice renderers accept the subject title, topic data, and destination
+paths. Algorithms reuses the existing catalog/preview/workspace visuals. Section
+links and Back destinations stay within the current subject; focused workspaces
+omit global navigation for both JavaScript and Algorithms. The copied lesson keeps
+its existing walkthrough and pointer visualization without a separate visual style.
+
+| Property        | Pattern                                                                          |
+| --------------- | -------------------------------------------------------------------------------- |
+| String fields   | Shared FieldGroup / Field / FieldLabel / Input / FieldDescription                |
+| Input surface   | Existing semantic Input background, border, rounded-md and focus ring            |
+| Labels and help | Shared field typography; muted descriptions with lowercase/length/empty guidance |
+| Validation      | Field `data-invalid` and Input `aria-invalid`; original value retained           |
+| Layout          | Two vertically stacked fields in the existing scrollable testcase panel          |
+| Topic accent    | Two Pointers reuses the semantic Arrays accent and existing Repeat2 icon         |
+
+Valid Anagram uses plain `s` and `t` strings with capitalization, correction, and
+spell checking disabled. Do not trim drafts or substitute a numeric/JSON field.
+Empty text means the empty string; result formatting quotes it and renders both
+boolean values through explicit undefined checks.

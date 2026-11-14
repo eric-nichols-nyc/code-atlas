@@ -2,9 +2,11 @@
 
 **Know the concept. Write the code.**
 
-Code Atlas helps developers practice JavaScript through hands-on coding challenges,
+Code Atlas helps developers practice JavaScript and Algorithms through hands-on coding challenges,
 real execution feedback, and progress that follows their account. JavaScript practice
-is available now; guided learning and additional subjects are planned.
+is available now, alongside a Two Pointers learning module preview with a six-step
+guided code walkthrough and an array visualization of the sample run. Individual
+lessons and additional subjects are planned.
 
 Built with Next.js, Electron, React, TypeScript, CodeMirror, QuickJS, Neon Auth, Neon PostgreSQL,
 Prisma, and Turborepo.
@@ -18,7 +20,7 @@ The coding workspace brings the problem, editor, and test cases together in resi
 <details>
 <summary>View the practice catalog and landing page</summary>
 
-Browse thirteen challenges by topic, search, or difficulty, with account-backed flags and solved status.
+Browse thirteen JavaScript challenges and the first Algorithms challenge by topic, search, or difficulty, with account-backed flags and solved status.
 
 ![JavaScript practice catalog with categories, difficulty filtering, search, and progress indicators](docs/images/practice-catalog.jpg)
 
@@ -30,8 +32,8 @@ The public landing page includes a Counter example that works without an account
 
 ## How It Works
 
-Start by choosing a JavaScript challenge, from a foundational concept like closures
-to something more involved like debouncing.
+Start by choosing a JavaScript or Algorithms challenge, from closures and debouncing
+to comparing strings with two pointers.
 
 Once you open a challenge, you'll see the problem description on one side and a code
 editor on the other. Write your solution, experiment with different approaches, and
@@ -52,6 +54,9 @@ feedback, and improve.**
 
 ## What works today
 
+- **Learning preview:** Browse JavaScript or Algorithms Learn with category, search, and difficulty
+  filters, then read the Two Pointers introduction, JavaScript example, and three
+  lesson outlines. Interactive lessons and learning progress are deferred.
 - **Focused practice:** CodeMirror JavaScript editor, resizable panels, hints and solutions,
   plus light, dark, and system themes.
 - **Real evaluation:** Run editable visible cases, then Submit against a server-selected
@@ -72,6 +77,7 @@ feedback, and improve.**
 
 | Challenge                            | Difficulty | Concept                                |
 | ------------------------------------ | ---------- | -------------------------------------- |
+| Valid Anagram                        | Easy       | Two pointers and sorted strings        |
 | Counter                              | Easy       | Closures                               |
 | Curry                                | Medium     | Closures and partial application       |
 | Function Composition                 | Easy       | Higher-order functions and closures    |
@@ -206,7 +212,7 @@ and the [full command list](docs/development.md#commands).
 
 ## What's next
 
-Guided Learn content, additional JavaScript and algorithm challenges, saved tutor history,
+Individual Learn lessons, additional JavaScript and Algorithms challenges, saved tutor history,
 note media embeds/uploads, submission history, and signed desktop distribution are planned.
 AI tutoring requires a server OpenAI key and model setting; see the [tutor setup](docs/development.md#ai-tutor). Hosted deployment is not yet configured.
 

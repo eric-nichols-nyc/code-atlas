@@ -85,7 +85,7 @@ test("dashboard → JavaScript → editable Sleep problem", async ({ page }) => 
     page.getByRole("navigation", { name: "Main navigation" }),
   ).toBeVisible();
 });
-test("Practice and future Learn remain separate routes", async ({ page }) => {
+test("Practice and Learn remain separate routes", async ({ page }) => {
   await page.goto("/javascript/practice");
   await page
     .getByRole("navigation", { name: "Main navigation" })
@@ -98,8 +98,453 @@ test("Practice and future Learn remain separate routes", async ({ page }) => {
   await expect(
     page.getByRole("button", { name: "Run", exact: true }),
   ).toHaveCount(0);
-  await page.getByRole("link", { name: "Explore practice problems" }).click();
+  await expect(
+    page.getByRole("link", { name: "Two Pointers", exact: true }),
+  ).toHaveAttribute("href", "/javascript/learn/two-pointers");
+  await page
+    .getByRole("navigation", { name: "Main navigation" })
+    .getByRole("link", { name: "Practice", exact: true })
+    .click();
   await expect(page).toHaveURL(/\/javascript\/practice$/);
+});
+
+test("slow learning navigation stays interactive and can be interrupted", async ({
+  page,
+}) => {
+  let release!: () => void;
+  const responseGate = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  await page.route(
+    (url) => url.pathname === "/javascript/learn",
+    async (route) => {
+      if (route.request().headers().rsc === "1") await responseGate;
+      await route.continue().catch(() => {});
+    },
+  );
+  try {
+    await page.goto("/javascript/practice");
+    await expect(
+      page.getByRole("heading", { name: "JavaScript practice", exact: true }),
+    ).toBeVisible();
+    const nav = page.getByRole("navigation", { name: "Main navigation" });
+    await nav.getByRole("link", { name: "Learn", exact: true }).click();
+    await expect(
+      nav.getByRole("status").filter({ hasText: /^Loading Learn…$/ }),
+    ).toHaveCount(1);
+    await expect(
+      page.getByRole("heading", { name: "JavaScript practice", exact: true }),
+    ).toBeVisible();
+    await nav.getByRole("link", { name: "Dashboard", exact: true }).click();
+    await expect(page).toHaveURL(/\/dashboard$/);
+    await expect(
+      page.getByRole("heading", { name: "Your learning space", exact: true }),
+    ).toBeVisible();
+    await expect(nav.getByRole("status")).toHaveCount(0);
+  } finally {
+    release();
+  }
+});
+
+test("learning catalog filters and opens the Two Pointers preview", async ({
+  page,
+}) => {
+  await page.goto("/javascript/learn");
+  await page.getByRole("tab", { name: "Arrays", exact: true }).focus();
+  await page.keyboard.press("Enter");
+  const search = page.getByRole("searchbox", { name: "Search modules" });
+  await search.fill("  TWO POINTERS  ");
+  await page.getByRole("combobox", { name: "Difficulty", exact: true }).click();
+  await page.getByRole("option", { name: "Hard", exact: true }).click();
+  await expect(page.getByRole("status")).toHaveText("0 modules");
+  await page
+    .getByRole("button", { name: "Clear filters", exact: true })
+    .click();
+  await expect(
+    page.getByRole("tab", { name: "Arrays", exact: true }),
+  ).toHaveAttribute("aria-selected", "true");
+  await expect(search).toHaveValue("");
+  await expect(page.getByRole("status")).toHaveText("1 module");
+  await page.getByRole("link", { name: "Two Pointers", exact: true }).focus();
+  await page.keyboard.press("Enter");
+  await expect(page).toHaveURL(/\/javascript\/learn\/two-pointers$/);
+  await expect(
+    page.getByRole("heading", { name: "Two Pointers", exact: true }),
+  ).toBeVisible();
+  await expect(page.getByText("Module preview", { exact: true })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Lesson outlines", exact: true }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole("button", { name: /^(Run|Submit)$/ }),
+  ).toHaveCount(0);
+  await expect(
+    page
+      .getByRole("navigation", { name: "Main navigation" })
+      .getByRole("link", { name: "Learn", exact: true }),
+  ).toHaveAttribute("aria-current", "page");
+  await page.getByRole("link", { name: "Back to Learn", exact: true }).click();
+  await expect(page).toHaveURL(/\/javascript\/learn$/);
+});
+
+test("Two Pointers array visualization moves, scrubs and survives themes and resizing", async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  const progress = await (
+    await page.request.get("/api/practice-progress")
+  ).json();
+  const writes: string[] = [];
+  page.on("request", (request) => {
+    if (
+      /\/api\/(problems|practice-progress)/.test(request.url()) &&
+      !["GET", "HEAD"].includes(request.method())
+    )
+      writes.push(request.url());
+  });
+  await page.goto("/javascript/learn/two-pointers");
+  const visualization = page.getByRole("region", {
+    name: "Watch left and right find a pair",
+    exact: true,
+  });
+  const conceptual = page.getByRole("region", {
+    name: "Find a pair in a sorted array",
+    exact: true,
+  });
+  const next = visualization.getByRole("button", { name: "Next", exact: true });
+  const slider = visualization.getByRole("slider", {
+    name: "Example step",
+    exact: true,
+  });
+  const positions = [
+    [0, 4],
+    [0, 4],
+    [0, 3],
+    [0, 3],
+    [1, 3],
+    [1, 3],
+    [1, 3],
+  ];
+  for (const [index, [left, right]] of positions.entries()) {
+    await expect(
+      visualization.getByText(`Step ${index + 1} of 7`, { exact: true }),
+    ).toBeVisible();
+    await expect(visualization.locator('[data-left="true"]')).toHaveAttribute(
+      "data-array-index",
+      String(left),
+    );
+    await expect(visualization.locator('[data-right="true"]')).toHaveAttribute(
+      "data-array-index",
+      String(right),
+    );
+    await expect(slider).toHaveAttribute("aria-valuenow", String(index + 1));
+    await expect(
+      conceptual.getByText("Step 1 of 6", { exact: true }),
+    ).toBeVisible();
+    if (index === 1)
+      await expect(
+        visualization.getByText("12 > 9 · sum too large", { exact: true }),
+      ).toBeVisible();
+    if (index === 3)
+      await expect(
+        visualization.getByText("8 < 9 · sum too small", { exact: true }),
+      ).toBeVisible();
+    if (index === 5)
+      await expect(
+        visualization.getByText("9 = 9 · target matched", { exact: true }),
+      ).toBeVisible();
+    if (index < 6) await next.press("Enter");
+  }
+  await expect(next).toBeDisabled();
+  await expect(
+    visualization.getByText("Return [1, 3] · values 2 and 7", { exact: true }),
+  ).toBeVisible();
+  await expect(visualization.locator('[data-match="true"]')).toHaveCount(2);
+  await visualization
+    .getByRole("button", { name: "Previous", exact: true })
+    .press("Enter");
+  await expect(
+    visualization.getByText("Step 6 of 7", { exact: true }),
+  ).toBeVisible();
+  await visualization
+    .getByRole("button", { name: "Restart", exact: true })
+    .press("Enter");
+  await expect(
+    visualization.getByRole("button", { name: "Previous", exact: true }),
+  ).toBeDisabled();
+  await slider.press("End");
+  await expect(slider).toHaveAttribute("aria-valuenow", "7");
+  await slider.press("Home");
+  await slider.press("ArrowRight");
+  await slider.press("ArrowRight");
+  for (const width of [1280, 390, 320]) {
+    await page.setViewportSize({ width, height: 900 });
+    for (const theme of ["Light", "Dark", "Dark purple", "System"]) {
+      await page
+        .getByRole("button", { name: "Change theme", exact: true })
+        .click();
+      await page
+        .getByRole("menuitemradio", { name: theme, exact: true })
+        .click();
+      await expect(
+        visualization.getByText("Step 3 of 7", { exact: true }),
+      ).toBeVisible();
+      await expect(
+        visualization.locator('[data-right="true"]'),
+      ).toHaveAttribute("data-array-index", "3");
+      await noOverflow(page);
+      const fits = await visualization
+        .locator("[data-array-index]")
+        .evaluateAll((cells) =>
+          cells.every(
+            (cell) =>
+              cell.getBoundingClientRect().width >= 30 &&
+              cell.getBoundingClientRect().right <= innerWidth,
+          ),
+        );
+      expect(fits).toBe(true);
+    }
+  }
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.getByRole("button", { name: "Change theme", exact: true }).click();
+  await page.getByRole("menuitemradio", { name: "Dark", exact: true }).click();
+  await expect(
+    page.getByRole("menu", { name: "Change theme", exact: true }),
+  ).toBeHidden();
+  await slider.press("End");
+  await visualization.screenshot({
+    path: test.info().outputPath("two-pointer-array-desktop.png"),
+  });
+  await page.setViewportSize({ width: 320, height: 900 });
+  await visualization.screenshot({
+    path: test.info().outputPath("two-pointer-array-mobile.png"),
+  });
+  await page.reload();
+  await expect(
+    visualization.getByText("Step 1 of 7", { exact: true }),
+  ).toBeVisible();
+  await expect(visualization.locator('[data-right="true"]')).toHaveAttribute(
+    "data-array-index",
+    "4",
+  );
+  expect(writes).toEqual([]);
+  expect(
+    await (await page.request.get("/api/practice-progress")).json(),
+  ).toEqual(progress);
+});
+
+test("guided walkthrough supports six steps, keyboard, restart and visit-only state", async ({
+  page,
+}) => {
+  const progress = await (
+    await page.request.get("/api/practice-progress")
+  ).json();
+  const writes: string[] = [];
+  page.on("request", (request) => {
+    if (
+      /\/api\/(problems|practice-progress)/.test(request.url()) &&
+      !["GET", "HEAD"].includes(request.method())
+    )
+      writes.push(`${request.method()} ${request.url()}`);
+  });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/javascript/learn/two-pointers");
+  const walkthrough = page.getByRole("region", {
+    name: "Find a pair in a sorted array",
+    exact: true,
+  });
+  const source = walkthrough.getByRole("region", {
+    name: /JavaScript source$/,
+  });
+  const previous = walkthrough.getByRole("button", {
+    name: "Previous",
+    exact: true,
+  });
+  const next = walkthrough.getByRole("button", { name: "Next", exact: true });
+  const restart = walkthrough.getByRole("button", {
+    name: "Restart",
+    exact: true,
+  });
+  await expect(
+    walkthrough.getByText("Step 1 of 6", { exact: true }),
+  ).toBeVisible();
+  await expect(page.locator("pre")).toHaveCount(1);
+  await expect(walkthrough.locator("[data-line]")).toHaveCount(17);
+  const original = await walkthrough.locator("code").textContent();
+  await expect(previous).toBeDisabled();
+  await expect(restart).toBeDisabled();
+  await source.focus();
+  await page.keyboard.press("Tab");
+  await expect(next).toBeFocused();
+  await page.keyboard.press("Enter");
+  const lines = [[2, 3], [5], [6], [8], [9, 10], [13]];
+  for (let step = 2; step <= 6; step += 1) {
+    await expect(
+      walkthrough.getByText(`Step ${step} of 6`, { exact: true }),
+    ).toBeVisible();
+    expect(
+      await walkthrough
+        .locator('[data-line][data-active="true"]')
+        .evaluateAll((elements) =>
+          elements.map((element) => Number(element.getAttribute("data-line"))),
+        ),
+    ).toEqual(lines[step - 1]);
+    expect(await walkthrough.locator("code").textContent()).toBe(original);
+    if (step < 6) await next.press("Enter");
+  }
+  await expect(next).toBeDisabled();
+  await expect(walkthrough.locator('[aria-live="polite"]')).toContainText(
+    "alternative no-match outcome",
+  );
+  await expect(page).toHaveURL(/\/javascript\/learn\/two-pointers$/);
+  await previous.press("Enter");
+  await expect(
+    walkthrough.getByText("Step 5 of 6", { exact: true }),
+  ).toBeVisible();
+  await restart.press("Space");
+  await expect(
+    walkthrough.getByText("Step 1 of 6", { exact: true }),
+  ).toBeVisible();
+  await expect(previous).toBeDisabled();
+  await next.press("Enter");
+  await page.reload();
+  await expect(
+    walkthrough.getByText("Step 1 of 6", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: /^(Run|Submit|Done)$/ }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole("heading", { name: "Lesson outlines", exact: true }),
+  ).toHaveCount(0);
+  expect(writes).toEqual([]);
+  expect(
+    await (await page.request.get("/api/practice-progress")).json(),
+  ).toEqual(progress);
+});
+
+test("guided walkthrough preserves its step through themes and responsive layouts", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto("/javascript/learn/two-pointers");
+  const walkthrough = page.getByRole("region", {
+    name: "Find a pair in a sorted array",
+    exact: true,
+  });
+  const source = walkthrough.getByRole("region", {
+    name: /JavaScript source$/,
+  });
+  for (let i = 0; i < 3; i += 1)
+    await walkthrough
+      .getByRole("button", { name: "Next", exact: true })
+      .click();
+  const count = walkthrough.getByText("Step 4 of 6", { exact: true });
+  for (const width of [1280, 390, 320]) {
+    await page.setViewportSize({ width, height: 900 });
+    for (const theme of ["Light", "Dark", "Dark purple", "System"]) {
+      await page
+        .getByRole("button", { name: "Change theme", exact: true })
+        .click();
+      await page
+        .getByRole("menuitemradio", { name: theme, exact: true })
+        .click();
+      await expect(count).toBeVisible();
+      await expect(walkthrough.locator('[data-line="8"]')).toHaveAttribute(
+        "data-active",
+        "true",
+      );
+      await expect(walkthrough.locator('[data-line="1"]')).toHaveCSS(
+        "opacity",
+        "1",
+      );
+      await noOverflow(page);
+      const codeBox = await source.boundingBox();
+      const explanationBox = await walkthrough
+        .locator('[aria-live="polite"]')
+        .boundingBox();
+      expect(codeBox).not.toBeNull();
+      expect(explanationBox).not.toBeNull();
+      if (!codeBox || !explanationBox)
+        throw new Error("Walkthrough panels are missing");
+      if (width === 1280)
+        expect(explanationBox.x).toBeGreaterThan(codeBox.x + codeBox.width - 1);
+      else
+        expect(explanationBox.y).toBeGreaterThanOrEqual(
+          codeBox.y + codeBox.height,
+        );
+    }
+    if (width === 320) {
+      expect(
+        await source.evaluate(
+          (element) => element.scrollWidth > element.clientWidth,
+        ),
+      ).toBe(true);
+      await source.focus();
+      await page.keyboard.press("ArrowRight");
+      await expect
+        .poll(() => source.evaluate((element) => element.scrollLeft))
+        .toBeGreaterThan(0);
+      await expect(count).toBeVisible();
+    }
+  }
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.getByRole("button", { name: "Change theme", exact: true }).click();
+  await page.getByRole("menuitemradio", { name: "Dark", exact: true }).click();
+  await expect(
+    page.getByRole("menu", { name: "Change theme", exact: true }),
+  ).toBeHidden();
+  await walkthrough.scrollIntoViewIfNeeded();
+  await page.screenshot({
+    path: test.info().outputPath("two-pointers-walkthrough-desktop.png"),
+  });
+  await page.setViewportSize({ width: 320, height: 900 });
+  await walkthrough.getByRole("button", { name: "Next", exact: true }).focus();
+  await page.screenshot({
+    path: test.info().outputPath("two-pointers-walkthrough-mobile.png"),
+  });
+});
+
+test("learning preview direct access, themes, responsive state and unavailable modules", async ({
+  page,
+}) => {
+  await page.goto("/javascript/learn");
+  const search = page.getByRole("searchbox", { name: "Search modules" });
+  await search.fill("two");
+  for (const theme of ["Light", "Dark", "Dark purple", "System"]) {
+    await page
+      .getByRole("button", { name: "Change theme", exact: true })
+      .click();
+    await page.getByRole("menuitemradio", { name: theme, exact: true }).click();
+    await expect(search).toHaveValue("two");
+    await page.goto("/javascript/learn/two-pointers");
+    await expect(
+      page.getByRole("heading", { name: "Two Pointers", exact: true }),
+    ).toBeVisible();
+    await noOverflow(page);
+    await page
+      .getByRole("link", { name: "Back to Learn", exact: true })
+      .click();
+    await search.fill("two");
+  }
+  for (const width of [1280, 390, 320]) {
+    await page.setViewportSize({ width, height: 900 });
+    await expect(search).toHaveValue("two");
+    await noOverflow(page);
+    await page.getByRole("link", { name: "Two Pointers", exact: true }).click();
+    await noOverflow(page);
+    await expect(page.locator("pre")).toContainText("function findPair");
+    await page
+      .getByRole("link", { name: "Back to Learn", exact: true })
+      .click();
+    await search.fill("two");
+  }
+  await page.goto("/javascript/learn/not-published");
+  await expect(
+    page.getByRole("heading", { name: "Module unavailable", exact: true }),
+  ).toBeVisible();
+  await page.getByRole("link", { name: "Back to Learn", exact: true }).click();
+  await expect(page).toHaveURL(/\/javascript\/learn$/);
 });
 test("real Run and Submit and source revisions", async ({ page }) => {
   await page.goto(path);

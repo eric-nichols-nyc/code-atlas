@@ -1,4 +1,8 @@
-import { counterProblem, publicProblems } from "@workspace/problems";
+import {
+  counterProblem,
+  publicProblems,
+  validAnagramProblem,
+} from "@workspace/problems";
 import { expect, it } from "vitest";
 import {
   buildTutorPrompt,
@@ -71,4 +75,19 @@ it("keeps instructions static and current code/questions/history inside learner 
       "callbacks",
     ].sort(),
   );
+});
+
+it("uses Algorithms content and refuses unregistered or mismatched statement paths", async () => {
+  const context = await tutorProblemContext(validAnagramProblem);
+  expect(context.statement).toContain("isAnagram(s, t)");
+  expect(context.statement).not.toContain("createCounter");
+  await expect(
+    tutorProblemContext({
+      ...validAnagramProblem,
+      slug: "../../private-suites",
+    }),
+  ).rejects.toThrow("unavailable");
+  await expect(
+    tutorProblemContext({ ...validAnagramProblem, id: "unknown" }),
+  ).rejects.toThrow("unavailable");
 });

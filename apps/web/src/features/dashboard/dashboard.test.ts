@@ -49,7 +49,7 @@ describe("learner dashboard", () => {
       expect(button).toBeDisabled();
     }
     expect(screen.getAllByRole("button", { name: "Coming soon" })).toHaveLength(
-      2,
+      1,
     );
     expect(screen.queryByRole("img")).toBeNull();
   });
@@ -61,4 +61,11 @@ describe("learner dashboard", () => {
     ).toHaveAttribute("href", "/javascript");
     expect(screen.queryByRole("dialog")).toBeNull();
   });
+});
+
+it("links Algorithms to its available subject landing", async () => {
+  render(await DashboardPage());
+  expect(
+    screen.getByRole("link", { name: "Explore Algorithms" }),
+  ).toHaveAttribute("href", "/algorithms");
 });

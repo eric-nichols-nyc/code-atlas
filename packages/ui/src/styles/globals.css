@@ -2,7 +2,7 @@
 @import "tw-animate-css";
 
 @source "../**/*.{ts,tsx}";
-@custom-variant dark (&:is(.dark *));
+@custom-variant dark (&:is(.dark *, .dark-purple *));
 
 @theme inline {
   --color-background: var(--background);
@@ -48,6 +48,7 @@
 }
 
 :root {
+  color-scheme: light;
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -86,7 +87,9 @@
   --category-generators: #a62470;
 }
 
-.dark {
+.dark,
+.dark-purple {
+  color-scheme: dark;
   --background: #0e0e0e;
   --foreground: #f9f9f9;
   --card: #111111;
@@ -122,6 +125,26 @@
   --category-closures: #fbbf24;
   --category-arrays: #60a5fa;
   --category-generators: #f472b6;
+}
+
+.dark-purple {
+  --background: #110d1a;
+  --foreground: #f4eefb;
+  --card: #181221;
+  --card-foreground: #f4eefb;
+  --popover: #1e162b;
+  --popover-foreground: #f4eefb;
+  --primary: #c4a7f5;
+  --primary-foreground: #21152f;
+  --secondary: #291e37;
+  --secondary-foreground: #f4eefb;
+  --muted: #20172d;
+  --muted-foreground: #b8aacb;
+  --accent: #322442;
+  --accent-foreground: #f4eefb;
+  --border: #30223f;
+  --input: #402e55;
+  --ring: #b496e5;
 }
 
 @layer base {

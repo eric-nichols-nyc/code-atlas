@@ -28,6 +28,7 @@ import { useId } from "react";
 import Markdown from "react-markdown";
 import { useProblemTutor } from "../state/problem-tutor";
 
+// Render model text without raw HTML/images; allow only safe HTTPS links.
 export function TutorAnswer({ children }: { children: string }) {
   return (
     <div className="tutor-markdown">

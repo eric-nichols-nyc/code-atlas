@@ -110,7 +110,7 @@ export default function JavaScriptEditor() {
             ...completionKeymap,
           ]),
           theme.current.of(
-            appearance(document.documentElement.classList.contains("dark")),
+            appearance(document.documentElement.matches(".dark, .dark-purple")),
           ),
           EditorView.contentAttributes.of({
             "aria-label": "JavaScript solution",
@@ -140,7 +140,9 @@ export default function JavaScriptEditor() {
     if (instance && theme.current)
       instance.dispatch({
         effects: theme.current.reconfigure(
-          appearance(resolvedTheme === "dark"),
+          appearance(
+            resolvedTheme === "dark" || resolvedTheme === "dark-purple",
+          ),
         ),
       });
   }, [resolvedTheme]);

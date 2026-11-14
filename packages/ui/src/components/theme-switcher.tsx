@@ -9,7 +9,7 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@workspace/ui/components/dropdown-menu";
-import { MonitorIcon, MoonIcon, SunIcon } from "lucide-react";
+import { MonitorIcon, MoonIcon, PaletteIcon, SunIcon } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
@@ -22,9 +22,11 @@ export function ThemeSwitcher() {
   const Icon =
     !mounted || theme === "system"
       ? MonitorIcon
-      : resolvedTheme === "dark"
-        ? MoonIcon
-        : SunIcon;
+      : resolvedTheme === "dark-purple"
+        ? PaletteIcon
+        : resolvedTheme === "dark"
+          ? MoonIcon
+          : SunIcon;
 
   return (
     <DropdownMenu>
@@ -49,6 +51,9 @@ export function ThemeSwitcher() {
           </DropdownMenuRadioItem>
           <DropdownMenuRadioItem value="dark">
             <MoonIcon aria-hidden="true" /> Dark
+          </DropdownMenuRadioItem>
+          <DropdownMenuRadioItem value="dark-purple">
+            <PaletteIcon aria-hidden="true" /> Dark purple
           </DropdownMenuRadioItem>
           <DropdownMenuRadioItem value="system">
             <MonitorIcon aria-hidden="true" /> System

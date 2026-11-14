@@ -1,5 +1,6 @@
 "use client";
 
+import { Badge } from "@workspace/ui/components/badge";
 import { BrandIcon } from "@workspace/ui/components/brand-icon";
 import {
   GlobalNav,
@@ -10,38 +11,94 @@ import {
   BookOpenIcon,
   CodeXmlIcon,
   LayoutDashboardIcon,
+  LoaderCircleIcon,
 } from "@workspace/ui/components/icons";
 import { ThemeSwitcher } from "@workspace/ui/components/theme-switcher";
-import Link from "next/link";
+import { cn } from "@workspace/ui/lib/utils";
+import Link, { useLinkStatus } from "next/link";
 import { usePathname } from "next/navigation";
+import type { ComponentProps } from "react";
+import { createPortal } from "react-dom";
 import { NavAuth } from "@/components/nav-auth";
+
+function withNavigationStatus(Icon: typeof BookOpenIcon, label: string) {
+  return function NavigationIcon(props: ComponentProps<typeof BookOpenIcon>) {
+    const { pending } = useLinkStatus();
+    const CurrentIcon = pending ? LoaderCircleIcon : Icon;
+    return (
+      <>
+        <CurrentIcon
+          {...props}
+          className={cn(props.className, pending && "motion-safe:animate-spin")}
+        />
+        {pending && (
+          <>
+            <span role="status" className="sr-only hidden md:block">
+              Loading {label}…
+            </span>
+            {createPortal(
+              <Badge
+                role="status"
+                variant="secondary"
+                className="pointer-events-none fixed bottom-5 left-1/2 z-50 -translate-x-1/2 gap-2 px-3 py-2 md:hidden"
+              >
+                <LoaderCircleIcon
+                  aria-hidden="true"
+                  data-icon="inline-start"
+                  className="motion-safe:animate-spin"
+                />
+                Loading {label}…
+              </Badge>,
+              document.body,
+            )}
+          </>
+        )}
+      </>
+    );
+  };
+}
+
+const DashboardIcon = withNavigationStatus(LayoutDashboardIcon, "Dashboard");
+const LearnIcon = withNavigationStatus(BookOpenIcon, "Learn");
+const PracticeIcon = withNavigationStatus(CodeXmlIcon, "Practice");
 
 const items: readonly GlobalNavItem[] = [
   {
     id: "dashboard",
     label: "Dashboard",
     href: "/dashboard",
-    icon: LayoutDashboardIcon,
+    icon: DashboardIcon,
   },
 ];
-const javascriptItems: readonly GlobalNavItem[] = [
-  {
-    id: "learn",
-    label: "Learn",
-    href: "/javascript/learn",
-    icon: BookOpenIcon,
-    appearance: "text",
-  },
-  {
-    id: "practice",
-    label: "Practice",
-    href: "/javascript/practice",
-    icon: CodeXmlIcon,
-    appearance: "text",
-  },
+function subjectItems(
+  subject: "javascript" | "algorithms",
+): readonly GlobalNavItem[] {
+  return [
+    {
+      id: "learn",
+      label: "Learn",
+      href: `/${subject}/learn`,
+      icon: LearnIcon,
+      appearance: "text",
+    },
+    {
+      id: "practice",
+      label: "Practice",
+      href: `/${subject}/practice`,
+      icon: PracticeIcon,
+      appearance: "text",
+    },
+  ];
+}
+const allSectionItems = [
+  ...subjectItems("javascript"),
+  ...subjectItems("algorithms"),
 ];
 function NavLink(props: GlobalNavLinkProps) {
-  return <Link {...props} prefetch={false} />;
+  const label = [...items, ...allSectionItems].find(
+    (item) => item.href === props.href,
+  )?.label;
+  return <Link {...props} aria-label={props["aria-label"] ?? label} />;
 }
 
 export function SiteNav({ authConfigured }: { authConfigured: boolean }) {
@@ -50,12 +107,13 @@ export function SiteNav({ authConfigured }: { authConfigured: boolean }) {
   if (
     pathname === "/" ||
     /^\/sign-(?:in|up)(?:\/|$)/.test(pathname) ||
-    /^\/javascript\/practice\/[^/]+\/?$/.test(pathname)
+    /^\/(?:javascript|algorithms)\/practice\/[^/]+\/?$/.test(pathname)
   )
     return null;
-  const inJavaScript =
-    pathname === "/javascript" || pathname.startsWith("/javascript/");
-  const navigationItems = inJavaScript ? javascriptItems : [];
+  const subject = (["javascript", "algorithms"] as const).find(
+    (id) => pathname === `/${id}` || pathname.startsWith(`/${id}/`),
+  );
+  const navigationItems = subject ? subjectItems(subject) : [];
   const activeItem = [...items, ...navigationItems].find((item) =>
     item.href === "/"
       ? pathname === "/"
@@ -64,6 +122,7 @@ export function SiteNav({ authConfigured }: { authConfigured: boolean }) {
 
   return (
     <GlobalNav
+      className="sticky top-0 z-40"
       brand={
         <Link href="/" className="inline-flex max-w-full items-center gap-2">
           <BrandIcon className="size-5 shrink-0" />
@@ -72,7 +131,7 @@ export function SiteNav({ authConfigured }: { authConfigured: boolean }) {
       }
       items={navigationItems}
       leadingItems={items}
-      itemsAlign={inJavaScript ? "center" : "start"}
+      itemsAlign={subject ? "center" : "start"}
       activeItemId={activeItem?.id}
       containerClassName="max-w-none"
       linkComponent={NavLink}

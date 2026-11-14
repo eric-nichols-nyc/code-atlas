@@ -6,7 +6,10 @@ export interface PracticeEntry extends CatalogEntry {
   difficulty: string;
 }
 
-export function practiceCategories(entries: PracticeEntry[]) {
+export function practiceCategories(
+  entries: PracticeEntry[],
+  categoryTopics: readonly (typeof topics)[number][] = topics,
+) {
   const published = entries.filter((entry) => entry.status === "published");
   return [
     {
@@ -15,7 +18,7 @@ export function practiceCategories(entries: PracticeEntry[]) {
       heading: "Recommended problems",
       count: published.filter((entry) => entry.recommended).length,
     },
-    ...topics.flatMap((topic) => {
+    ...categoryTopics.flatMap((topic) => {
       const count = published.filter(
         (entry) => entry.topicId === topic.id,
       ).length;

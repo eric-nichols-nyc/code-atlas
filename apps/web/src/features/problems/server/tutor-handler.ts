@@ -63,6 +63,7 @@ export function createTutorHandler(
       options.timeout ?? TUTOR_LIMITS.timeout,
     );
     let finished = false;
+    // Hold the concurrency slot until streaming ends, fails or is cancelled.
     const finish = () => {
       if (finished) return;
       finished = true;

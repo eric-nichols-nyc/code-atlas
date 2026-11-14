@@ -41,6 +41,10 @@ export function ProblemExperience({
         <ProblemTutorSession>
           <WorkspaceTools>
             <LearningWorkspace
+              backHref={`/${problem.subjectId}/practice`}
+              subjectTitle={
+                problem.subjectId === "algorithms" ? "Algorithms" : "JavaScript"
+              }
               lesson={<DescriptionPanel>{children}</DescriptionPanel>}
               code={<CodePanel />}
               output={<ResultPanel />}

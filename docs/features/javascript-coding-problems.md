@@ -1,5 +1,8 @@
 # JavaScript practice
 
+Current Learn availability is described in [JavaScript learning](javascript-learning.md).
+The coming-soon Learn references below record this feature's original scope.
+
 **Outcome:** Solve JavaScript problems with editable code, real Run/Submit results,
 and a consistent practice workspace. Published problems: Counter, Filter Elements
 from Array, Debounce, and Sleep.

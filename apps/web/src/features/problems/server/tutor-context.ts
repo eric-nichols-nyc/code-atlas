@@ -12,7 +12,7 @@ import {
   type ProblemDefinition,
   reduceFunctions,
 } from "@workspace/problems";
-import { javascriptPracticeCatalog } from "@/content/javascript/practice/catalog";
+import { publishedPractice } from "@/features/catalog/lib/published-practice";
 import {
   TUTOR_LIMITS,
   TutorInputError,
@@ -20,7 +20,7 @@ import {
   utf8Bytes,
 } from "../lib/problem-tutor-contract";
 
-export const TUTOR_INSTRUCTIONS = `You are the Code Atlas JavaScript practice tutor.
+export const TUTOR_INSTRUCTIONS = `You are the Code Atlas coding practice tutor.
 Give concise, specific, hint-first guidance grounded in the current problem and current_code.
 For a vague first question such as "I'm stuck here", give ONE concrete hint in at most 100 words and end with one guiding question. Refer to their actual code.
 In that first hint you may quote their existing problematic line, but do not supply its corrected replacement, a completed function, or the complete core body of the solution.
@@ -36,7 +36,7 @@ Use readable Markdown with short paragraphs and fenced JavaScript snippets when 
 export function tutorProblem(id: string) {
   const problem = findProblem(id);
   return problem &&
-    javascriptPracticeCatalog.some(
+    publishedPractice.some(
       (entry) =>
         entry.id === problem.id &&
         entry.slug === problem.slug &&
@@ -47,12 +47,28 @@ export function tutorProblem(id: string) {
 }
 const statements = new Map<string, Promise<string>>();
 export async function tutorProblemContext(problem: ProblemDefinition) {
+  const registered = tutorProblem(problem.id);
+  if (
+    !registered ||
+    registered.slug !== problem.slug ||
+    registered.subjectId !== problem.subjectId
+  )
+    throw new TutorInputError(
+      "This problem's tutor context is unavailable.",
+      503,
+    );
   let statement = statements.get(problem.id);
   if (!statement) {
-    const local = resolve(process.cwd(), "src/content/javascript/practice");
+    const local = resolve(
+      process.cwd(),
+      `src/content/${problem.subjectId}/practice`,
+    );
     const root = existsSync(local)
       ? local
-      : resolve(process.cwd(), "apps/web/src/content/javascript/practice");
+      : resolve(
+          process.cwd(),
+          `apps/web/src/content/${problem.subjectId}/practice`,
+        );
     statement = readFile(resolve(root, problem.slug, "problem.mdx"), "utf8");
     statements.set(problem.id, statement);
     statement.catch(() => statements.delete(problem.id));
@@ -65,6 +81,7 @@ export async function tutorProblemContext(problem: ProblemDefinition) {
     "function-composition": compositionFunctions,
     memoize: memoizeFunctions,
   };
+  // Project public fields explicitly; whole definitions also contain solutions.
   const context = {
     id: problem.id,
     title: problem.title,
@@ -87,6 +104,7 @@ export async function buildTutorPrompt(
   problem: ProblemDefinition,
   request: TutorRequest,
 ) {
+  // Keep learner code and dialogue in user input, separate from tutor policy.
   const prompt = {
     instructions: TUTOR_INSTRUCTIONS,
     input: [

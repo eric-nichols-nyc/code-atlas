@@ -269,3 +269,22 @@ it("runs the generator through the authenticated Next boundary and saves its rea
     expect.objectContaining({ verdict: "accepted" }),
   );
 });
+
+it("denies unauthenticated Algorithms execution and rejects invalid string pairs before dispatch", async () => {
+  const post = make();
+  const target = context("run", "algorithms.valid-anagram");
+  state.userId = null;
+  expect((await post(req(), target)).status).toBe(401);
+  expect(execute).not.toHaveBeenCalled();
+  state.userId = "owner-a";
+  expect(
+    (
+      await post(
+        req({ code: "function isAnagram(){}", inputs: [{ s: "a\n", t: "a" }] }),
+        target,
+      )
+    ).status,
+  ).toBe(400);
+  expect(execute).not.toHaveBeenCalled();
+  expect(progress.recordExecution).not.toHaveBeenCalled();
+});

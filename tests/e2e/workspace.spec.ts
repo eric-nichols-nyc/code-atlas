@@ -81,6 +81,89 @@ test("global navigation follows the active web route", async ({ page }) => {
   await expect(page.locator("html")).toHaveClass(/dark/);
 });
 
+for (const [source, destination, label] of [
+  ["/javascript/practice", "/javascript/learn", "Learn"],
+  ["/javascript/learn", "/javascript/practice", "Practice"],
+] as const) {
+  for (const width of [1280, 320]) {
+    test(`shows pending feedback before a slow ${label} navigation responds at ${width}px`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width, height: 900 });
+      if (width === 320) await page.emulateMedia({ reducedMotion: "reduce" });
+      let release!: () => void;
+      const responseGate = new Promise<void>((resolve) => {
+        release = resolve;
+      });
+      await page.route(
+        (url) => url.pathname === destination,
+        async (route) => {
+          if (route.request().headers().rsc === "1") await responseGate;
+          await route.continue();
+        },
+      );
+      try {
+        await page.goto(source);
+        await expect(
+          page.getByRole("button", { name: "Change theme", exact: true }),
+        ).toBeEnabled();
+        const navigation = page.getByRole("navigation", {
+          name: "Main navigation",
+        });
+        const toggle = navigation.getByRole("button", {
+          name: /^(Open|Close) navigation$/,
+        });
+        if (width === 320) await toggle.click();
+        const link = navigation.getByRole("link", { name: label, exact: true });
+        const before = width === 1280 ? await link.boundingBox() : null;
+        if (label === "Practice") {
+          await link.focus();
+          await page.keyboard.press("Enter");
+        } else await link.click();
+        const status = page
+          .getByRole("status")
+          .filter({ hasText: new RegExp(`^Loading ${label}…$`) });
+        await expect(status).toHaveCount(1);
+        if (width === 1280) {
+          await expect(link.locator("svg")).toHaveClass(
+            /motion-safe:animate-spin/,
+          );
+          const pending = await link.boundingBox();
+          expect(pending?.width).toBeCloseTo(before?.width ?? 0, 1);
+          await expect(
+            navigation.getByRole("link", { name: "Dashboard", exact: true }),
+          ).toBeEnabled();
+        } else {
+          await expect(status).toBeVisible();
+          await expect(status.locator("svg")).toHaveCSS(
+            "animation-name",
+            "none",
+          );
+          await expect(toggle).toHaveAttribute("aria-expanded", "false");
+          await expect(toggle).toBeEnabled();
+          expect(
+            await page.evaluate(
+              () => document.documentElement.scrollWidth <= innerWidth,
+            ),
+          ).toBe(true);
+        }
+      } finally {
+        release();
+      }
+      await expect(page).toHaveURL(new RegExp(`${destination}$`));
+      await expect(
+        page
+          .getByRole("status")
+          .filter({ hasText: new RegExp(`^Loading ${label}…$`) }),
+      ).toHaveCount(0);
+      await expect(
+        page.getByText("Authentication setup", { exact: true }),
+      ).toBeVisible();
+      await expect(page.getByRole("main", { name: /^Loading/ })).toHaveCount(0);
+    });
+  }
+}
+
 test("mobile navigation supports the keyboard and closes after navigation", async ({
   page,
 }) => {
@@ -334,8 +417,18 @@ for (const { origin, setup, navigationLabel } of [
 }
 
 for (const path of [
+  "/algorithms",
+  "/algorithms/learn",
+  "/algorithms/learn/two-pointers",
+  "/algorithms/learn/unknown",
+  "/algorithms/practice",
+  "/algorithms/practice/valid-anagram",
+  "/algorithms/practice/sleep",
+  "/algorithms/practice/unknown",
   "/javascript",
   "/javascript/learn",
+  "/javascript/learn/two-pointers",
+  "/javascript/learn/unknown",
   "/javascript/practice",
   "/javascript/practice/sleep",
   "/javascript/practice/counter",
@@ -354,7 +447,7 @@ for (const path of [
   "/javascript/practice/closures",
   "/javascript/practice/unknown",
 ]) {
-  test(`JavaScript route ${path} withholds content before credentials`, async ({
+  test(`Subject route ${path} withholds content before credentials`, async ({
     page,
   }) => {
     await page.goto(path);
@@ -363,6 +456,9 @@ for (const path of [
     ).toBeVisible();
     await expect(page.getByRole("heading", { name: "Sleep" })).toHaveCount(0);
     await expect(page.getByRole("heading", { name: "Counter" })).toHaveCount(0);
+    await expect(
+      page.getByRole("heading", { name: "Two Pointers" }),
+    ).toHaveCount(0);
     await expect(
       page.getByRole("button", { name: "Run", exact: true }),
     ).toHaveCount(0);
@@ -374,6 +470,7 @@ for (const [oldPath, destination] of [
   ["/learn/javascript/sleep", "/javascript/practice/sleep"],
   ["/learn/javascript/unknown", "/javascript/practice/unknown"],
   ["/javascript", "/javascript/practice"],
+  ["/algorithms", "/algorithms/practice"],
 ] as const) {
   test(`redirects ${oldPath} to ${destination}`, async ({ request }) => {
     const response = await request.get(oldPath, { maxRedirects: 0 });

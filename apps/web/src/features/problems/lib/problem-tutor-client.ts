@@ -34,6 +34,7 @@ export function visibleTutorFeedback(
   } | null,
 ) {
   if (!latest) return {};
+  // Submit/hidden results and diagnostics for older code or inputs stay out.
   if (
     latest.source !== code ||
     latest.result.action !== "run" ||
@@ -92,6 +93,7 @@ export async function readTutorStream(
       "The tutor returned an invalid reply. Try sending again.",
     );
   const reader = response.body.getReader();
+  // Network chunks can split both UTF-8 characters and SSE frames.
   const decoder = new TextDecoder();
   let buffer = "";
   let text = "";

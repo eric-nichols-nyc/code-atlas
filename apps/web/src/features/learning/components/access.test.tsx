@@ -9,6 +9,8 @@ vi.mock("@/lib/auth/server", () => ({
   learnerStorageId: (id: string) => `neon:${id}`,
 }));
 
+import AlgorithmsLearnPage from "@/app/algorithms/learn/page";
+import AlgorithmsPracticePage from "@/app/algorithms/practice/page";
 import JavaScriptLearnPage from "@/app/javascript/learn/page";
 import JavaScriptPracticePage from "@/app/javascript/practice/page";
 
@@ -18,6 +20,8 @@ beforeEach(() => {
   protect.mockResolvedValue("test-neon-user");
 });
 describe.each([
+  ["Algorithms Practice", AlgorithmsPracticePage],
+  ["Algorithms Learn", AlgorithmsLearnPage],
   ["Practice", JavaScriptPracticePage],
   ["Learn", JavaScriptLearnPage],
 ] as const)("JavaScript %s access", (_section, Page) => {
@@ -45,18 +49,17 @@ describe("authorized JavaScript sections", () => {
     );
     expect(screen.getByRole("status")).toHaveTextContent("13 problems");
   });
-  it("reserves Learn without publishing lessons or coding controls", async () => {
+  it("opens the learning catalog without publishing lesson or coding controls", async () => {
     render(await JavaScriptLearnPage());
     expect(protect).toHaveBeenCalledOnce();
     expect(
       screen.getByRole("heading", { name: "JavaScript Learn" }),
     ).toBeVisible();
-    expect(
-      screen.getByText(/JavaScript learning content is coming soon/),
-    ).toBeVisible();
-    expect(
-      screen.getByRole("link", { name: "Explore practice problems" }),
-    ).toHaveAttribute("href", "/javascript/practice");
+    expect(screen.getByRole("link", { name: "Two Pointers" })).toHaveAttribute(
+      "href",
+      "/javascript/learn/two-pointers",
+    );
+    expect(screen.getByRole("status")).toHaveTextContent("1 module");
     expect(screen.queryByRole("button", { name: "Run" })).toBeNull();
   });
 });

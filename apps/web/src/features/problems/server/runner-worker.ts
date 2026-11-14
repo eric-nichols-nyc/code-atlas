@@ -80,7 +80,14 @@ const {
 );
 const { memoizeHarness, judgeMemoize }: typeof import("./adapters/memoize.js") =
   await import(`./adapters/memoize.${adapterExtension}`);
+const {
+  anagramHarness,
+  judgeAnagram,
+}: typeof import("./adapters/valid-anagram.js") = await import(
+  `./adapters/valid-anagram.${adapterExtension}`
+);
 const additionalHarnesses: Record<string, string> = {
+  "algorithms.valid-anagram": anagramHarness,
   "javascript.map-array": mapArrayHarness,
   "javascript.reduce-array": reduceArrayHarness,
   "javascript.chunk-array": chunkArrayHarness,
@@ -430,6 +437,25 @@ async function runCase(test: Work["cases"][number]): Promise<CaseResult> {
       errorText,
       exceeded: () => interrupted || cpu > 250,
     };
+    if (work.problemId === "algorithms.valid-anagram") {
+      if (
+        typeof test.input === "number" ||
+        !("s" in test.input) ||
+        !additionalCheck
+      )
+        return result("runtime-error", "Invalid anagram input.");
+      const outcome = judgeAnagram(test.input, guest, additionalCheck);
+      return result(
+        outcome.verdict,
+        test.hidden
+          ? outcome.verdict === "accepted"
+            ? "Hidden case passed."
+            : "Hidden case failed."
+          : outcome.message,
+        undefined,
+        outcome,
+      );
+    }
     if (additionalCheck && typeof test.input !== "number") {
       const input = test.input;
       const outcome =
@@ -499,7 +525,11 @@ async function runCase(test: Work["cases"][number]): Promise<CaseResult> {
       return result(outcome.verdict, outcome.message, undefined, outcome);
     }
     if (work.problemId === "javascript.debounce") {
-      if (typeof test.input === "number" || !("t" in test.input))
+      if (
+        typeof test.input === "number" ||
+        !("t" in test.input) ||
+        !("calls" in test.input)
+      )
         return result("runtime-error", "Invalid debounce input.");
       const outcome = judgeDebounce(test.input, guest, {
         now: () => virtualNow,
