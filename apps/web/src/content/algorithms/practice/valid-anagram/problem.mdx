@@ -1,0 +1,11 @@
+Write `isAnagram(s, t)`. Return `true` when the strings contain exactly the same letters with the same counts, and `false` otherwise.
+
+An anagram rearranges every character of a string. For example, `"anagram"` and `"nagaram"` are anagrams. `"rat"` and `"car"` are not.
+
+Repeated letters matter: `"aab"` and `"abb"` contain the same distinct letters, but their counts differ. Strings with unequal lengths cannot be anagrams. Two empty strings are anagrams; an empty and a nonempty string are not.
+
+Both inputs contain only lowercase English letters and have 0–1000 characters each. Do not trim whitespace or change case; unsupported characters are invalid testcase inputs.
+
+Try the **Two Pointers** approach: sort character copies and scan them with one forward pointer per string. The scan is linear, while sorting makes the complete solution O(n log n) time with O(n) extra space. Other correct approaches, including counting characters, are accepted.
+
+In the testcase panel, edit `s` and `t` as plain strings. Leave a field blank to test the empty string. Return a boolean rather than `"true"`, `1`, or a Promise.

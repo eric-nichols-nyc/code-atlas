@@ -45,6 +45,6 @@ export const landingQuestions = [
     id: "subjects",
     question: "Is there more than JavaScript?",
     answer:
-      "JavaScript practice is available now. Guided learning, Algorithms and React JS are planned and clearly marked as coming soon. This is a growing map, and JavaScript is the first path.",
+      "JavaScript practice and a Two Pointers learning module preview are available now. Guided lessons, Algorithms and React JS are planned. JavaScript is the first path.",
   },
 ] as const;

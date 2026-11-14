@@ -9,10 +9,13 @@ export interface InputDraft {
   json: string;
   predicate: string;
   callback?: string;
+  s?: string;
+  t?: string;
 }
 export function inputDraft(input: ProblemInput): InputDraft {
   const base = { value: "", calls: "", json: "", predicate: "greaterThan10" };
   if (typeof input === "number") return { ...base, value: String(input) };
+  if ("s" in input) return { ...base, s: input.s, t: input.t };
   if ("x" in input)
     return {
       ...base,
@@ -64,6 +67,10 @@ export function parseInputDraft(
   draft: InputDraft,
 ): ProblemInput | undefined {
   try {
+    if (problem.kind === "valid-anagram") {
+      const input = { s: draft.s, t: draft.t };
+      return validProblemInput(problem, input) ? input : undefined;
+    }
     if (
       problem.kind !== "map-array" &&
       problem.kind !== "memoize" &&

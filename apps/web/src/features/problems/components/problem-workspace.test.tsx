@@ -13,6 +13,7 @@ import {
   type ProblemOutput,
   reduceArrayProblem,
   sleepProblem,
+  validAnagramProblem,
 } from "@workspace/problems";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { readPracticeRecord } from "../../catalog/state/practice-records";
@@ -481,3 +482,70 @@ it.each(expansionExamples)(
     ).toBeGreaterThanOrEqual(2);
   },
 );
+
+it("runs exact Anagram string fields, displays false, flags stale edits and rejects whitespace", async () => {
+  const fetch = vi.fn(async (_url: string, init?: RequestInit) => {
+    const { inputs } = JSON.parse(init?.body as string);
+    const input = inputs[0];
+    const expected = input.s === "" && input.t === "";
+    return Response.json({
+      ...accepted,
+      passed: 1,
+      total: 1,
+      cases: [
+        {
+          id: "case-1",
+          hidden: false,
+          passed: true,
+          verdict: "accepted",
+          message: "Checked.",
+          logs: [],
+          input,
+          expected,
+          actual: expected,
+        },
+      ],
+    });
+  });
+  vi.stubGlobal("fetch", fetch);
+  render(<Workspace problem={validAnagramProblem} />);
+  expect(screen.getByText("Two Pointers")).toBeVisible();
+  expect(screen.getByRole("main")).toHaveAccessibleName(
+    "Algorithms practice workspace",
+  );
+  expect(screen.getByRole("link", { name: "Back" })).toHaveAttribute(
+    "href",
+    "/algorithms/practice",
+  );
+  fireEvent.change(screen.getByLabelText("s ="), { target: { value: "aab" } });
+  fireEvent.change(screen.getByLabelText("t ="), { target: { value: "abb" } });
+  fireEvent.click(screen.getByRole("button", { name: "Run" }));
+  await screen.findByText("Checked.");
+  expect(screen.getAllByText("false")).toHaveLength(2);
+  expect(
+    JSON.parse(fetch.mock.calls[0]?.[1]?.body as string).inputs[0],
+  ).toEqual({ s: "aab", t: "abb" });
+  fireEvent.mouseDown(screen.getByRole("tab", { name: "Testcase" }), {
+    button: 0,
+    ctrlKey: false,
+  });
+  fireEvent.change(screen.getByLabelText("t ="), { target: { value: "aba" } });
+  fireEvent.mouseDown(screen.getByRole("tab", { name: "Test Result" }), {
+    button: 0,
+    ctrlKey: false,
+  });
+  expect(screen.getByText(/Code or inputs changed/)).toBeVisible();
+  fireEvent.mouseDown(screen.getByRole("tab", { name: "Testcase" }), {
+    button: 0,
+    ctrlKey: false,
+  });
+  fireEvent.change(screen.getByLabelText("s ="), { target: { value: " aab" } });
+  fireEvent.click(screen.getByRole("button", { name: "Run" }));
+  expect(fetch).toHaveBeenCalledTimes(1);
+  expect(screen.getByLabelText("s =")).toHaveAttribute("aria-invalid", "true");
+  fireEvent.change(screen.getByLabelText("s ="), { target: { value: "" } });
+  fireEvent.change(screen.getByLabelText("t ="), { target: { value: "" } });
+  fireEvent.click(screen.getByRole("button", { name: "Run" }));
+  await waitFor(() => expect(fetch).toHaveBeenCalledTimes(2));
+  await screen.findAllByText("true");
+});

@@ -11,6 +11,7 @@ import {
   SelectValue,
 } from "@workspace/ui/components/select";
 import { useProblemSession } from "../state/problem-session";
+import { AnagramCaseFields } from "./anagram-case-fields";
 import { CurryCaseFields } from "./curry-case-fields";
 import { ExpandedCaseFields } from "./expanded-case-fields";
 export function CaseInputFields({ index }: { index: number }) {
@@ -28,6 +29,7 @@ export function CaseInputFields({ index }: { index: number }) {
     ].includes(kind)
   )
     return <ExpandedCaseFields index={index} />;
+  if (kind === "valid-anagram") return <AnagramCaseFields index={index} />;
   if (kind === "curry") return <CurryCaseFields index={index} />;
   const predicate = filterPredicates.find(
     (item) => item.id === draft.predicate,

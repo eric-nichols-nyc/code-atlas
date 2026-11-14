@@ -87,7 +87,12 @@ export interface MemoizeOutput {
   values: number[];
   callCount: number;
 }
+export interface AnagramInput {
+  s: string;
+  t: string;
+}
 export type ProblemInput =
+  | AnagramInput
   | number
   | CounterInput
   | DebounceInput
@@ -102,6 +107,7 @@ export type ProblemInput =
   | CompositionInput
   | MemoizeInput;
 export type ProblemOutput =
+  | boolean
   | number
   | number[]
   | number[][]
@@ -150,7 +156,8 @@ export interface ProblemDefinition {
     | "async"
     | "closures"
     | "arrays"
-    | "generators";
+    | "generators"
+    | "two-pointers";
   kind:
     | "delay"
     | "counter"
@@ -164,7 +171,8 @@ export interface ProblemDefinition {
     | "reduce-array"
     | "chunk-array"
     | "function-composition"
-    | "memoize";
+    | "memoize"
+    | "valid-anagram";
   inputError: string;
   title: string;
   summary: string;

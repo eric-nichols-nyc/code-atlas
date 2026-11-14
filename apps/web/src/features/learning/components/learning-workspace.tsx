@@ -27,12 +27,16 @@ export function LearningWorkspace({
   output,
   notes,
   tutor,
+  backHref = "/javascript/practice",
+  subjectTitle = "JavaScript",
 }: {
   lesson: ReactNode;
   code: ReactNode;
   output?: ReactNode;
   notes?: ReactNode;
   tutor?: ReactNode;
+  backHref?: string;
+  subjectTitle?: string;
 }) {
   const layout = useWorkspaceLayout();
   const tools = useWorkspaceTools();
@@ -49,14 +53,17 @@ export function LearningWorkspace({
   const aiActive = tutorOpen && tools.tab === "tutor";
   const notesActive = tutorOpen && tools.tab === "notes";
   return (
-    <main className="min-w-0 flex-1" aria-label="JavaScript practice workspace">
+    <main
+      className="min-w-0 flex-1"
+      aria-label={`${subjectTitle} practice workspace`}
+    >
       <header className="flex min-w-0 flex-wrap items-center justify-between gap-2 border-b px-3 py-2">
         <nav
           aria-label="Problem navigation"
           className="flex min-w-0 flex-wrap items-center gap-2"
         >
           <Button asChild variant="ghost" size="sm">
-            <Link href="/javascript/practice">
+            <Link href={backHref}>
               <ArrowLeftIcon aria-hidden="true" data-icon="inline-start" />
               Back
             </Link>

@@ -40,7 +40,10 @@ import {
 import { cn } from "@workspace/ui/lib/utils";
 import Link from "next/link";
 import { useId, useState } from "react";
-import { problemHref, topics } from "../../learning/lib/catalog";
+import {
+  topics as javascriptTopics,
+  problemHref,
+} from "../../learning/lib/catalog";
 import {
   type PracticeEntry,
   practiceCategories,
@@ -49,12 +52,16 @@ import {
 import { usePracticeRecords } from "../state/practice-records";
 import { DifficultyBadge } from "./difficulty-badge";
 
-export function JavaScriptPractice({
+export function PracticeCatalog({
   catalog,
   learnerId,
+  title = "JavaScript practice",
+  topics = javascriptTopics,
 }: {
   catalog: PracticeEntry[];
   learnerId?: string;
+  title?: string;
+  topics?: readonly (typeof javascriptTopics)[number][];
 }) {
   const records = usePracticeRecords(learnerId);
   const [category, setCategory] = useState("recommended");
@@ -62,7 +69,7 @@ export function JavaScriptPractice({
   const [difficulty, setDifficulty] = useState("all");
   const searchId = useId();
   const difficultyId = useId();
-  const categories = practiceCategories(catalog);
+  const categories = practiceCategories(catalog, topics);
   const selected =
     categories.find((item) => item.id === category) ?? categories[0];
   const selectedId = selected?.id ?? "recommended";
@@ -74,7 +81,7 @@ export function JavaScriptPractice({
     <main className="mx-auto flex w-full max-w-[1920px] min-w-0 flex-1 flex-col gap-11 px-5 pt-6 pb-8 md:px-8 md:pt-14 lg:px-14">
       <header className="max-w-2xl">
         <h1 className="text-[28px] leading-9 font-semibold tracking-tight md:text-[40px] md:leading-[50px]">
-          JavaScript practice
+          {title}
         </h1>
       </header>
       {records.error && (
@@ -139,11 +146,15 @@ export function JavaScriptPractice({
                     data-icon="inline-start"
                     className="text-category-arrays"
                   />
-                ) : item.id === "generators" ? (
+                ) : item.id === "generators" || item.id === "two-pointers" ? (
                   <Repeat2Icon
                     aria-hidden="true"
                     data-icon="inline-start"
-                    className="text-category-generators"
+                    className={cn(
+                      item.id === "two-pointers"
+                        ? "text-category-arrays"
+                        : "text-category-generators",
+                    )}
                   />
                 ) : null}
                 <span className="min-w-0 flex-1 truncate text-left">
@@ -371,3 +382,5 @@ export function JavaScriptPractice({
     </main>
   );
 }
+
+export { PracticeCatalog as JavaScriptPractice };

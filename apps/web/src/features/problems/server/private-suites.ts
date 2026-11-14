@@ -7,6 +7,20 @@ import type {
 // These inputs are server-only. Public content contains examples, never full suites.
 export const privateSuites: Record<ProblemDefinition["kind"], ProblemInput[]> =
   {
+    "valid-anagram": [
+      { s: "", t: "" },
+      { s: "", t: "a" },
+      { s: "a", t: "" },
+      { s: "ab", t: "a" },
+      { s: "a", t: "a" },
+      { s: "a", t: "b" },
+      { s: "aabbcc", t: "abcabc" },
+      { s: "aabbcc", t: "aabccc" },
+      { s: "listen", t: "silent" },
+      { s: "abc", t: "abd" },
+      { s: "a".repeat(500) + "z".repeat(500), t: "za".repeat(500) },
+      { s: "a".repeat(1000), t: `${"a".repeat(999)}b` },
+    ],
     "map-array": [
       { arr: [], transform: "double" },
       { arr: [0, -1, 2, -10000, 10000], transform: "square" },

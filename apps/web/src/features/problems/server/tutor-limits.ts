@@ -1,4 +1,5 @@
 import "server-only";
+// Per-process tutor limits are independent of the Run/Submit limiter.
 export function createTutorLimiter(now = Date.now) {
   const entries = new Map<
     string,

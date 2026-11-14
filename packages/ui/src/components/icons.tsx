@@ -16,6 +16,7 @@ export {
   LinkIcon,
   ListIcon,
   ListOrderedIcon,
+  LoaderCircleIcon,
   LogOutIcon,
   NotebookPenIcon,
   QuoteIcon,

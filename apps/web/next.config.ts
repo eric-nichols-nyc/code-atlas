@@ -11,6 +11,7 @@ const nextConfig: NextConfig = {
   outputFileTracingIncludes: {
     "/api/problems/**/*": [
       "./src/content/javascript/practice/*/problem.mdx",
+      "./src/content/algorithms/practice/*/problem.mdx",
       "./.workers/**/*",
       "./node_modules/quickjs-emscripten/**/*",
       "../../node_modules/.pnpm/quickjs-emscripten@*/**/*",
@@ -20,6 +21,16 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
+      {
+        source: "/algorithms",
+        destination: "/algorithms/practice",
+        permanent: false,
+      },
+      {
+        source: "/javascript",
+        destination: "/javascript/practice",
+        permanent: false,
+      },
       {
         source: "/learn/javascript",
         destination: "/javascript/practice",

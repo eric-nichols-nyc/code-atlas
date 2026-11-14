@@ -68,6 +68,7 @@ export const streamTutor: TutorProvider = async (prompt, signal) => {
     throw new TutorUnavailable(
       "AI tutor is not configured. Your code and question are kept.",
     );
+  // Runtime-only construction keeps imports and builds independent of credentials.
   const client = new OpenAI({
     apiKey,
     baseURL: "https://api.openai.com/v1",

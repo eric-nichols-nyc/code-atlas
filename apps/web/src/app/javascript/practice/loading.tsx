@@ -1,14 +1,4 @@
-import { Skeleton } from "@workspace/ui/components/skeleton";
+import { RouteLoading } from "@/components/route-loading";
 export default function Loading() {
-  return (
-    <main
-      className="flex flex-1 flex-col gap-5 p-6"
-      aria-label="Loading JavaScript practice"
-      aria-busy="true"
-    >
-      <Skeleton className="h-8 w-48" />
-      <Skeleton className="h-20 w-full" />
-      <Skeleton className="h-64 w-full" />
-    </main>
-  );
+  return <RouteLoading label="Loading JavaScript practice" />;
 }

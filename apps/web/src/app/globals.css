@@ -63,7 +63,8 @@ html[data-learning-workspace="split"] {
   --code-comment: #636b75;
   --code-number: #7a3e00;
 }
-.dark {
+.dark,
+.dark-purple {
   --code-keyword: #b7c9e8;
   --code-string: #d9c58e;
   --code-comment: #909898;

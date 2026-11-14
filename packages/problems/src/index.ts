@@ -24,6 +24,7 @@ import {
   reduceFunctions,
 } from "./problems/reduce-array.js";
 import { sleepProblem } from "./problems/sleep.js";
+import { validAnagramProblem } from "./problems/valid-anagram.js";
 import {
   type ExecutionResult,
   type NestedArray,
@@ -56,8 +57,10 @@ export {
   reduceArrayProblem,
   reduceFunctions,
   sleepProblem,
+  validAnagramProblem,
 };
 export const publicProblems = [
+  validAnagramProblem,
   mapArrayProblem,
   reduceArrayProblem,
   chunkArrayProblem,
@@ -121,6 +124,16 @@ export function validProblemInput(
   if (problem.kind === "delay") return validMillis(value);
   if (!value || typeof value !== "object" || Array.isArray(value)) return false;
   const input = value as Record<string, unknown>;
+  if (problem.kind === "valid-anagram")
+    return (
+      Object.keys(input).length === 2 &&
+      typeof input.s === "string" &&
+      typeof input.t === "string" &&
+      input.s.length <= 1000 &&
+      input.t.length <= 1000 &&
+      !/[^a-z]/.test(input.s) &&
+      !/[^a-z]/.test(input.t)
+    );
   if (problem.kind === "map-array")
     return (
       Object.keys(input).length === 2 &&
@@ -244,6 +257,8 @@ export function validRunInputs(
 }
 export function formatProblemInput(input: ProblemInput) {
   if (typeof input === "number") return `millis = ${input}`;
+  if ("s" in input)
+    return `s = ${JSON.stringify(input.s)}, t = ${JSON.stringify(input.t)}`;
   if ("x" in input)
     return `functions = ${JSON.stringify(input.functions)}, x = ${input.x}`;
   if ("nums" in input)
