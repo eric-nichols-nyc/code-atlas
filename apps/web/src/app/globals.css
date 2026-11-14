@@ -1,4 +1,41 @@
 @import "@workspace/ui/globals.css";
+
+.tutor-markdown {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: 14px;
+  line-height: 1.65;
+}
+.tutor-markdown > * + * {
+  margin-top: 0.75rem;
+}
+.tutor-markdown ul {
+  list-style: disc;
+  padding-left: 1.25rem;
+}
+.tutor-markdown ol {
+  list-style: decimal;
+  padding-left: 1.25rem;
+}
+.tutor-markdown pre {
+  max-width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--muted);
+  padding: 0.75rem;
+  font-family: Menlo, monospace;
+  font-size: 12px;
+  white-space: pre;
+}
+.tutor-markdown :not(pre) > code {
+  font-family: Menlo, monospace;
+  font-size: 0.9em;
+}
+.tutor-markdown a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
 @source "../**/*.{ts,tsx}";
 
 @layer components {

@@ -1,5 +1,21 @@
 import { expect, test } from "@playwright/test";
 
+test("tutor access fails closed before auth configuration", async ({
+  request,
+}) => {
+  const response = await request.post(
+    "/api/problems/javascript.counter/tutor",
+    {
+      data: { question: "I'm stuck here", code: "", history: [] },
+    },
+  );
+  expect(response.status()).toBe(503);
+  expect(response.headers()["cache-control"]).toBe("no-store");
+  expect(await response.json()).toEqual({
+    error: "Authentication is not configured.",
+  });
+});
+
 test("home introduces the subjects and links to the dashboard", async ({
   page,
 }) => {

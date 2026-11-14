@@ -205,6 +205,7 @@ function useProblemState(problem: ProblemDefinition, learnerId?: string) {
   return {
     problem,
     source,
+    readCurrentSource: () => sourceRef.current,
     setSource,
     editorState,
     editorTheme,

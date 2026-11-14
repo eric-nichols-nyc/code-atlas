@@ -52,7 +52,8 @@ The workspace provides:
 - Category icons use distinct theme colors. Difficulty labels use green for Easy, amber for Medium, and red for Hard.
 - Light, Dark, and System themes; the initial theme is dark and the preference persists in the browser.
 
-AI tutoring remains a clearly labeled placeholder. Notes supports private formatted documents,
+AI tutoring provides question-triggered hints using the latest code and public problem context.
+Chat lasts for the current visit; see [AI tutor setup](#ai-tutor). Notes supports private formatted documents,
 explicit account saves, and drafts that survive workspace tool/layout changes. The workspace has no visualization,
 Submissions view, Problems button, or Reset layout action. An accepted Submit records account-backed solved status; submission history remains future work.
 
@@ -350,6 +351,48 @@ progress to that test account; never point it at a personal account or productio
 The setup signs in through the actual form and saves ignored `.auth/learner.json` session state.
 Auth setup disables traces, video and screenshots to keep login details out of artifacts.
 Manual browser review does not count as authenticated automated coverage.
+
+## AI tutor
+
+The existing tools panel includes a hint-first tutor for published JavaScript problems.
+Its conversation and question draft live only for the current learner/problem visit:
+closing the panel, switching Notes and resizing preserve them; leaving/reloading the
+problem, signing out or quitting Electron discards them. Nothing is written to chat
+tables or browser storage. Notes, editor saves, Run/Submit and solved progress retain
+their own behavior.
+
+Set `OPENAI_API_KEY` and `OPENAI_TUTOR_MODEL` only in the ignored web server environment.
+The reviewed local model is `gpt-5.4-mini`. Empty examples are tracked; actual keys never
+belong in a browser variable, source file or desktop archive. Provider configuration is
+read only when an authenticated, validated tutor request reaches the server. Public
+pages and production builds work without it; missing settings return a recoverable
+tutor-unavailable response and do not disable other practice features.
+
+`POST /api/problems/[problemId]/tutor` verifies the Neon session/origin through
+`requireLearner`, then calls feature-owned server modules. Send and explicit Retry are
+the only AI triggers. CodeMirror edits stay in the existing local problem session, and
+Send reads its synchronous source snapshot. The server selects the published statement,
+public examples/constraints and supplied callbacks. Authored `.mdx` statement assets
+are included in Next production file tracing and checked by `content:check`.
+
+The provider receives the current code/question, recent completed dialogue and optional
+visible Run feedback only when its source/inputs still match. Stale results, Submit/hidden
+diagnostics, private notes, account records and separate authored solution fields are
+excluded. Model output cannot edit or execute code. The official OpenAI SDK stays on the
+server, uses Responses with `store: false`, no tools and no automatic retries, and
+normalizes text/completion/error events to a noncacheable POST stream. Stop cancels the
+request; incomplete replies remain labeled and explicit Retry captures current code again.
+
+Initial limits: 32 KiB source, 4 KiB question, four recent exchanges/16 KiB history,
+8 KiB optional feedback, 2,000 output tokens, 60 seconds. Each Node process permits
+10 questions/minute per verified learner, one active request per learner and four total.
+These controls do not represent a distributed or monetary budget. Provider retention is
+separate from the app's session-only chat lifetime.
+
+Deterministic tutor tests inject streams and make no paid inference calls. Real model
+and signed-in Electron reviews are recorded separately in the
+[tutor brief](features/problem-ai-tutor.md). Keep the dedicated development learner and
+existing production/desktop test setup; coordinate free port 3000 with a running app.
 
 ## Deployment and future work
 

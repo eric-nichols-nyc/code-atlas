@@ -10,6 +10,7 @@ const nextConfig: NextConfig = {
   outputFileTracingRoot: fileURLToPath(new URL("../..", import.meta.url)),
   outputFileTracingIncludes: {
     "/api/problems/**/*": [
+      "./src/content/javascript/practice/*/problem.mdx",
       "./.workers/**/*",
       "./node_modules/quickjs-emscripten/**/*",
       "../../node_modules/.pnpm/quickjs-emscripten@*/**/*",
