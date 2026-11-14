@@ -5,8 +5,9 @@ import {
   TabsList,
   TabsTrigger,
 } from "@workspace/ui/components/tabs";
+import type { ReactNode } from "react";
 import { useWorkspaceTools } from "../state/workspace-tools";
-export function TutorPanel() {
+export function TutorPanel({ notes }: { notes?: ReactNode }) {
   const s = useWorkspaceTools();
   return (
     <section className="learning-panel h-full" aria-label="Learning tools">
@@ -30,13 +31,8 @@ export function TutorPanel() {
             feedback, and guided walkthrough.
           </p>
         </TabsContent>
-        <TabsContent value="notes" className="p-5">
-          <p className="mb-2 text-sm font-semibold">
-            Space for your own connections.
-          </p>
-          <p className="text-sm leading-relaxed text-muted-foreground">
-            Saved notes are coming soon. There is nothing to save or sync yet.
-          </p>
+        <TabsContent value="notes" className="min-h-0 overflow-hidden p-3">
+          {notes}
         </TabsContent>
       </Tabs>
     </section>

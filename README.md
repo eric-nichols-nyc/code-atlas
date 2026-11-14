@@ -58,6 +58,9 @@ feedback, and improve.**
   suite that includes private cases. Only an accepted Submit marks a problem solved.
 - **Persistent progress:** Flag problems and restore the latest code saved after Run or
   Submit, regardless of verdict. Unsaved editor changes remain in memory.
+- **Private problem notes:** Write formatted takeaways, lists, code blocks, and links in
+  Notes, then select Save to keep them with your account. Unsaved notes last only until
+  leaving or reloading the problem.
 - **Account ownership:** Neon Auth handles authentication; Prisma and Neon store each learner's
   progress behind authenticated Next.js APIs.
 - **Isolated execution:** QuickJS WebAssembly runs in disposable Node.js Workers with
@@ -200,8 +203,8 @@ and the [full command list](docs/development.md#commands).
 ## What's next
 
 Guided Learn content, additional JavaScript and algorithm challenges, connected AI
-tutoring, saved notes, submission history, and signed desktop distribution are planned.
-AI and notes controls currently show placeholders. Hosted deployment is not yet configured.
+tutoring, note media embeds/uploads, submission history, and signed desktop distribution are planned.
+AI controls currently show placeholders. Hosted deployment is not yet configured.
 
 ## Documentation
 

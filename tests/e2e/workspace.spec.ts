@@ -382,6 +382,28 @@ test("withholds account progress before authentication is configured", async ({
   ).toBe(503);
 });
 
+test("withholds personal notes before authentication is configured", async ({
+  request,
+}) => {
+  for (const method of ["get", "put"] as const) {
+    const response = await request[method](
+      "/api/problems/javascript.sleep/notes",
+      method === "put"
+        ? {
+            data: {
+              content: {
+                formatVersion: 1,
+                document: { ops: [{ insert: "\n" }] },
+              },
+            },
+          }
+        : {},
+    );
+    expect(response.status()).toBe(503);
+    expect(response.headers()["cache-control"]).toBe("no-store");
+  }
+});
+
 for (const path of ["/forgot-password", "/reset-password", "/verify-email"]) {
   test(`${path} remains available before auth configuration`, async ({
     page,

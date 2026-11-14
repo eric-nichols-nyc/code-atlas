@@ -52,7 +52,8 @@ The workspace provides:
 - Category icons use distinct theme colors. Difficulty labels use green for Easy, amber for Medium, and red for Hard.
 - Light, Dark, and System themes; the initial theme is dark and the preference persists in the browser.
 
-AI tutoring and saved notes are clearly labeled placeholders. The workspace has no visualization,
+AI tutoring remains a clearly labeled placeholder. Notes supports private formatted documents,
+explicit account saves, and drafts that survive workspace tool/layout changes. The workspace has no visualization,
 Submissions view, Problems button, or Reset layout action. An accepted Submit records account-backed solved status; submission history remains future work.
 
 ## Environment and authentication
@@ -120,7 +121,7 @@ A short ownership map replaces a full directory tree. Keep feature details in th
 | [Web features](../apps/web/src/features)                        | Landing, catalog, dashboard, problem behavior/state and workspace layout |
 | [JavaScript content](../apps/web/src/content/javascript)        | Practice catalog and trusted problem MDX                                 |
 | [Problem server code](../apps/web/src/features/problems/server) | Private suites, execution policy and isolated worker                     |
-| [Progress server code](../apps/web/src/features/catalog/server) | Authenticated account reads, flags and executed-source persistence       |
+| [Account server code](../apps/web/src/features/catalog/server)  | Authenticated progress, executed-source persistence and private notes    |
 | [Server boundary](../apps/web/src/server)                       | Shared session, origin and request validation                            |
 | [Public problem package](../packages/problems/src)              | Shared problem definitions and execution contracts                       |
 | [Shared UI](../packages/ui/src)                                 | shadcn primitives, generic navigation, icons, and theme                  |
@@ -188,10 +189,28 @@ Future Learn content is a separate feature. Reuse the shared workspace where its
 | `POST /api/practice-progress/import`      | Idempotent import of browser flags and unverified legacy history |
 | `POST /api/problems/:problemId/run`       | Execute visible cases                                            |
 | `POST /api/problems/:problemId/submit`    | Execute the server-selected suite                                |
+| `GET /api/problems/:problemId/notes`      | Read the current learner's private note, or an empty document    |
+| `PUT /api/problems/:problemId/notes`      | Explicitly replace the current learner's private note            |
 
 Routes live in `apps/web/src/app/api/**/route.ts` and use the Node.js runtime. Thin handlers compose
 feature-owned server code, which verifies Neon Auth identity before execution or database access.
 Server services use `server-only` boundaries. UI code uses the same-origin `/api` URLs.
+
+Personal notes use `{ content, updatedAt }` responses. `content` is
+`{ formatVersion: 1, document: { ops: [{ insert: "\n" }] } }` for a blank note;
+`updatedAt` is null when no saved note exists, or a server ISO timestamp after saving.
+PUT accepts only `{ content }`, with a complete insert-only formatted document.
+The server derives the owner from the verified Neon session, resolves the canonical
+published problem ID, validates request origin and content before database access,
+and returns `Cache-Control: no-store` on handled successes and failures.
+Content is limited to 65,536 serialized UTF-8 bytes and 4,096 operations; the streamed
+JSON request limit is 512 KiB. Links must be absolute HTTP/HTTPS URLs. Media, raw HTML
+structures, unsupported formats, and owner fields are rejected. Empty saves replace
+the prior document; they do not alter progress, flags, or executed code.
+Authentication/origin/problem/input/size/storage failures use 401/403/404/400/413/503.
+Notes use explicit Save and last successful database write wins across devices;
+there is no background synchronization or conflict merge. Unsaved edits remain
+only in the current problem session. See the [notes brief](features/personal-problem-notes.md).
 
 The execution service runs QuickJS WebAssembly inside a disposable Node Worker. Guest memory, stack, CPU, timers,
 console output, concurrency, and wall time are bounded. Learner code has no Node module, filesystem,
@@ -352,7 +371,7 @@ pnpm start
 ```
 
 The next work is to review account-backed practice data, then add content through the existing content and judge
-contracts. Learn, connected AI tutoring, editable/saved notes, submission history, and future
+contracts. Learn, connected AI tutoring, note media/uploads, submission history, and future
 administration require their own feature scope. There is currently no admin app.
 
 ## Electron desktop
