@@ -54,9 +54,10 @@ feedback, and improve.**
 
 ## What works today
 
-- **Learning preview:** Browse JavaScript or Algorithms Learn with category, search, and difficulty
-  filters, then read the Two Pointers introduction, JavaScript example, and three
-  lesson outlines. Interactive lessons and learning progress are deferred.
+- **Learning preview:** Browse JavaScript, Algorithms, or React Learn with category,
+  search, and difficulty filters. Two Pointers introduces array strategies; React's
+  Hooks section starts with useEffect lifecycle and a six-step timer explanation.
+  These authored examples do not execute code or save learning progress.
 - **Focused practice:** CodeMirror JavaScript editor, resizable panels, hints and solutions,
   plus light, dark, and system themes.
 - **Real evaluation:** Run editable visible cases, then Submit against a server-selected
@@ -65,7 +66,7 @@ feedback, and improve.**
   Submit, regardless of verdict. Unsaved editor changes remain in memory.
 - **Context-aware AI tutor:** Ask for hints using your current unsaved code and the problem
   context. Requests happen only when you send a question; chat lasts for this visit.
-- **React development pilot:** In development, open React Practice from Dashboard for a
+- **React development pilot:** In development, explore React from Dashboard and select Practice for a
   Stale Closure Counter exercise with a TypeScript/JSX editor, Submit-based browser
   preview, console and the existing tutor. Drafts/chat are visit-only. The pilot is
   unavailable in production; see [its scope and execution limits](docs/features/react-sandbox.md).

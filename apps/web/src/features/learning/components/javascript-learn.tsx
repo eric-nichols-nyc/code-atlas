@@ -111,7 +111,13 @@ export function LearningCatalog({
                     data-icon="inline-start"
                     className="text-category-arrays"
                   />
-                ) : null}
+                ) : (
+                  <LayersIcon
+                    aria-hidden="true"
+                    data-icon="inline-start"
+                    className="text-muted-foreground"
+                  />
+                )}
                 <span className="min-w-0 flex-1 truncate text-left">
                   {item.label}
                 </span>

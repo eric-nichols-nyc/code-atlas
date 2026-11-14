@@ -26,13 +26,14 @@ const params = (exerciseSlug = "stale-closure-counter") => ({
   params: Promise.resolve({ exerciseSlug }),
 });
 
-it("gates both pages and the dashboard link in production", async () => {
+it("gates both practice pages while Dashboard offers React learning in production", async () => {
   vi.stubEnv("NODE_ENV", "production");
   await expect(ReactPracticePage()).rejects.toThrow("not-found");
   await expect(ReactExercisePage(params())).rejects.toThrow("not-found");
   render(<DashboardContent />);
-  expect(screen.queryByRole("link", { name: "Explore React JS" })).toBeNull();
-  expect(screen.getByRole("button", { name: "Coming soon" })).toBeDisabled();
+  expect(
+    screen.getByRole("link", { name: "Explore React JS" }),
+  ).toHaveAttribute("href", "/react");
   expect(protect).not.toHaveBeenCalled();
 });
 it("authenticates both resources independently and rejects unknown slugs", async () => {
@@ -56,7 +57,7 @@ it("exposes the development catalog and exercise without account controls", asyn
   expect(protect).toHaveBeenCalledTimes(2);
   expect(
     screen.getByRole("link", { name: "Explore React JS" }),
-  ).toHaveAttribute("href", "/react/practice");
+  ).toHaveAttribute("href", "/react");
   expect(screen.getByRole("link", { name: "Open exercise" })).toHaveAttribute(
     "href",
     "/react/practice/stale-closure-counter",

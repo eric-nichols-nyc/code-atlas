@@ -1,0 +1,42 @@
+import { CodeWalkthrough } from "@/features/learning/components/code-walkthrough";
+import { useEffectLifecycleWalkthrough } from "./walkthrough";
+
+## Start and stop synchronization
+
+`useEffect` connects a component to something outside React, such as a timer,
+browser event, or subscription. Its setup starts that connection; its returned
+cleanup stops it. One component can repeat this cycle while it stays mounted.
+
+Read an Effect as one setup/cleanup pair. When a dependency changes, the previous
+pair ends before the next begins. See React's
+[Effect lifecycle guide](https://react.dev/learn/lifecycle-of-reactive-effects).
+
+## A timer that follows its delay
+
+`Heartbeat` receives a positive `delay` in milliseconds. It renders no visible UI;
+its Effect owns one interval. These six steps are an authored explanation, not a
+running component or a recorded execution trace.
+
+<CodeWalkthrough definition={useEffectLifecycleWalkthrough} />
+
+## What makes an Effect run again?
+
+- `[delay]`: setup runs after the initial commit, then again when the committed
+  `delay` changes. React compares dependencies with `Object.is`. Cleanup from the
+  previous setup runs first, using its previous values.
+- `[]`: no reactive dependencies trigger re-synchronization. This is not a promise
+  of one execution for the component's entire lifetime; remounting starts again.
+- No dependency argument: the Effect runs after every commit of that component.
+
+Include every reactive value the Effect reads. Call Hooks at the component's top
+level. Effects run on the client, not during server rendering, and their timing
+relative to browser paint can vary. See the
+[useEffect reference](https://react.dev/reference/react/useEffect).
+
+## Cleanup and development Strict Mode
+
+Cleanup also runs on unmount. With Strict Mode enabled at the root, development
+adds a setup → cleanup → setup check on initial mount. The timer should still have
+only one active interval after setup settles. Keep the cleanup instead of hiding
+the check: it reveals missing teardown. This extra check does not run in production.
+See [Strict Mode](https://react.dev/reference/react/StrictMode).

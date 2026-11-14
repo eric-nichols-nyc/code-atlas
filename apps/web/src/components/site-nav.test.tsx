@@ -42,7 +42,7 @@ it.each(["javascript", "algorithms"])(
   },
 );
 
-it("offers only React Practice in development and hides navigation in its workspace", () => {
+it("offers React Learn and development Practice and hides navigation in its workspace", () => {
   vi.stubEnv("NODE_ENV", "development");
   state.path = "/react/practice";
   const view = render(<SiteNav authConfigured={false} />);
@@ -50,16 +50,31 @@ it("offers only React Practice in development and hides navigation in its worksp
     "href",
     "/react/practice",
   );
-  expect(screen.queryByRole("link", { name: "Learn" })).toBeNull();
+  expect(screen.getByRole("link", { name: "Learn" })).toHaveAttribute(
+    "href",
+    "/react/learn",
+  );
   state.path = "/react/practice/stale-closure-counter";
   view.rerender(<SiteNav authConfigured={false} />);
   expect(screen.queryByRole("navigation")).toBeNull();
 });
 
-it("does not expose React navigation in production", () => {
+it("keeps React Learn active and omits Practice in production, including mobile navigation", () => {
   vi.stubEnv("NODE_ENV", "production");
-  state.path = "/react/practice";
+  state.path = "/react/learn/use-effect-lifecycle";
   render(<SiteNav authConfigured={false} />);
   expect(screen.queryByRole("link", { name: "Practice" })).toBeNull();
-  expect(screen.queryByRole("link", { name: "Learn" })).toBeNull();
+  expect(screen.getByRole("link", { name: "Learn" })).toHaveAttribute(
+    "href",
+    "/react/learn",
+  );
+  expect(screen.getByRole("link", { name: "Learn" })).toHaveAttribute(
+    "aria-current",
+    "page",
+  );
+  for (const link of screen.getAllByRole("link", { name: "Dashboard" }))
+    expect(link).toHaveAttribute("href", "/dashboard");
+  fireEvent.click(screen.getByRole("button", { name: /navigation/i }));
+  fireEvent.keyDown(screen.getByRole("navigation"), { key: "Escape" });
+  expect(screen.getByRole("button", { name: /navigation/i })).toHaveFocus();
 });

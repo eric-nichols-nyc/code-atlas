@@ -48,13 +48,15 @@ test("discovers React and executes only submitted snapshots without account writ
   await page
     .getByRole("link", { name: "Explore React JS", exact: true })
     .click();
+  await expect(page).toHaveURL("/react/learn");
+  await page.getByRole("link", { name: "Practice", exact: true }).click();
   await expect(page).toHaveURL("/react/practice");
   await expect(
     page.getByRole("link", { name: "Practice", exact: true }),
   ).toHaveAttribute("href", "/react/practice");
   await expect(
     page.getByRole("link", { name: "Learn", exact: true }),
-  ).toHaveCount(0);
+  ).toHaveAttribute("href", "/react/learn");
   await page.getByRole("link", { name: "Open exercise", exact: true }).click();
   await expect(page).toHaveURL(workspace);
   await edit(page, sample("FIRST_SNAPSHOT"));

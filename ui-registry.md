@@ -551,6 +551,13 @@ for visible keyboard focus, keeping the surrounding prose typography.
 
 ## Guided code walkthroughs
 
+React Learn reuses this catalog and preview pattern for the Hooks category and
+useEffect lifecycle lesson. Non-Recommended categories without a specialized icon
+use the existing Layers icon in muted foreground; Arrays retains its blue accent.
+React navigation always offers Learn and offers Practice only while its development
+pilot is enabled. No completion/flag controls appear in Learn. The timer example
+uses the same numbered JavaScript source and six manual conceptual steps.
+
 Files: `features/learning/components/code-walkthrough.tsx`,
 `code-walkthrough-client.tsx`, and `code-walkthrough.module.css`.
 Last updated: 2026-11-14.

@@ -22,6 +22,11 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       {
+        source: "/react",
+        destination: "/react/learn",
+        permanent: false,
+      },
+      {
         source: "/algorithms",
         destination: "/algorithms/practice",
         permanent: false,

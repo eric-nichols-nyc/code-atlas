@@ -22,12 +22,18 @@ import {
 } from "../src/content/javascript/learn/walkthroughs";
 import { javascriptPracticeCatalog } from "../src/content/javascript/practice/catalog";
 import { problemStatements as javascriptStatements } from "../src/content/javascript/practice/statements";
+import {
+  reactLearningCatalog,
+  learningTopics as reactTopics,
+} from "../src/content/react/learn/catalog";
+import { moduleOverviews as reactOverviews } from "../src/content/react/learn/overviews";
+import { learningWalkthroughs as reactWalkthroughs } from "../src/content/react/learn/walkthroughs";
 import { validatePracticeContent } from "../src/features/catalog/lib/practice-content";
 import { validateWalkthroughRegistry } from "../src/features/learning/lib/code-walkthrough";
 import { validateLearningContent } from "../src/features/learning/lib/learn-content";
 import { validateTwoPointerVisualization } from "../src/features/learning/lib/two-pointer-visualization";
 
-const subjects = [
+const learningSubjects = [
   {
     id: "javascript",
     modules: javascriptLearningCatalog,
@@ -35,8 +41,6 @@ const subjects = [
     overviews: javascriptOverviews,
     walkthroughs: javascriptWalkthroughs,
     visualizations: javascriptVisualizations,
-    catalog: javascriptPracticeCatalog,
-    statementSlugs: Object.keys(javascriptStatements),
   },
   {
     id: "algorithms",
@@ -45,12 +49,30 @@ const subjects = [
     overviews: algorithmsOverviews,
     walkthroughs: algorithmsWalkthroughs,
     visualizations: algorithmsVisualizations,
+  },
+  {
+    id: "react",
+    modules: reactLearningCatalog,
+    topics: reactTopics,
+    overviews: reactOverviews,
+    walkthroughs: reactWalkthroughs,
+    visualizations: [],
+  },
+];
+const practiceSubjects = [
+  {
+    id: "javascript",
+    catalog: javascriptPracticeCatalog,
+    statementSlugs: Object.keys(javascriptStatements),
+  },
+  {
+    id: "algorithms",
     catalog: algorithmsPracticeCatalog,
     statementSlugs: Object.keys(algorithmsStatements),
   },
 ];
 const errors: string[] = [];
-for (const subject of subjects) {
+for (const subject of learningSubjects) {
   errors.push(
     ...(await validateLearningContent(
       subject.modules,
@@ -78,14 +100,17 @@ for (const subject of subjects) {
     errors.push(...validateTwoPointerVisualization(visualization));
 }
 errors.push(
-  ...(await validatePracticeContent(subjects, publicProblems, (subject, slug) =>
-    readFile(
-      new URL(
-        `../src/content/${subject}/practice/${slug}/problem.mdx`,
-        import.meta.url,
+  ...(await validatePracticeContent(
+    practiceSubjects,
+    publicProblems,
+    (subject, slug) =>
+      readFile(
+        new URL(
+          `../src/content/${subject}/practice/${slug}/problem.mdx`,
+          import.meta.url,
+        ),
+        "utf8",
       ),
-      "utf8",
-    ),
   )),
 );
 if (errors.length) {
@@ -93,5 +118,5 @@ if (errors.length) {
   process.exitCode = 1;
 } else
   console.log(
-    `Content valid for ${subjects.map((subject) => subject.id).join(", ")}: ${publicProblems.length} practice problems.`,
+    `Learning content valid for ${learningSubjects.map((subject) => subject.id).join(", ")}; ${publicProblems.length} practice problems valid for ${practiceSubjects.map((subject) => subject.id).join(", ")}.`,
   );
