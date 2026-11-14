@@ -196,8 +196,10 @@ requests targeting `main` and pushes to `main`. Biome handles linting and format
 Vitest covers unit and integration behavior.
 
 `pnpm test:e2e` runs the production Playwright smoke suite after a credential-free
-build, with port 3000 available. Optional authenticated automation requires a dedicated
-Neon Auth development test user and remains unverified. See [verification instructions](docs/development.md#verification)
+build, with port 3000 available. Optional authenticated browser and Electron checks require a dedicated
+Neon Auth development test user. `pnpm test:e2e:desktop:auth` checks Run/Submit and saved
+progress after fully quitting and reopening Electron against the production server.
+See [verification instructions](docs/development.md#verification)
 and the [full command list](docs/development.md#commands).
 
 ## What's next
