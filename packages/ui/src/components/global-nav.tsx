@@ -37,6 +37,8 @@ export type GlobalNavProps = Omit<
   activeItemId?: string;
   /** Center the link group independently of branding and account controls on desktop. */
   itemsAlign?: "start" | "center";
+  /** Keep section links in a second row on mobile; the disclosure contains account actions. */
+  mobileSections?: boolean;
   actions?: ReactNode;
   /** Always-visible controls, including on narrow screens. */
   utilities?: ReactNode;
@@ -55,6 +57,7 @@ export function GlobalNav({
   items = [],
   activeItemId,
   itemsAlign = "start",
+  mobileSections = false,
   actions,
   utilities,
   linkComponent: LinkComponent = "a",
@@ -72,6 +75,10 @@ export function GlobalNav({
   const toggleRef = useRef<HTMLButtonElement>(null);
   const hasContent =
     leadingItems.length > 0 || items.length > 0 || Boolean(actions);
+  const hasDisclosure =
+    leadingItems.length > 0 ||
+    (!mobileSections && items.length > 0) ||
+    Boolean(actions);
   const renderItem = (item: GlobalNavItem) => {
     const Icon = item.icon;
     return (
@@ -85,7 +92,10 @@ export function GlobalNav({
                 ? "secondary"
                 : "ghost"
           }
-          className="w-full justify-start md:w-auto"
+          className={cn(
+            "w-full justify-start md:w-auto",
+            mobileSections && "min-h-11 w-auto justify-center lg:min-h-9",
+          )}
         >
           <LinkComponent
             href={item.href}
@@ -105,6 +115,22 @@ export function GlobalNav({
       </li>
     );
   };
+  const sectionLinks = items.length > 0 && (
+    <ul
+      data-slot="global-nav-links"
+      className={cn(
+        "flex min-w-0 gap-1",
+        mobileSections
+          ? "col-start-1 row-start-2 flex-wrap lg:col-start-2 lg:row-start-1 lg:justify-self-center"
+          : "flex-col md:flex-row md:flex-wrap",
+        !mobileSections &&
+          itemsAlign === "center" &&
+          "md:col-start-2 md:row-start-1 md:justify-self-center",
+      )}
+    >
+      {items.map(renderItem)}
+    </ul>
+  );
 
   return (
     // biome-ignore lint/a11y/noStaticElementInteractions: Delegates Escape from descendant controls; the header itself is not focusable.
@@ -137,8 +163,10 @@ export function GlobalNav({
         aria-label={navigationLabel}
         className={cn(
           "mx-auto flex w-full max-w-7xl flex-wrap items-center gap-x-4 gap-y-3 px-6 py-3",
-          itemsAlign === "center" &&
-            "md:grid md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]",
+          mobileSections
+            ? "grid grid-cols-[minmax(0,1fr)_auto] gap-x-2 gap-y-1 px-4 md:px-6 lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] lg:gap-x-4"
+            : itemsAlign === "center" &&
+                "md:grid md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]",
           containerClassName,
         )}
       >
@@ -148,14 +176,20 @@ export function GlobalNav({
         >
           <div
             data-slot="global-nav-brand"
-            className="min-w-0 truncate font-semibold md:max-w-64"
+            className={cn(
+              "min-w-0 font-semibold",
+              !mobileSections && "truncate md:max-w-64",
+            )}
           >
             {brand}
           </div>
           {leadingItems.length > 0 && (
             <ul
               data-slot="global-nav-leading-links"
-              className="hidden shrink-0 items-center gap-1 md:flex"
+              className={cn(
+                "hidden shrink-0 items-center gap-1",
+                mobileSections ? "lg:flex" : "md:flex",
+              )}
             >
               {leadingItems.map(renderItem)}
             </ul>
@@ -166,18 +200,22 @@ export function GlobalNav({
           <div
             className={cn(
               "flex shrink-0 items-center gap-2",
-              hasContent
-                ? "md:hidden"
-                : itemsAlign === "center"
-                  ? "md:col-start-3 md:justify-self-end"
-                  : "md:ml-auto",
+              mobileSections
+                ? "col-start-2 row-start-1 justify-self-end lg:hidden"
+                : hasContent
+                  ? "md:hidden"
+                  : itemsAlign === "center"
+                    ? "md:col-start-3 md:justify-self-end"
+                    : "md:ml-auto",
             )}
           >
             {utilities}
           </div>
         )}
 
-        {hasContent && (
+        {mobileSections && sectionLinks}
+
+        {hasDisclosure && (
           <Button
             ref={toggleRef}
             type="button"
@@ -187,7 +225,12 @@ export function GlobalNav({
             aria-expanded={menuOpen}
             aria-controls={linksId}
             onClick={() => setMenuOpen((open) => !open)}
-            className="ml-auto shrink-0 touch-manipulation md:hidden"
+            className={cn(
+              "ml-auto shrink-0 touch-manipulation",
+              mobileSections
+                ? "col-start-2 row-start-2 lg:hidden"
+                : "md:hidden",
+            )}
           >
             {menuOpen ? (
               <XIcon data-icon="inline-start" />
@@ -203,44 +246,45 @@ export function GlobalNav({
             data-slot="global-nav-content"
             className={cn(
               "w-full min-w-0 flex-col gap-3",
-              itemsAlign === "center"
-                ? "md:contents"
-                : "md:flex md:w-auto md:flex-1 md:flex-row md:items-center",
+              mobileSections
+                ? "col-span-2 lg:contents"
+                : itemsAlign === "center"
+                  ? "md:contents"
+                  : "md:flex md:w-auto md:flex-1 md:flex-row md:items-center",
               menuOpen ? "flex" : "hidden",
             )}
           >
             {leadingItems.length > 0 && (
               <ul
                 data-slot="global-nav-mobile-leading-links"
-                className="flex min-w-0 flex-col gap-1 md:hidden"
+                className={cn(
+                  "flex min-w-0 flex-col gap-1",
+                  mobileSections ? "lg:hidden" : "md:hidden",
+                )}
               >
                 {leadingItems.map(renderItem)}
               </ul>
             )}
-            {items.length > 0 && (
-              <ul
-                data-slot="global-nav-links"
-                className={cn(
-                  "flex min-w-0 flex-col gap-1 md:flex-row md:flex-wrap",
-                  itemsAlign === "center" &&
-                    "md:col-start-2 md:row-start-1 md:justify-self-center",
-                )}
-              >
-                {items.map(renderItem)}
-              </ul>
-            )}
+            {!mobileSections && sectionLinks}
             {(actions || utilities) && (
               <div
                 data-slot="global-nav-actions"
                 className={cn(
                   "flex flex-wrap items-center gap-2",
-                  itemsAlign === "center"
-                    ? "md:col-start-3 md:row-start-1 md:justify-self-end"
-                    : "md:ml-auto",
+                  mobileSections
+                    ? "lg:col-start-3 lg:row-start-1 lg:justify-self-end"
+                    : itemsAlign === "center"
+                      ? "md:col-start-3 md:row-start-1 md:justify-self-end"
+                      : "md:ml-auto",
                 )}
               >
                 {utilities && (
-                  <div className="hidden shrink-0 items-center gap-2 md:flex">
+                  <div
+                    className={cn(
+                      "hidden shrink-0 items-center gap-2",
+                      mobileSections ? "lg:flex" : "md:flex",
+                    )}
+                  >
                     {utilities}
                   </div>
                 )}

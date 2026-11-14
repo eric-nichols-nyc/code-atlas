@@ -40,6 +40,10 @@
   --color-category-closures: var(--category-closures);
   --color-category-arrays: var(--category-arrays);
   --color-category-generators: var(--category-generators);
+  --color-brand-javascript: var(--brand-javascript);
+  --color-brand-javascript-foreground: var(--brand-javascript-foreground);
+  --color-brand-react: var(--brand-react);
+  --color-brand-algorithms: var(--brand-algorithms);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -85,6 +89,10 @@
   --category-closures: #99610c;
   --category-arrays: #245ca6;
   --category-generators: #a62470;
+  --brand-javascript: #f7df1e;
+  --brand-javascript-foreground: #171717;
+  --brand-react: #087ea4;
+  --brand-algorithms: #7548bd;
 }
 
 .dark,
@@ -125,6 +133,8 @@
   --category-closures: #fbbf24;
   --category-arrays: #60a5fa;
   --category-generators: #f472b6;
+  --brand-react: #61dafb;
+  --brand-algorithms: #a78bfa;
 }
 
 .dark-purple {
@@ -145,6 +155,7 @@
   --border: #30223f;
   --input: #402e55;
   --ring: #b496e5;
+  --brand-algorithms: #c4a7f5;
 }
 
 @layer base {

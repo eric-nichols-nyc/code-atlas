@@ -27,4 +27,5 @@ export {
   SparklesIcon,
   StarIcon,
   TimerIcon,
+  WorkflowIcon,
 } from "lucide-react";

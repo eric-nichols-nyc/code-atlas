@@ -113,7 +113,6 @@ for (const [source, destination, label] of [
         const toggle = navigation.getByRole("button", {
           name: /^(Open|Close) navigation$/,
         });
-        if (width === 320) await toggle.click();
         const link = navigation.getByRole("link", { name: label, exact: true });
         const before = width === 1280 ? await link.boundingBox() : null;
         if (label === "Practice") {
@@ -177,12 +176,14 @@ test("mobile navigation supports the keyboard and closes after navigation", asyn
     name: "Dashboard",
     exact: true,
   });
-  await expect(dashboard).toBeHidden();
+  await expect(dashboard).toBeVisible();
   await toggle.focus();
   await page.keyboard.press("Enter");
   await expect(toggle).toHaveAttribute("aria-expanded", "true");
   await page.keyboard.press("Tab");
-  await expect(dashboard).toBeFocused();
+  await expect(
+    navigation.getByRole("link", { name: "Sign in", exact: true }),
+  ).toBeFocused();
   await page.keyboard.press("Escape");
   await expect(toggle).toHaveAttribute("aria-expanded", "false");
   await expect(toggle).toBeFocused();
@@ -206,7 +207,7 @@ test("JavaScript navigation centers the active section on desktop", async ({
   const nav = page.getByRole("navigation", { name: "Main navigation" });
   const practice = nav.getByRole("link", { name: "Practice", exact: true });
   const learn = nav.getByRole("link", { name: "Learn", exact: true });
-  for (const width of [768, 1280]) {
+  for (const width of [1024, 1280]) {
     await page.setViewportSize({ width, height: 800 });
     const bounds = await nav
       .locator('[data-slot="global-nav-links"]')
@@ -215,18 +216,18 @@ test("JavaScript navigation centers the active section on desktop", async ({
     expect(
       Math.abs((bounds?.x ?? 0) + (bounds?.width ?? 0) / 2 - width / 2),
     ).toBeLessThanOrEqual(1);
-    const brand = await nav
-      .locator('[data-slot="global-nav-brand"]')
+    const identity = await nav
+      .locator('[data-slot="subject-identity"]')
       .boundingBox();
     const dashboard = await nav
       .getByRole("link", { name: "Dashboard", exact: true })
       .boundingBox();
-    expect(brand).not.toBeNull();
+    expect(identity).not.toBeNull();
     expect(dashboard).not.toBeNull();
-    expect(dashboard?.x).toBeGreaterThanOrEqual(
-      (brand?.x ?? 0) + (brand?.width ?? 0),
+    expect(identity?.x).toBeGreaterThanOrEqual(
+      (dashboard?.x ?? 0) + (dashboard?.width ?? 0),
     );
-    expect((dashboard?.x ?? 0) + (dashboard?.width ?? 0)).toBeLessThan(
+    expect((identity?.x ?? 0) + (identity?.width ?? 0)).toBeLessThan(
       bounds?.x ?? 0,
     );
   }
@@ -254,12 +255,18 @@ test("JavaScript navigation supports mobile keyboard and route changes", async (
   const nav = page.getByRole("navigation", { name: "Main navigation" });
   const toggle = nav.getByRole("button", { name: /^(Open|Close) navigation$/ });
   const learn = nav.getByRole("link", { name: "Learn", exact: true });
-  await expect(learn).toBeHidden();
+  await expect(learn).toBeVisible();
+  const dashboard = nav.getByRole("link", { name: "Dashboard", exact: true });
+  await dashboard.focus();
+  await page.keyboard.press("Tab");
+  await expect(nav.getByRole("button", { name: "Change theme" })).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(learn).toBeFocused();
   await toggle.focus();
   await page.keyboard.press("Enter");
   await page.keyboard.press("Tab");
   await expect(
-    nav.getByRole("link", { name: "Dashboard", exact: true }),
+    nav.getByRole("link", { name: "Sign in", exact: true }),
   ).toBeFocused();
   await page.keyboard.press("Escape");
   await expect(toggle).toBeFocused();
@@ -275,6 +282,56 @@ test("JavaScript navigation supports mobile keyboard and route changes", async (
     ),
   ).toBe(true);
 });
+
+for (const [subject, label, section] of [
+  ["javascript", "JavaScript", "practice"],
+  ["react", "React", "learn"],
+  ["algorithms", "Algorithms", "practice"],
+] as const) {
+  test(`${label} header keeps the topic and Dashboard visible at every size`, async ({
+    page,
+  }) => {
+    await page.goto(`/${subject}/${section}`);
+    const nav = page.getByRole("navigation", { name: "Main navigation" });
+    const identity = nav.locator('[data-slot="subject-identity"]');
+    await expect(identity.getByText(label, { exact: true })).toBeVisible();
+    await expect(nav.getByRole("link", { name: "Dashboard" })).toHaveCount(1);
+    for (const width of [320, 390, 768, 1024, 1280]) {
+      await page.setViewportSize({ width, height: 800 });
+      await expect(nav.getByRole("link", { name: "Dashboard" })).toBeVisible();
+      await expect(nav.getByRole("link", { name: "Learn" })).toBeVisible();
+      await expect(
+        nav.getByRole("button", { name: "Change theme" }),
+      ).toBeVisible();
+      expect(
+        await identity.evaluate((element) => {
+          const label = element.querySelector("span");
+          return Boolean(label && label.scrollWidth <= label.clientWidth);
+        }),
+      ).toBe(true);
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= innerWidth,
+        ),
+      ).toBe(true);
+      const topic = await identity.boundingBox();
+      const sections = await nav
+        .locator('[data-slot="global-nav-links"]')
+        .boundingBox();
+      if (width < 1024)
+        expect(sections?.y).toBeGreaterThanOrEqual(
+          (topic?.y ?? 0) + (topic?.height ?? 0),
+        );
+      else
+        expect((topic?.x ?? 0) + (topic?.width ?? 0)).toBeLessThan(
+          sections?.x ?? 0,
+        );
+    }
+    await nav.getByRole("link", { name: "Dashboard" }).click();
+    await expect(page).toHaveURL(/\/dashboard$/);
+    await expect(nav.getByRole("link", { name: "Code Atlas" })).toBeVisible();
+  });
+}
 
 test("Next route health works and protected endpoints fail closed", async ({
   request,
@@ -294,12 +351,12 @@ test("Next route health works and protected endpoints fail closed", async ({
 
 for (const { origin, setup, navigationLabel } of [
   {
-    origin: "http://127.0.0.1:3000",
+    origin: "",
     setup: "Authentication setup",
     navigationLabel: "Main navigation",
   },
 ]) {
-  test(`${origin} preserves the chosen theme across pages and reloads`, async ({
+  test(`${origin || "web"} preserves the chosen theme across pages and reloads`, async ({
     page,
   }) => {
     await page.goto(`${origin}/javascript/practice`);
@@ -337,12 +394,12 @@ for (const { origin, setup, navigationLabel } of [
       .click();
     await expect(page).toHaveURL(`${origin}/sign-in`);
     await expect(page.locator("html")).toHaveClass(/light/);
-    await page.goto(origin);
+    await page.goto(origin || "/");
     await expect(page.locator("html")).toHaveClass(/light/);
     await expect(themeButton).toHaveCount(0);
   });
 
-  test(`${origin} follows system appearance and keeps mobile controls accessible`, async ({
+  test(`${origin || "web"} follows system appearance and keeps mobile controls accessible`, async ({
     page,
   }) => {
     await page.emulateMedia({ colorScheme: "light" });
@@ -381,7 +438,7 @@ for (const { origin, setup, navigationLabel } of [
     ).toBe(true);
   });
 
-  test(`${origin} exposes sign-in and sign-up from the navigation`, async ({
+  test(`${origin || "web"} exposes sign-in and sign-up from the navigation`, async ({
     page,
   }) => {
     await page.goto(`${origin}/dashboard`);
@@ -401,7 +458,9 @@ for (const { origin, setup, navigationLabel } of [
     await expect(navigation).toHaveCount(0);
   });
 
-  test(`${origin} resolves nested authentication routes`, async ({ page }) => {
+  test(`${origin || "web"} resolves nested authentication routes`, async ({
+    page,
+  }) => {
     for (const path of [
       "/sign-in/verify-email-address",
       "/sign-up/verify-email-address",

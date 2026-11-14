@@ -15,9 +15,10 @@ from Array, Debounce, and Sleep.
 - The compact table shows a flag beside each title, difficulty, topic, and solved status.
   Easy/Medium/Hard use green/amber/red; category icons have distinct theme colors.
   On narrow screens, topic metadata groups with difficulty without page overflow.
-- Dashboard sits beside Code Atlas with a grid icon. Learn/Practice have book/code
-  icons, centered navigation, and text-only hover states. `/javascript/learn` remains
-  an explicit coming-soon page. Legacy learning URLs redirect to Practice.
+- Subject headers show an arrow + Dashboard link, divider, and topic icon/name.
+  Learn/Practice have book/code icons, centered desktop navigation, and text-only
+  hover states. Mobile keeps Dashboard/topic visible above the section links.
+  Current Learn availability is described in the linked learning brief.
 - Problem routes use Back to Practice and AI/Notes icon toggles instead of the global
   header. A continuous description contains examples, constraints, independent hint
   accordions, and Solution last. No visualization or Submissions view is included.
@@ -109,6 +110,44 @@ The earlier checks below record the browser-local implementation before this mig
 - The web/UI import-graph audit found no remaining orphan modules. `git diff --check`
   passed. Authenticated Playwright remains deferred at the user's request; manual
   signed-in review does not count as authenticated automated coverage. Electron is unverified.
+
+## Shared subject header polish — 2026-11-14
+
+**Before/after:** The Code Atlas/Dashboard group did not identify the current
+subject, and mobile hid Dashboard and the section links behind a disclosure.
+JavaScript, React, and Algorithms now share the approved header: arrow + Dashboard,
+divider, topic icon/name, centered desktop Learn/Practice, and theme/account on the
+right. Below `lg`, section links occupy a visible second row, with the existing
+account disclosure. The three topic symbols are a yellow JS tile, a React atom,
+and an Algorithms branching diagram. Routes/auth remain app-owned; reusable
+layout, technology icons, and semantic accent tokens live in `packages/ui`.
+
+**Acceptance and implementation:**
+
+- [x] One direct `/dashboard` link and the correct full topic name on each subject.
+- [x] Preserve subject-specific section routes, active state and loading feedback;
+  React Practice remains development-only and focused workspaces retain local Back.
+- [x] Keep Dashboard/topic/sections/theme visible without horizontal overflow or
+  truncated topic names from 320px through desktop widths.
+- [x] Preserve account access, keyboard navigation and Escape focus restoration.
+- [x] Record the shared header, icon and color conventions in `ui-registry.md`.
+- [x] Complete final root checks and production smoke verification.
+
+**Verification:** Dedicated-learner signed-in browser review passed for all three
+subjects at 320, 390, 768, 1024 and 1440px. It checked topic identity, full labels,
+no overflow/overlap, account disclosure, Escape focus and Dashboard destinations.
+Light, Dark and Dark purple theme switching passed without browser runtime
+errors. Screenshots are in ignored `outputs/*-header-*.png`.
+
+Root lint, typecheck, `git diff --check`, and a credential-free production build
+passed. `pnpm test --maxWorkers=2` passed all **570 tests across 66 files**; the
+initial unrestricted run had one resource-sensitive judging timeout, resolved by
+the lower-concurrency run. Production Playwright passed **66/66** credential-free
+checks on port 3100 using ignored `outputs/ui-polish-smoke.config.ts`, preserving
+the existing development server on 3000. Existing theme/auth smoke journeys now
+use the configured base URL instead of a hardcoded port. The signed-in browser
+review used the separate dedicated test identity and made no progress edits.
+Packaged Electron remains outside this browser-only change's verification.
 
 ## References
 

@@ -27,8 +27,10 @@ Start with the [README quick start](../README.md#quick-start).
 | `/javascript/learn`                                         | Protected coming-soon page; Learn requirements are deferred                                                     |
 | `/sign-in`, `/sign-up`                                      | Neon Auth catch-all authentication routes; completed authentication redirects to Dashboard                      |
 
-JavaScript catalog and Learn pages use centered Learn/Practice navigation, with Dashboard beside
-Code Atlas for returning to the subject picker. Learn/Practice have book/code icons and text-only hover states. Individual problem pages use a focused workspace
+JavaScript, React and Algorithms catalogs and Learn pages identify the topic with
+an icon and name beside an arrow + Dashboard link. Learn/Practice are centered on
+desktop and remain visible on a second row below 1024px; account controls use the
+existing mobile disclosure. Learn/Practice have book/code icons and text-only hover states. Individual problem pages use a focused workspace
 with Back to Practice and AI/Notes icons. Each icon opens its corresponding tab; clicking the active
 icon closes the tools panel. Legacy `/learn/javascript` URLs redirect to Practice.
 
