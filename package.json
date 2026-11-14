@@ -32,7 +32,8 @@
     "desktop:start": "pnpm --filter @workspace/desktop start",
     "desktop:package": "pnpm --filter @workspace/desktop package",
     "desktop:package:local": "pnpm --filter @workspace/desktop package:local",
-    "desktop:smoke": "pnpm --filter @workspace/desktop smoke"
+    "desktop:smoke": "pnpm --filter @workspace/desktop smoke",
+    "test:e2e:react": "playwright test --config playwright.react.config.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "2.6.6",

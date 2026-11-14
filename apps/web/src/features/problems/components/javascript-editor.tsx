@@ -68,8 +68,18 @@ function appearance(dark: boolean) {
     { dark },
   );
 }
-export default function JavaScriptEditor() {
-  const s = useProblemSession();
+export type CodeEditorSession = Pick<
+  ReturnType<typeof useProblemSession>,
+  "source" | "editorState" | "editorTheme" | "editorCallbacks"
+>;
+
+export function CodeEditor({
+  session: s,
+  typescript = false,
+}: {
+  session: CodeEditorSession;
+  typescript?: boolean;
+}) {
   const { resolvedTheme } = useTheme();
   const host = useRef<HTMLDivElement>(null);
   const view = useRef<EditorView | null>(null);
@@ -90,7 +100,7 @@ export default function JavaScriptEditor() {
           drawSelection(),
           highlightActiveLine(),
           highlightActiveLineGutter(),
-          javascript(),
+          javascript({ typescript, jsx: typescript }),
           indentOnInput(),
           bracketMatching(),
           closeBrackets(),
@@ -113,7 +123,9 @@ export default function JavaScriptEditor() {
             appearance(document.documentElement.matches(".dark, .dark-purple")),
           ),
           EditorView.contentAttributes.of({
-            "aria-label": "JavaScript solution",
+            "aria-label": typescript
+              ? "React TypeScript source"
+              : "JavaScript solution",
             spellcheck: "false",
           }),
           EditorView.updateListener.of((update) => {
@@ -133,7 +145,7 @@ export default function JavaScriptEditor() {
       instance.destroy();
       view.current = null;
     };
-  }, []);
+  }, [typescript]);
   useEffect(() => {
     const instance = view.current;
     const theme = current.current.editorTheme;
@@ -157,7 +169,11 @@ export default function JavaScriptEditor() {
     <div
       ref={host}
       className="h-full min-h-0 min-w-0"
-      data-testid="javascript-editor"
+      data-testid={typescript ? "typescript-editor" : "javascript-editor"}
     />
   );
+}
+
+export default function JavaScriptEditor() {
+  return <CodeEditor session={useProblemSession()} />;
 }

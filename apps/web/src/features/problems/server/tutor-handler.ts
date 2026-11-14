@@ -16,22 +16,37 @@ import {
 
 type Context = { params: Promise<{ problemId: string }> };
 export function createTutorHandler(
-  options: { provider?: TutorProvider; timeout?: number } = {},
+  options: {
+    provider?: TutorProvider;
+    timeout?: number;
+    preparePrompt?: (
+      problemId: string,
+      value: unknown,
+    ) => Promise<Awaited<ReturnType<typeof buildTutorPrompt>> | undefined>;
+  } = {},
 ) {
   const provider = options.provider ?? streamTutor;
   const limiter = createTutorLimiter();
   return async (request: Request, context: Context) => {
     const learner = await requireLearner(request);
     if (learner instanceof Response) return learner;
-    const problem = tutorProblem((await context.params).problemId);
-    if (!problem) return json({ error: "Problem not found." }, 404);
+    const { problemId } = await context.params;
+    const problem = tutorProblem(problemId);
+    if (!problem && !options.preparePrompt)
+      return json({ error: "Problem not found." }, 404);
     let prompt: Awaited<ReturnType<typeof buildTutorPrompt>>;
     try {
-      const input = parseTutorRequest(
-        await readJson(request, TUTOR_LIMITS.body),
-        problem,
-      );
-      prompt = await buildTutorPrompt(problem, input);
+      const value = await readJson(request, TUTOR_LIMITS.body);
+      if (options.preparePrompt) {
+        const prepared = await options.preparePrompt(problemId, value);
+        if (!prepared) return json({ error: "Problem not found." }, 404);
+        prompt = prepared;
+      } else if (problem) {
+        prompt = await buildTutorPrompt(
+          problem,
+          parseTutorRequest(value, problem),
+        );
+      } else return json({ error: "Problem not found." }, 404);
     } catch (error) {
       if (error instanceof Response) return error;
       if (error instanceof TutorInputError)

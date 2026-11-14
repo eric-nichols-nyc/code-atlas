@@ -641,3 +641,31 @@ Valid Anagram uses plain `s` and `t` strings with capitalization, correction, an
 spell checking disabled. Do not trim drafts or substitute a numeric/JSON field.
 Empty text means the empty string; result formatting quotes it and renders both
 boolean values through explicit undefined checks.
+
+## React practice pilot
+
+Files: `features/react-sandbox/components/react-workspace.tsx`,
+`react-workspace.module.css` and `react-practice-catalog.tsx`.
+Last updated: 2026-11-14. Development-only module; production adoption is pending.
+
+Reuse learning-panel headers, shared Badge/Button/Tabs, CodeMirror appearance and
+the existing ProblemTutor. Use three columns for exercise/editor/tutor; place the
+preview beneath the editor and switch the same output region to Console / errors.
+Keep the preview mounted when its tab is hidden so logging and component state
+continue. At 1100px and below, stack in reading order and bound the tutor's height.
+Panels use flow height, internal code overflow, semantic theme tokens and explicit
+error text. Guest preview styles stay inside its separate iframe.
+
+Place the primary Submit action beside Reset code in the editor header. Submit
+renders an immutable source snapshot in a fresh output runtime; edits and Reset
+code leave the last preview in place. Before submission, show a short prompt in
+the output panel. After edits, identify the displayed preview as the last
+submission. Mod-Enter uses the same Submit action. Keep editor and tutor state
+outside the submitted runtime so they survive each submission.
+
+The one-exercise catalog reuses Card, DifficultyBadge, Badge and Button without
+account flag/completion columns. React-local Back returns to React Practice.
+The catalog navigation offers Practice; React Learn remains unavailable. Focused
+workspaces carry their own theme switcher and omit global navigation. Keep visible
+visit-only, preview-only and TypeScript-transpilation copy, and disclose that tutor
+questions include the current draft but no preview/console capture.

@@ -65,6 +65,10 @@ feedback, and improve.**
   Submit, regardless of verdict. Unsaved editor changes remain in memory.
 - **Context-aware AI tutor:** Ask for hints using your current unsaved code and the problem
   context. Requests happen only when you send a question; chat lasts for this visit.
+- **React development pilot:** In development, open React Practice from Dashboard for a
+  Stale Closure Counter exercise with a TypeScript/JSX editor, Submit-based browser
+  preview, console and the existing tutor. Drafts/chat are visit-only. The pilot is
+  unavailable in production; see [its scope and execution limits](docs/features/react-sandbox.md).
 - **Private problem notes:** Write formatted takeaways, lists, code blocks, and links in
   Notes, then select Save to keep them with your account. Unsaved notes last only until
   leaving or reloading the problem.

@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import { expect, it, vi } from "vitest";
+import { afterEach, expect, it, vi } from "vitest";
 
 const state = vi.hoisted(() => ({ path: "/algorithms/learn/two-pointers" }));
 vi.mock("next/navigation", () => ({ usePathname: () => state.path }));
@@ -13,6 +13,8 @@ vi.mock("@workspace/ui/components/theme-switcher", () => ({
 }));
 
 import { SiteNav } from "./site-nav";
+
+afterEach(() => vi.unstubAllEnvs());
 
 it.each(["javascript", "algorithms"])(
   "keeps section links in %s and hides them on focused problems",
@@ -39,3 +41,25 @@ it.each(["javascript", "algorithms"])(
     expect(screen.queryByRole("navigation")).toBeNull();
   },
 );
+
+it("offers only React Practice in development and hides navigation in its workspace", () => {
+  vi.stubEnv("NODE_ENV", "development");
+  state.path = "/react/practice";
+  const view = render(<SiteNav authConfigured={false} />);
+  expect(screen.getByRole("link", { name: "Practice" })).toHaveAttribute(
+    "href",
+    "/react/practice",
+  );
+  expect(screen.queryByRole("link", { name: "Learn" })).toBeNull();
+  state.path = "/react/practice/stale-closure-counter";
+  view.rerender(<SiteNav authConfigured={false} />);
+  expect(screen.queryByRole("navigation")).toBeNull();
+});
+
+it("does not expose React navigation in production", () => {
+  vi.stubEnv("NODE_ENV", "production");
+  state.path = "/react/practice";
+  render(<SiteNav authConfigured={false} />);
+  expect(screen.queryByRole("link", { name: "Practice" })).toBeNull();
+  expect(screen.queryByRole("link", { name: "Learn" })).toBeNull();
+});
