@@ -13,6 +13,7 @@ next-env.d.ts
 .auth/
 .clerk/
 .DS_Store
+.obsidian/
 packages/db/src/generated/
 work/
 outputs/
