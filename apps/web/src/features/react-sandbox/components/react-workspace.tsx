@@ -16,14 +16,15 @@ import {
   TabsTrigger,
 } from "@workspace/ui/components/tabs";
 import { useTheme } from "@workspace/ui/components/theme-provider";
+import { ThemeSwitcher } from "@workspace/ui/components/theme-switcher";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { staleClosureCounter as exercise } from "@/content/react/practice/stale-closure-counter/exercise";
 import { CodeEditor } from "@/features/problems/components/javascript-editor";
 import { ProblemTutor } from "@/features/problems/components/problem-tutor";
 import { parseTutorRequest } from "@/features/problems/lib/problem-tutor-contract";
 import { TutorSession } from "@/features/problems/state/problem-tutor";
-import { reactPrototypeExercise as exercise } from "./exercise";
-import styles from "./sandbox.module.css";
+import styles from "./react-workspace.module.css";
 
 const theme: SandpackTheme = {
   colors: {
@@ -64,7 +65,7 @@ const files = {
 };
 const setup = { dependencies: { react: "19.3.1", "react-dom": "19.3.1" } };
 
-export function ReactSandbox() {
+export function ReactWorkspace() {
   const { resolvedTheme } = useTheme();
   return (
     <div className={styles.host} data-theme={resolvedTheme}>
@@ -102,7 +103,7 @@ function Workspace() {
         readCurrentSource: () => editorState.current?.doc.toString() ?? source,
         validateRequest: (value) => parseTutorRequest(value),
         feedback: () => ({}),
-        endpoint: "/api/react-prototype/tutor",
+        endpoint: `/api/react/exercises/${encodeURIComponent(exercise.id)}/tutor`,
       }}
     >
       <main
@@ -110,15 +111,18 @@ function Workspace() {
         className="mx-auto flex w-full max-w-[1920px] min-w-0 flex-col gap-4 p-3 md:p-5"
       >
         <header className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
+          <div className="flex min-w-0 flex-wrap items-center gap-3">
             <Button asChild variant="ghost" size="sm">
-              <Link href="/dashboard">← Dashboard</Link>
+              <Link href="/react/practice">← Back to React Practice</Link>
             </Button>
-            <Badge variant="secondary">React sandbox prototype</Badge>
+            <Badge variant="secondary">React practice pilot</Badge>
           </div>
-          <p className="text-xs text-muted-foreground">
-            Session draft · no judging or saved progress
-          </p>
+          <div className="flex min-w-0 flex-wrap items-center gap-3">
+            <p className="text-xs text-muted-foreground">
+              Draft and chat last for this visit.
+            </p>
+            <ThemeSwitcher />
+          </div>
         </header>
         <div className={styles.columns}>
           <section
@@ -147,8 +151,10 @@ function Workspace() {
                 the tutor about your current code.
               </p>
               <p className="text-xs leading-5 text-muted-foreground">
-                The hosted CodeSandbox preview receives these example files.
-                Keep credentials out of sandbox code.
+                Submit compiles and renders your code. It does not judge or save
+                progress. TypeScript is transpiled without semantic type
+                checking. The hosted CodeSandbox preview receives the submitted
+                files.
               </p>
             </div>
           </section>
@@ -228,6 +234,10 @@ function Workspace() {
             <header className="learning-panel-header">
               <h2>AI tutor</h2>
             </header>
+            <p className="border-b px-3 py-2 text-xs leading-5 text-muted-foreground">
+              Questions include your current draft. The tutor cannot see the
+              preview or console.
+            </p>
             <div className="min-h-0 flex-1">
               <ProblemTutor />
             </div>
@@ -257,7 +267,20 @@ function SubmittedOutput({ code }: { code: string }) {
 }
 
 function OutputPanels() {
-  const { sandpack } = useSandpack();
+  const { sandpack, listen } = useSandpack();
+  const [ready, setReady] = useState(false);
+  useEffect(
+    () =>
+      listen((message) => {
+        if (message.type === "start") setReady(false);
+        if (
+          message.type === "done" ||
+          (message.type === "action" && message.action === "show-error")
+        )
+          setReady(true);
+      }),
+    [listen],
+  );
   const error = sandpack.error && (
     <p role="alert" className="border-b p-3 text-sm text-destructive">
       {sandpack.error.path ?? "/App.tsx"}: {sandpack.error.message}
@@ -299,10 +322,13 @@ function OutputPanels() {
         role="status"
         className="border-t px-3 py-2 text-xs text-muted-foreground"
       >
-        Preview: {sandpack.status}
         {sandpack.status === "timeout"
-          ? " · Preview service unavailable. Select Submit to retry."
-          : ""}
+          ? "Preview service unavailable. Select Submit to retry."
+          : sandpack.error
+            ? "Preview error. Correct your code and select Submit again."
+            : ready
+              ? "Preview ready."
+              : "Preparing React preview…"}
       </p>
     </>
   );

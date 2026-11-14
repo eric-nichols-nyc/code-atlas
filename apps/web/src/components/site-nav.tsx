@@ -20,6 +20,7 @@ import { usePathname } from "next/navigation";
 import type { ComponentProps } from "react";
 import { createPortal } from "react-dom";
 import { NavAuth } from "@/components/nav-auth";
+import { isReactPilotAvailable } from "@/features/react-sandbox/lib/availability";
 
 function withNavigationStatus(Icon: typeof BookOpenIcon, label: string) {
   return function NavigationIcon(props: ComponentProps<typeof BookOpenIcon>) {
@@ -71,8 +72,18 @@ const items: readonly GlobalNavItem[] = [
   },
 ];
 function subjectItems(
-  subject: "javascript" | "algorithms",
+  subject: "javascript" | "algorithms" | "react",
 ): readonly GlobalNavItem[] {
+  if (subject === "react")
+    return [
+      {
+        id: "practice",
+        label: "Practice",
+        href: "/react/practice",
+        icon: PracticeIcon,
+        appearance: "text",
+      },
+    ];
   return [
     {
       id: "learn",
@@ -93,6 +104,7 @@ function subjectItems(
 const allSectionItems = [
   ...subjectItems("javascript"),
   ...subjectItems("algorithms"),
+  ...subjectItems("react"),
 ];
 function NavLink(props: GlobalNavLinkProps) {
   const label = [...items, ...allSectionItems].find(
@@ -107,11 +119,13 @@ export function SiteNav({ authConfigured }: { authConfigured: boolean }) {
   if (
     pathname === "/" ||
     /^\/sign-(?:in|up)(?:\/|$)/.test(pathname) ||
-    /^\/(?:javascript|algorithms)\/practice\/[^/]+\/?$/.test(pathname)
+    /^\/(?:javascript|algorithms|react)\/practice\/[^/]+\/?$/.test(pathname)
   )
     return null;
-  const subject = (["javascript", "algorithms"] as const).find(
-    (id) => pathname === `/${id}` || pathname.startsWith(`/${id}/`),
+  const subject = (["javascript", "algorithms", "react"] as const).find(
+    (id) =>
+      (id !== "react" || isReactPilotAvailable()) &&
+      (pathname === `/${id}` || pathname.startsWith(`/${id}/`)),
   );
   const navigationItems = subject ? subjectItems(subject) : [];
   const activeItem = [...items, ...navigationItems].find((item) =>

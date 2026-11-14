@@ -2,7 +2,7 @@
 import dynamic from "next/dynamic";
 
 const Sandbox = dynamic(
-  () => import("./sandbox").then((module) => module.ReactSandbox),
+  () => import("./react-workspace").then((module) => module.ReactWorkspace),
   {
     ssr: false,
     loading: () => (
@@ -12,6 +12,6 @@ const Sandbox = dynamic(
     ),
   },
 );
-export function ReactSandboxPrototype() {
+export function ReactWorkspaceClient() {
   return <Sandbox />;
 }

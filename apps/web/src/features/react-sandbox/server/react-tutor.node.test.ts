@@ -1,34 +1,37 @@
 import { beforeEach, expect, it, vi } from "vitest";
+import { staleClosureCounter as exercise } from "@/content/react/practice/stale-closure-counter/exercise";
 import { createTutorHandler } from "@/features/problems/server/tutor-handler";
 import type { TutorProvider } from "@/features/problems/server/tutor-provider";
-import { reactPrototypeExercise as exercise } from "../prototype/exercise";
-import { prepareReactPrototypePrompt } from "./prototype-tutor";
+import { prepareReactTutorPrompt } from "./react-tutor";
 
-const auth = vi.hoisted(() => ({ learner: "react-spike" as string | null }));
+const auth = vi.hoisted(() => ({ learner: "react-pilot" as string | null }));
 vi.mock("@/lib/auth", () => ({ isAuthConfigured: () => true }));
 vi.mock("@/lib/auth/server", () => ({
   getVerifiedUserId: async () => auth.learner,
 }));
 beforeEach(() => {
-  auth.learner = "react-spike";
+  auth.learner = "react-pilot";
 });
 const input = {
   question: "Why is it stuck?",
   code: exercise.starter,
   history: [],
 };
-const request = (body: unknown = input, origin = "http://localhost:3002") =>
-  new Request("http://localhost:3002/api/react-prototype/tutor", {
-    method: "POST",
-    headers: { origin, "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
+const request = (body: unknown = input, origin = "http://localhost:3000") =>
+  new Request(
+    "http://localhost:3000/api/react/exercises/react.stale-closure-counter/tutor",
+    {
+      method: "POST",
+      headers: { origin, "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    },
+  );
 const context = { params: Promise.resolve({ problemId: exercise.id }) };
 
 it("uses authored React context with current TSX and rejects fabricated judge feedback", async () => {
   const code =
     "export default function App() { return <button>Latest edit</button>; }";
-  const prompt = await prepareReactPrototypePrompt(exercise.id, {
+  const prompt = await prepareReactTutorPrompt(exercise.id, {
     ...input,
     code,
   });
@@ -37,15 +40,15 @@ it("uses authored React context with current TSX and rejects fabricated judge fe
   expect(data.current_code).toBe(code);
   expect(data.problem.activeFile).toBe("/App.tsx");
   expect(data.problem.title).toBe(exercise.title);
-  expect(await prepareReactPrototypePrompt("forged", input)).toBeUndefined();
+  expect(await prepareReactTutorPrompt("forged", input)).toBeUndefined();
   await expect(
-    prepareReactPrototypePrompt(exercise.id, { ...input, runFeedback: {} }),
+    prepareReactTutorPrompt(exercise.id, { ...input, runFeedback: {} }),
   ).rejects.toThrow("unavailable");
   await expect(
-    prepareReactPrototypePrompt(exercise.id, { ...input, model: "forged" }),
+    prepareReactTutorPrompt(exercise.id, { ...input, model: "forged" }),
   ).rejects.toThrow();
   await expect(
-    prepareReactPrototypePrompt(exercise.id, {
+    prepareReactTutorPrompt(exercise.id, {
       ...input,
       code: "x".repeat(33000),
     }),
@@ -53,7 +56,7 @@ it("uses authored React context with current TSX and rejects fabricated judge fe
 });
 
 it("retains authentication and origin checks before preparing or streaming a sandbox prompt", async () => {
-  const preparePrompt = vi.fn(prepareReactPrototypePrompt);
+  const preparePrompt = vi.fn(prepareReactTutorPrompt);
   const provider = vi.fn<TutorProvider>(async () =>
     (async function* () {
       yield {
@@ -66,7 +69,7 @@ it("retains authentication and origin checks before preparing or streaming a san
   const post = createTutorHandler({ preparePrompt, provider });
   auth.learner = null;
   expect((await post(request(), context)).status).toBe(401);
-  auth.learner = "react-spike";
+  auth.learner = "react-pilot";
   expect(
     (await post(request(input, "https://foreign.example"), context)).status,
   ).toBe(403);

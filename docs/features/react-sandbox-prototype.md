@@ -1,5 +1,7 @@
 # React sandbox integration prototype
 
+Historical spike: commands and paths below refer to `codex/react-sandbox-spike` in `work/react-sandbox-spike`. The integrated development module is documented in [react-sandbox.md](react-sandbox.md) and runs with root `pnpm dev` at `/react/practice`.
+
 ## Outcome and review
 
 Test whether Sandpack can run a React TypeScript exercise while retaining Code Atlas's CodeMirror editor, shared panels, themes, and existing streaming AI tutor. The first example is **Stale Closure Counter**, based on the supplied layout reference: description left, editor above preview/console in the center, tutor right. Below 1100px the panels stack; the tutor has a bounded scroll area.

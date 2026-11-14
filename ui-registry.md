@@ -642,10 +642,11 @@ spell checking disabled. Do not trim drafts or substitute a numeric/JSON field.
 Empty text means the empty string; result formatting quotes it and renders both
 boolean values through explicit undefined checks.
 
-## React sandbox prototype
+## React practice pilot
 
-Files: `features/react-sandbox/prototype/sandbox.tsx` and `sandbox.module.css`.
-Last updated: 2026-11-14. Experimental branch only; production adoption is pending.
+Files: `features/react-sandbox/components/react-workspace.tsx`,
+`react-workspace.module.css` and `react-practice-catalog.tsx`.
+Last updated: 2026-11-14. Development-only module; production adoption is pending.
 
 Reuse learning-panel headers, shared Badge/Button/Tabs, CodeMirror appearance and
 the existing ProblemTutor. Use three columns for exercise/editor/tutor; place the
@@ -661,3 +662,10 @@ code leave the last preview in place. Before submission, show a short prompt in
 the output panel. After edits, identify the displayed preview as the last
 submission. Mod-Enter uses the same Submit action. Keep editor and tutor state
 outside the submitted runtime so they survive each submission.
+
+The one-exercise catalog reuses Card, DifficultyBadge, Badge and Button without
+account flag/completion columns. React-local Back returns to React Practice.
+The catalog navigation offers Practice; React Learn remains unavailable. Focused
+workspaces carry their own theme switcher and omit global navigation. Keep visible
+visit-only, preview-only and TypeScript-transpilation copy, and disclose that tutor
+questions include the current draft but no preview/console capture.

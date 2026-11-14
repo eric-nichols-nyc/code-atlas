@@ -1,6 +1,9 @@
-// Throwaway integration spike: not a published or judged practice problem.
-export const reactPrototypeExercise = {
-  id: "react.prototype.stale-closure-counter",
+// Trusted public authoring for the development-only React preview exercise.
+export const staleClosureCounter = {
+  id: "react.stale-closure-counter",
+  slug: "stale-closure-counter",
+  difficulty: "Medium",
+  topic: "Hooks",
   title: "Stale Closure Counter",
   statement:
     "Fix a React TypeScript counter that gets stuck at 1. It should increase by 1 every second, using one interval that is cleaned up on unmount. Explain why the interval sees stale state.",

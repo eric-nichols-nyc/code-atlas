@@ -87,30 +87,31 @@ second application, token-forwarding origin or CORS configuration.
 
 Root `package.json` is the source of truth for scripts.
 
-| Command                                       | Purpose                                                                      |
-| --------------------------------------------- | ---------------------------------------------------------------------------- |
-| `pnpm dev`                                    | Build shared dependencies/worker and run Next.js development                 |
-| `pnpm build` / `pnpm start`                   | Build all workspaces / start production servers after building               |
-| `pnpm lint` / `pnpm lint:fix`                 | Biome checks / safe fixes                                                    |
-| `pnpm format`                                 | Format supported files                                                       |
-| `pnpm typecheck`                              | Root and workspace TypeScript checks                                         |
-| `pnpm test` / `pnpm test:watch`               | Build shared packages/worker and run Vitest / watch                          |
-| `pnpm test:coverage`                          | Build shared packages/worker and run Vitest coverage                         |
-| `pnpm test:e2e` / `pnpm test:e2e:ui`          | Credential-free production Playwright smoke tests / test UI                  |
-| `pnpm test:e2e:auth`                          | Optional authenticated suite with a dedicated Neon Auth development identity |
-| `pnpm test:e2e:desktop:auth`                  | Authenticated Electron Run/Submit, full quit and account restore             |
-| `pnpm --filter @workspace/web content:check`  | Validate the current practice catalog and public definitions                 |
-| `pnpm --filter @workspace/web worker:build`   | Compile the isolated worker/adapters to ignored `.workers/`                  |
-| `pnpm analyze`                                | Webpack bundle-analysis build for the web app                                |
-| `pnpm db:generate`                            | Generate Prisma Client without connecting to a database                      |
-| `pnpm db:migrate --name <name>`               | Create/apply a development migration once models and credentials exist       |
-| `pnpm db:deploy` / `pnpm db:studio`           | Apply committed migrations / open Prisma Studio                              |
-| `pnpm specify version` / `pnpm specify check` | Inspect the optional pinned Spec Kit CLI and available tools                 |
-| `pnpm desktop:dev`                            | Start/reuse the local web server and open Electron                           |
-| `pnpm desktop:build` / `pnpm desktop:start`   | Compile desktop TypeScript / open against an already running server          |
-| `pnpm desktop:package:local`                  | Package an unsigned local-server app for this OS/architecture                |
-| `pnpm desktop:package`                        | Package for the configured hosted HTTPS origin                               |
-| `pnpm desktop:smoke`                          | Native renderer, navigation, session and connection-retry checks             |
+| Command                                       | Purpose                                                                           |
+| --------------------------------------------- | --------------------------------------------------------------------------------- |
+| `pnpm dev`                                    | Build shared dependencies/worker and run Next.js development                      |
+| `pnpm build` / `pnpm start`                   | Build all workspaces / start production servers after building                    |
+| `pnpm lint` / `pnpm lint:fix`                 | Biome checks / safe fixes                                                         |
+| `pnpm format`                                 | Format supported files                                                            |
+| `pnpm typecheck`                              | Root and workspace TypeScript checks                                              |
+| `pnpm test` / `pnpm test:watch`               | Build shared packages/worker and run Vitest / watch                               |
+| `pnpm test:coverage`                          | Build shared packages/worker and run Vitest coverage                              |
+| `pnpm test:e2e` / `pnpm test:e2e:ui`          | Credential-free production Playwright smoke tests / test UI                       |
+| `pnpm test:e2e:auth`                          | Optional authenticated suite with a dedicated Neon Auth development identity      |
+| `pnpm test:e2e:react`                         | Online React development-pilot journeys with dedicated test auth and mocked tutor |
+| `pnpm test:e2e:desktop:auth`                  | Authenticated Electron Run/Submit, full quit and account restore                  |
+| `pnpm --filter @workspace/web content:check`  | Validate the current practice catalog and public definitions                      |
+| `pnpm --filter @workspace/web worker:build`   | Compile the isolated worker/adapters to ignored `.workers/`                       |
+| `pnpm analyze`                                | Webpack bundle-analysis build for the web app                                     |
+| `pnpm db:generate`                            | Generate Prisma Client without connecting to a database                           |
+| `pnpm db:migrate --name <name>`               | Create/apply a development migration once models and credentials exist            |
+| `pnpm db:deploy` / `pnpm db:studio`           | Apply committed migrations / open Prisma Studio                                   |
+| `pnpm specify version` / `pnpm specify check` | Inspect the optional pinned Spec Kit CLI and available tools                      |
+| `pnpm desktop:dev`                            | Start/reuse the local web server and open Electron                                |
+| `pnpm desktop:build` / `pnpm desktop:start`   | Compile desktop TypeScript / open against an already running server               |
+| `pnpm desktop:package:local`                  | Package an unsigned local-server app for this OS/architecture                     |
+| `pnpm desktop:package`                        | Package for the configured hosted HTTPS origin                                    |
+| `pnpm desktop:smoke`                          | Native renderer, navigation, session and connection-retry checks                  |
 
 ## Where the code lives
 

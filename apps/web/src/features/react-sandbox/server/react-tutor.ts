@@ -1,4 +1,5 @@
 import "server-only";
+import { staleClosureCounter as exercise } from "@/content/react/practice/stale-closure-counter/exercise";
 import {
   parseTutorRequest,
   TUTOR_LIMITS,
@@ -9,9 +10,8 @@ import {
   TUTOR_INSTRUCTIONS,
   type TutorPrompt,
 } from "@/features/problems/server/tutor-context";
-import { reactPrototypeExercise as exercise } from "../prototype/exercise";
 
-export async function prepareReactPrototypePrompt(
+export async function prepareReactTutorPrompt(
   id: string,
   value: unknown,
 ): Promise<TutorPrompt | undefined> {

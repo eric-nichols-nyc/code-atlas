@@ -27,9 +27,6 @@
   }
 }
 @media (max-width: 640px) {
-  .tutor {
-    height: 846px;
-  }
   .editor {
     flex: none;
     height: 340px;
