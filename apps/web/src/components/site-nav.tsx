@@ -2,17 +2,24 @@
 
 import { Badge } from "@workspace/ui/components/badge";
 import { BrandIcon } from "@workspace/ui/components/brand-icon";
+import { Button } from "@workspace/ui/components/button";
 import {
   GlobalNav,
   type GlobalNavItem,
   type GlobalNavLinkProps,
 } from "@workspace/ui/components/global-nav";
 import {
+  ArrowLeftIcon,
   BookOpenIcon,
   CodeXmlIcon,
   LayoutDashboardIcon,
   LoaderCircleIcon,
+  WorkflowIcon,
 } from "@workspace/ui/components/icons";
+import {
+  JavaScriptIcon,
+  ReactIcon,
+} from "@workspace/ui/components/technology-icons";
 import { ThemeSwitcher } from "@workspace/ui/components/theme-switcher";
 import { cn } from "@workspace/ui/lib/utils";
 import Link, { useLinkStatus } from "next/link";
@@ -60,8 +67,18 @@ function withNavigationStatus(Icon: typeof BookOpenIcon, label: string) {
 }
 
 const DashboardIcon = withNavigationStatus(LayoutDashboardIcon, "Dashboard");
+const BackIcon = withNavigationStatus(ArrowLeftIcon, "Dashboard");
 const LearnIcon = withNavigationStatus(BookOpenIcon, "Learn");
 const PracticeIcon = withNavigationStatus(CodeXmlIcon, "Practice");
+const subjectIdentity = {
+  javascript: { label: "JavaScript", icon: JavaScriptIcon, className: "" },
+  react: { label: "React", icon: ReactIcon, className: "" },
+  algorithms: {
+    label: "Algorithms",
+    icon: WorkflowIcon,
+    className: "text-brand-algorithms",
+  },
+} as const;
 
 const items: readonly GlobalNavItem[] = [
   {
@@ -118,6 +135,8 @@ export function SiteNav({ authConfigured }: { authConfigured: boolean }) {
     (id) => pathname === `/${id}` || pathname.startsWith(`/${id}/`),
   );
   const navigationItems = subject ? subjectItems(subject) : [];
+  const identity = subject ? subjectIdentity[subject] : undefined;
+  const SubjectIcon = identity?.icon;
   const activeItem = [...items, ...navigationItems].find((item) =>
     item.href === "/"
       ? pathname === "/"
@@ -126,16 +145,44 @@ export function SiteNav({ authConfigured }: { authConfigured: boolean }) {
 
   return (
     <GlobalNav
+      key={subject ?? "application"}
       className="sticky top-0 z-40"
       brand={
-        <Link href="/" className="inline-flex max-w-full items-center gap-2">
-          <BrandIcon className="size-5 shrink-0" />
-          <span className="truncate">Code Atlas</span>
-        </Link>
+        identity && SubjectIcon ? (
+          <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+            <Button
+              asChild
+              variant="navigation"
+              size="sm"
+              className="min-h-11 lg:min-h-9"
+            >
+              <NavLink href="/dashboard">
+                <BackIcon aria-hidden="true" data-icon="inline-start" />
+                Dashboard
+              </NavLink>
+            </Button>
+            <span
+              data-slot="subject-identity"
+              className="inline-flex min-w-0 items-center gap-2 border-s pl-3 text-sm"
+            >
+              <SubjectIcon
+                aria-hidden="true"
+                className={cn("size-5 shrink-0", identity.className)}
+              />
+              <span className="truncate">{identity.label}</span>
+            </span>
+          </div>
+        ) : (
+          <Link href="/" className="inline-flex max-w-full items-center gap-2">
+            <BrandIcon className="size-5 shrink-0" />
+            <span className="truncate">Code Atlas</span>
+          </Link>
+        )
       }
       items={navigationItems}
-      leadingItems={items}
+      leadingItems={subject ? [] : items}
       itemsAlign={subject ? "center" : "start"}
+      mobileSections={Boolean(subject)}
       activeItemId={activeItem?.id}
       containerClassName="max-w-none"
       linkComponent={NavLink}

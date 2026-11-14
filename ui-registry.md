@@ -55,7 +55,7 @@ primitives were removed; add shared primitives through shadcn when a feature nee
 ## Global navigation
 
 Files: `packages/ui/src/components/global-nav.tsx`, `packages/ui/src/components/brand-icon.tsx`, and each app's `site-nav.tsx`.
-Last updated: 2026-11-09.
+Last updated: 2026-11-14.
 
 | Property         | Pattern                                              |
 | ---------------- | ---------------------------------------------------- |
@@ -79,6 +79,13 @@ Consumers may supply `containerClassName` for the inner navigation width. The we
 The web header uses `sticky top-0 z-40` to stay visible during document scrolling. Its opaque `bg-background` keeps content readable beneath it; shared menus and dialogs retain their overlay stacking.
 
 On desktop, utilities sit immediately before the account actions, placing the theme switcher to the left of the avatar. Mobile retains an always-visible utility control beside the navigation disclosure. Responsive utility instances are mutually hidden so only one is visible and keyboard-reachable at a time.
+
+Consumers may opt into `mobileSections` for persistent section links. This layout
+uses a compact two-row grid below `lg`: consumer branding/context and utilities
+on the first row, section links and the account disclosure on the second. Section
+links stay outside the disclosure and use 44px minimum targets. At `lg`, links
+are centered between equal side columns, with utilities/account actions on the
+right. The default layout retains its existing `md` disclosure behavior.
 
 ## Authentication and account controls
 
@@ -214,26 +221,33 @@ The problem description is continuous, with no left-panel tabs or Submissions vi
 
 Feature CSS in `apps/web/src/app/globals.css` owns viewport containment and editor layout; shared primitives/tokens remain in UI. Split mode contains document scrolling; route exit removes the root mode attribute and restores ordinary scrolling. Sheets disable animation for reduced-motion preferences.
 
-## JavaScript sections and practice navigation
+## Subject headers and section navigation
 
 Files: `apps/web/src/components/site-nav.tsx`, `packages/ui/src/components/global-nav.tsx`,
+`packages/ui/src/components/technology-icons.tsx`,
 `apps/web/src/features/catalog/components/javascript-practice.tsx`,
 `apps/web/src/app/javascript/learn/page.tsx`, and the practice workspace toolbar.
-Last updated: 2026-11-09.
+Last updated: 2026-11-14.
 
-| Property          | Pattern                                                                                                                                |
-| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| Section links     | GlobalNav text appearance with decorative book/code icons; active text and `aria-current="page"`, no hover background                  |
-| Link spacing      | Existing `gap-1`; centered as one group on desktop                                                                                     |
-| Header appearance | Existing background/border, Button text/focus states and `px-6 py-3`; no new colors, shadow or decoration                              |
-| Placement         | `itemsAlign="center"` uses equal side columns; brand and Dashboard left, section links at the viewport center, utilities/account right |
-| Mobile            | Existing disclosure in document flow; Escape restores focus, selecting a route closes the menu                                         |
-| Availability      | Learn opens a module catalog with a Two Pointers preview; Interview remains deferred                                                   |
+| Property          | Pattern                                                                                                                           |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| Section links     | GlobalNav text appearance with decorative book/code icons; active text and `aria-current="page"`, no hover background             |
+| Link spacing      | Existing `gap-1`; centered as one group on desktop                                                                                |
+| Header appearance | Shared background/bottom border, navigation Button text/focus states, no shadow; `px-4 py-3`, `md:px-6`                           |
+| Context           | Arrow + Dashboard navigation Button (`sm`, 44px minimum below `lg`), then a `border-s pl-3` divider and topic icon + full name    |
+| Topic identity    | `text-sm font-semibold`, `gap-2`, decorative `size-5` icon; yellow JS tile, React atom, Algorithms Workflow icon                  |
+| Placement         | `mobileSections` centers section links at `lg`; Dashboard/topic left, theme/account right                                         |
+| Mobile            | Dashboard/topic/theme remain visible on the first row; Learn/Practice and account disclosure on the second; Escape restores focus |
+| Topic accents     | Shared `brand-javascript`/foreground, `brand-react`, and `brand-algorithms` tokens; no inline page colors                         |
+| Availability      | Learn opens a module catalog with a Two Pointers preview; Interview remains deferred                                              |
 
-For `/javascript` and descendants, the app supplies Learn / Practice as centered section links and Dashboard as a
-leading link beside Code Atlas. Problem routes `/javascript/practice/<problem>` omit the global header and use a compact Back link to Practice. Other
-routes retain Dashboard navigation. Keep JavaScript routes and auth decisions outside
-the shared UI package. The page body does not duplicate section links.
+For JavaScript, React, and Algorithms routes with global navigation, the app
+supplies one explicit Dashboard link and the current topic identity instead of
+the Code Atlas brand group. Learn / Practice stay within the subject; React
+Practice remains development-only. Focused practice routes omit this header and
+use their existing subject-local Back link. Other app routes retain the compass
+and Code Atlas brand. Keep route/topic/auth decisions outside the shared UI
+package. The page body does not duplicate section links.
 
 JavaScript owns `/javascript/practice` and `/javascript/learn`; `/javascript` opens Practice.
 Practice lists coding problems only; problem rows open canonical
@@ -242,10 +256,13 @@ breadcrumbs are removed; the Back link returns to Practice.
 Keep route navigation as semantic links, not state-only tabs. Preserve the shared theme
 and responsive workspace behavior. Old `/learn/javascript` links redirect to Practice.
 
-Dashboard is application-level navigation through the generic `leadingItems` prop.
-It remains available outside JavaScript for selecting subjects. On mobile, leading
-links appear first in the disclosure; only one responsive instance is visible at a time.
-Learn and Practice remain subject-level links, and page headings identify the current area.
+Outside subject routes, Dashboard remains application-level navigation through
+the generic `leadingItems` prop. Subject routes supply their always-visible Back
+link through consumer-owned brand content. Crossing between a subject and the
+Dashboard resets the disclosure. Topic names remain visible alongside icons;
+color and symbols alone never identify the current subject. The theme-aware
+React mark uses darker cyan on Light; Algorithms uses violet/lavender across the
+three themes. The yellow JS tile retains its dark monogram in every theme.
 
 ## Practice catalog categories
 

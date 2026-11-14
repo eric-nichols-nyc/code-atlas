@@ -16,6 +16,40 @@ import { SiteNav } from "./site-nav";
 
 afterEach(() => vi.unstubAllEnvs());
 
+it.each([
+  ["javascript", "JavaScript"],
+  ["react", "React"],
+  ["algorithms", "Algorithms"],
+])("identifies %s and provides one direct Dashboard link", (subject, label) => {
+  vi.stubEnv("NODE_ENV", "development");
+  state.path = `/${subject}/learn`;
+  const view = render(<SiteNav authConfigured={false} />);
+  expect(screen.getByText(label, { exact: true })).toBeInTheDocument();
+  expect(screen.getAllByRole("link", { name: "Dashboard" })).toHaveLength(1);
+  expect(screen.getByRole("link", { name: "Dashboard" })).toHaveAttribute(
+    "href",
+    "/dashboard",
+  );
+  expect(screen.queryByRole("link", { name: "Code Atlas" })).toBeNull();
+  state.path = `/${subject}/practice`;
+  view.rerender(<SiteNav authConfigured={false} />);
+  expect(screen.getByText(label, { exact: true })).toBeInTheDocument();
+  expect(screen.getByRole("link", { name: "Practice" })).toHaveAttribute(
+    "aria-current",
+    "page",
+  );
+  fireEvent.click(screen.getByRole("button", { name: "Open navigation" }));
+  state.path = "/dashboard";
+  view.rerender(<SiteNav authConfigured={false} />);
+  expect(screen.getByRole("link", { name: "Code Atlas" })).toHaveAttribute(
+    "href",
+    "/",
+  );
+  expect(
+    screen.getByRole("button", { name: "Open navigation" }),
+  ).toHaveAttribute("aria-expanded", "false");
+});
+
 it.each(["javascript", "algorithms"])(
   "keeps section links in %s and hides them on focused problems",
   (subject) => {

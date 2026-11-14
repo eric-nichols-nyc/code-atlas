@@ -71,4 +71,30 @@ describe("GlobalNav", () => {
     expect(screen.getByRole("navigation")).toHaveTextContent("Example");
     expect(screen.queryByRole("button")).toBeNull();
   });
+
+  it("keeps section links outside the account disclosure", () => {
+    render(
+      createElement(GlobalNav, {
+        brand: "Example topic",
+        items,
+        mobileSections: true,
+        actions: createElement("button", { type: "button" }, "Account"),
+      }),
+    );
+    const toggle = screen.getByRole("button", { name: "Open navigation" });
+    const disclosure = document.getElementById(
+      toggle.getAttribute("aria-controls") ?? "",
+    );
+    const home = screen.getByRole("link", { name: "Home" });
+    expect(disclosure).not.toContainElement(home);
+    expect(disclosure).toContainElement(
+      screen.getByRole("button", { name: "Account" }),
+    );
+    fireEvent.click(toggle);
+    fireEvent.click(home);
+    expect(toggle).toHaveAttribute("aria-expanded", "false");
+    fireEvent.click(toggle);
+    fireEvent.keyDown(home, { key: "Escape" });
+    expect(toggle).toHaveFocus();
+  });
 });
