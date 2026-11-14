@@ -17,7 +17,7 @@ import {
 } from "@workspace/ui/components/tabs";
 import { useTheme } from "@workspace/ui/components/theme-provider";
 import Link from "next/link";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { CodeEditor } from "@/features/problems/components/javascript-editor";
 import { ProblemTutor } from "@/features/problems/components/problem-tutor";
 import { parseTutorRequest } from "@/features/problems/lib/problem-tutor-contract";
@@ -68,56 +68,31 @@ export function ReactSandbox() {
   const { resolvedTheme } = useTheme();
   return (
     <div className={styles.host} data-theme={resolvedTheme}>
-      <SandpackProvider
-        template="react-ts"
-        theme={theme}
-        customSetup={setup}
-        files={files}
-        options={{
-          activeFile: "/App.tsx",
-          visibleFiles: ["/App.tsx"],
-          initMode: "immediate",
-          autorun: false,
-          recompileMode: "delayed",
-          recompileDelay: 350,
-          bundlerTimeOut: 30000,
-        }}
-      >
-        <Workspace />
-      </SandpackProvider>
+      <Workspace />
     </div>
   );
 }
 
 function Workspace() {
-  const { sandpack, dispatch } = useSandpack();
-  const currentSandpack = useRef(sandpack);
-  currentSandpack.current = sandpack;
-  useEffect(() => {
-    // Defer startup until React's development effect replay has settled. Sandpack
-    // 2.20 can otherwise create overlapping clients for the same iframe.
-    const timer = setTimeout(
-      () => void currentSandpack.current.runSandpack(),
-      0,
-    );
-    return () => clearTimeout(timer);
-  }, []);
-  const source = sandpack.files["/App.tsx"]?.code ?? exercise.starter;
+  const [source, setSource] = useState(exercise.starter);
+  const [submission, setSubmission] = useState<{
+    code: string;
+    revision: number;
+  } | null>(null);
   const editorState = useRef<EditorState | null>(null);
   const editorTheme = useRef<Compartment | null>(null);
   const editorCallbacks = useRef<{
     setSource: (source: string) => void;
     run: () => void;
   } | null>(null);
-  const restart = () => {
-    if (sandpack.status === "timeout" || sandpack.status === "idle")
-      void sandpack.runSandpack();
-    else dispatch({ type: "refresh" });
+  const submit = () => {
+    const code = editorState.current?.doc.toString() ?? source;
+    setSubmission((previous) => ({
+      code,
+      revision: (previous?.revision ?? 0) + 1,
+    }));
   };
-  editorCallbacks.current = {
-    setSource: (value) => sandpack.updateFile("/App.tsx", value),
-    run: restart,
-  };
+  editorCallbacks.current = { setSource, run: submit };
   return (
     <TutorSession
       key={exercise.id}
@@ -168,8 +143,8 @@ function Workspace() {
                 ))}
               </ul>
               <p className="text-xs leading-5 text-muted-foreground">
-                Edit App.tsx to try a fix. The preview updates after a short
-                pause. Ask the tutor about your current code.
+                Edit App.tsx to try a fix, then select Submit to render it. Ask
+                the tutor about your current code.
               </p>
               <p className="text-xs leading-5 text-muted-foreground">
                 The hosted CodeSandbox preview receives these example files.
@@ -189,13 +164,18 @@ function Workspace() {
                     App.tsx · TypeScript
                   </span>
                 </h2>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => sandpack.resetFile("/App.tsx")}
-                >
-                  Reset code
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setSource(exercise.starter)}
+                  >
+                    Reset code
+                  </Button>
+                  <Button size="sm" onClick={submit}>
+                    Submit
+                  </Button>
+                </div>
               </header>
               <div className={styles.editor}>
                 <CodeEditor
@@ -210,69 +190,34 @@ function Workspace() {
               </div>
               <p className="border-t px-3 py-2 text-xs text-muted-foreground">
                 {source.length} characters · Tab moves focus out · Mod-Enter
-                restarts preview
+                submits
               </p>
             </section>
             <section className="learning-panel" aria-label="React output">
-              <Tabs defaultValue="preview" className="gap-0">
-                <div className="learning-panel-header justify-between">
-                  <TabsList variant="line">
-                    <TabsTrigger value="preview">Preview</TabsTrigger>
-                    <TabsTrigger value="console">Console / errors</TabsTrigger>
-                  </TabsList>
-                  <Button variant="ghost" size="sm" onClick={restart}>
-                    Restart
-                  </Button>
-                </div>
-                <TabsContent
-                  value="preview"
-                  forceMount
-                  className="data-[state=inactive]:hidden"
-                >
-                  {sandpack.error && (
-                    <p
-                      role="alert"
-                      className="border-b p-3 text-sm text-destructive"
-                    >
-                      {sandpack.error.path ?? "/App.tsx"}:{" "}
-                      {sandpack.error.message}
-                    </p>
-                  )}
-                  <Preview />
-                </TabsContent>
-                <TabsContent
-                  value="console"
-                  forceMount
-                  className="data-[state=inactive]:hidden"
-                >
-                  {sandpack.error && (
-                    <p
-                      role="alert"
-                      className="border-b p-3 text-sm text-destructive"
-                    >
-                      {sandpack.error.path ?? "/App.tsx"}:{" "}
-                      {sandpack.error.message}
-                    </p>
-                  )}
-                  <SandpackConsole
-                    showSyntaxError
-                    resetOnPreviewRestart
-                    showRestartButton={false}
-                    showHeader
-                    maxMessageCount={100}
-                    style={{ height: 300 }}
-                  />
-                </TabsContent>
-              </Tabs>
+              {submission ? (
+                <SubmittedOutput
+                  key={submission.revision}
+                  code={submission.code}
+                />
+              ) : (
+                <>
+                  <header className="learning-panel-header">
+                    <h2>Preview</h2>
+                  </header>
+                  <div className="flex h-[300px] items-center justify-center p-6 text-center text-sm text-muted-foreground">
+                    Submit your code to render the React preview.
+                  </div>
+                </>
+              )}
               <p
                 role="status"
                 className="border-t px-3 py-2 text-xs text-muted-foreground"
               >
-                Preview: {sandpack.status}
-                {sandpack.status === "timeout"
-                  ? " · Preview service unavailable. Use Restart to retry."
-                  : ""}
-                {sandpack.error ? ` · ${sandpack.error.message}` : ""}
+                {!submission
+                  ? "Ready to submit."
+                  : source !== submission.code
+                    ? "Code changed since last submission. Select Submit to update the preview."
+                    : "Showing submitted code."}
               </p>
             </section>
           </div>
@@ -293,33 +238,87 @@ function Workspace() {
   );
 }
 
+function SubmittedOutput({ code }: { code: string }) {
+  const submittedFiles = useMemo(
+    () => ({ ...files, "/App.tsx": code }),
+    [code],
+  );
+  return (
+    <SandpackProvider
+      template="react-ts"
+      theme={theme}
+      customSetup={setup}
+      files={submittedFiles}
+      options={{ initMode: "immediate", autorun: false, bundlerTimeOut: 30000 }}
+    >
+      <OutputPanels />
+    </SandpackProvider>
+  );
+}
+
+function OutputPanels() {
+  const { sandpack } = useSandpack();
+  const error = sandpack.error && (
+    <p role="alert" className="border-b p-3 text-sm text-destructive">
+      {sandpack.error.path ?? "/App.tsx"}: {sandpack.error.message}
+    </p>
+  );
+  return (
+    <>
+      <Tabs defaultValue="preview" className="gap-0">
+        <div className="learning-panel-header">
+          <TabsList variant="line">
+            <TabsTrigger value="preview">Preview</TabsTrigger>
+            <TabsTrigger value="console">Console / errors</TabsTrigger>
+          </TabsList>
+        </div>
+        <TabsContent
+          value="preview"
+          forceMount
+          className="data-[state=inactive]:hidden"
+        >
+          {error}
+          <Preview />
+        </TabsContent>
+        <TabsContent
+          value="console"
+          forceMount
+          className="data-[state=inactive]:hidden"
+        >
+          {error}
+          <SandpackConsole
+            showSyntaxError
+            showRestartButton={false}
+            showHeader
+            maxMessageCount={100}
+            style={{ height: 300 }}
+          />
+        </TabsContent>
+      </Tabs>
+      <p
+        role="status"
+        className="border-t px-3 py-2 text-xs text-muted-foreground"
+      >
+        Preview: {sandpack.status}
+        {sandpack.status === "timeout"
+          ? " · Preview service unavailable. Select Submit to retry."
+          : ""}
+      </p>
+    </>
+  );
+}
+
 function Preview() {
   const runtime = useSandpackClient();
   const current = useRef(runtime);
   current.current = runtime;
   useEffect(() => {
-    let timer: ReturnType<typeof setTimeout>;
-    const unsubscribe = current.current.listen((message) => {
-      if (message.type !== "done") return;
-      // Sandpack skips file updates while compiling. Flush a newer edit after
-      // completion instead of leaving the preview on the previous source.
-      timer = setTimeout(() => {
-        const { sandpack, getClient } = current.current;
-        const client = getClient();
-        if (
-          client?.sandboxSetup.files["/App.tsx"]?.code !==
-          sandpack.files["/App.tsx"]?.code
-        )
-          client?.updateSandbox({
-            files: sandpack.files,
-            template: sandpack.environment,
-          });
-      }, 0);
-    });
-    return () => {
-      unsubscribe();
-      clearTimeout(timer);
-    };
+    // Start only this submitted snapshot, after development effect replay settles.
+    const timer = setTimeout(
+      () => void current.current.sandpack.runSandpack(),
+      0,
+    );
+    return () => clearTimeout(timer);
   }, []);
   return (
     <iframe

@@ -9,8 +9,7 @@ export const reactPrototypeExercise = {
     "Keep one interval; clean it up on unmount.",
     "Explain what the effect's callback captures.",
   ],
-  starter: `// @refresh reset
-import { useEffect, useState } from "react";
+  starter: `import { useEffect, useState } from "react";
 import "./styles.css";
 
 export default function App() {
