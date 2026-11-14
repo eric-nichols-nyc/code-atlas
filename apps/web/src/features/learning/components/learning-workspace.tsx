@@ -26,11 +26,13 @@ export function LearningWorkspace({
   code,
   output,
   notes,
+  tutor,
 }: {
   lesson: ReactNode;
   code: ReactNode;
   output?: ReactNode;
   notes?: ReactNode;
+  tutor?: ReactNode;
 }) {
   const layout = useWorkspaceLayout();
   const tools = useWorkspaceTools();
@@ -112,7 +114,7 @@ export function LearningWorkspace({
             tutor={
               docked && tutorOpen ? (
                 <div id="lesson-tutor" className="h-full">
-                  <TutorPanel notes={notes} />
+                  <TutorPanel notes={notes} tutor={tutor} />
                 </div>
               ) : undefined
             }
@@ -136,11 +138,12 @@ export function LearningWorkspace({
             <SheetHeader>
               <SheetTitle>Learning tools</SheetTitle>
               <SheetDescription>
-                Keep private notes for this problem. AI tutoring is coming soon.
+                Ask about your current code or keep private notes for this
+                problem.
               </SheetDescription>
             </SheetHeader>
             <div className="min-h-0 flex-1 px-4 pb-4">
-              <TutorPanel notes={notes} />
+              <TutorPanel notes={notes} tutor={tutor} />
             </div>
           </SheetContent>
         </Sheet>

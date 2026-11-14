@@ -30,7 +30,7 @@ export default defineConfig({
     { name: "auth-setup", testMatch: /auth\.setup\.ts/ },
     {
       name: "authenticated-chromium",
-      testMatch: /learning\.spec\.ts/,
+      testMatch: /(learning|tutor)\.spec\.ts/,
       dependencies: ["auth-setup"],
       use: { ...devices["Desktop Chrome"], storageState: ".auth/learner.json" },
     },

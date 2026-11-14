@@ -28,10 +28,12 @@
     "@workspace/problems": "workspace:*",
     "@workspace/ui": "workspace:*",
     "next": "16.4.5",
+    "openai": "^7.56.0",
     "quickjs-emscripten": "0.32.0",
     "quill": "2.0.3",
     "react": "19.3.1",
     "react-dom": "19.3.1",
+    "react-markdown": "^10.1.0",
     "server-only": "0.0.1"
   },
   "devDependencies": {
