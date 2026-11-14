@@ -654,3 +654,10 @@ Keep the preview mounted when its tab is hidden so logging and component state
 continue. At 1100px and below, stack in reading order and bound the tutor's height.
 Panels use flow height, internal code overflow, semantic theme tokens and explicit
 error text. Guest preview styles stay inside its separate iframe.
+
+Place the primary Submit action beside Reset code in the editor header. Submit
+renders an immutable source snapshot in a fresh output runtime; edits and Reset
+code leave the last preview in place. Before submission, show a short prompt in
+the output panel. After edits, identify the displayed preview as the last
+submission. Mod-Enter uses the same Submit action. Keep editor and tutor state
+outside the submitted runtime so they survive each submission.
