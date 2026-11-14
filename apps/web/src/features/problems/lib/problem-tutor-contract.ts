@@ -108,7 +108,7 @@ function diagnosticValue(value: unknown, depth = 0): boolean {
 
 export function parseTutorRequest(
   value: unknown,
-  problem: ProblemDefinition,
+  problem?: ProblemDefinition,
 ): TutorRequest {
   if (
     !isObject(value) ||
@@ -161,6 +161,10 @@ export function parseTutorRequest(
     throw new TutorInputError("Invalid tutor context status.");
   let runFeedback: TutorRunFeedback | undefined;
   if (value.runFeedback !== undefined) {
+    if (!problem)
+      throw new TutorInputError(
+        "Run feedback is unavailable for this sandbox.",
+      );
     const feedback = value.runFeedback;
     if (
       !isObject(feedback) ||

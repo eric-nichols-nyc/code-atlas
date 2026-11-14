@@ -641,3 +641,16 @@ Valid Anagram uses plain `s` and `t` strings with capitalization, correction, an
 spell checking disabled. Do not trim drafts or substitute a numeric/JSON field.
 Empty text means the empty string; result formatting quotes it and renders both
 boolean values through explicit undefined checks.
+
+## React sandbox prototype
+
+Files: `features/react-sandbox/prototype/sandbox.tsx` and `sandbox.module.css`.
+Last updated: 2026-11-14. Experimental branch only; production adoption is pending.
+
+Reuse learning-panel headers, shared Badge/Button/Tabs, CodeMirror appearance and
+the existing ProblemTutor. Use three columns for exercise/editor/tutor; place the
+preview beneath the editor and switch the same output region to Console / errors.
+Keep the preview mounted when its tab is hidden so logging and component state
+continue. At 1100px and below, stack in reading order and bound the tutor's height.
+Panels use flow height, internal code overflow, semantic theme tokens and explicit
+error text. Guest preview styles stay inside its separate iframe.

@@ -16,6 +16,8 @@ import {
   parseTutorRequest,
   TUTOR_LIMITS,
   type TutorHistoryMessage,
+  type TutorRequest,
+  type TutorRunFeedback,
   trimTutorHistory,
 } from "../lib/problem-tutor-contract";
 import { useProblemSession } from "./problem-session";
@@ -29,8 +31,18 @@ export interface TutorTurn {
   error?: string;
   signIn?: boolean;
 }
-function useTutorState() {
-  const problem = useProblemSession();
+export interface TutorWorkspace {
+  id: string;
+  source: string;
+  readCurrentSource: () => string;
+  validateRequest: (value: unknown) => TutorRequest;
+  feedback: (code: string) => {
+    runFeedback?: TutorRunFeedback;
+    feedbackOmitted?: boolean;
+  };
+  endpoint?: string;
+}
+function useTutorState(problem: TutorWorkspace) {
   const currentProblem = useRef(problem);
   currentProblem.current = problem;
   const [draft, setDraftState] = useState("");
@@ -75,18 +87,15 @@ function useTutorState() {
         { role: "assistant", content: turn.answer },
       ]);
     const history = trimTutorHistory(messages);
-    const feedback = visibleTutorFeedback(
-      session.problem,
-      code,
-      session.parsedInputs,
-      session.latest,
-    );
+    const feedback = session.feedback(code);
     let input: ReturnType<typeof parseTutorRequest>;
     try {
-      input = parseTutorRequest(
-        { question, code, history: history.history, ...feedback },
-        session.problem,
-      );
+      input = session.validateRequest({
+        question,
+        code,
+        history: history.history,
+        ...feedback,
+      });
     } catch (reason) {
       setError(
         reason instanceof Error ? reason.message : "Enter a valid question.",
@@ -135,7 +144,7 @@ function useTutorState() {
     );
     try {
       await askProblemTutor(
-        session.problem.id,
+        session.id,
         input,
         controller.signal,
         (event) => {
@@ -146,6 +155,7 @@ function useTutorState() {
             }));
           if (event.type === "done") update({ status: "completed" });
         },
+        session.endpoint,
       );
     } catch (reason) {
       update({
@@ -182,9 +192,37 @@ function useTutorState() {
 }
 const Context = createContext<ReturnType<typeof useTutorState> | null>(null);
 // Lives above panel remounts, inside the keyed learner/problem workspace.
-export function ProblemTutorSession({ children }: { children: ReactNode }) {
-  const value = useTutorState();
+export function TutorSession({
+  workspace,
+  children,
+}: {
+  workspace: TutorWorkspace;
+  children: ReactNode;
+}) {
+  const value = useTutorState(workspace);
   return <Context.Provider value={value}>{children}</Context.Provider>;
+}
+export function ProblemTutorSession({ children }: { children: ReactNode }) {
+  const problem = useProblemSession();
+  return (
+    <TutorSession
+      workspace={{
+        id: problem.problem.id,
+        source: problem.source,
+        readCurrentSource: problem.readCurrentSource,
+        validateRequest: (value) => parseTutorRequest(value, problem.problem),
+        feedback: (code) =>
+          visibleTutorFeedback(
+            problem.problem,
+            code,
+            problem.parsedInputs,
+            problem.latest,
+          ),
+      }}
+    >
+      {children}
+    </TutorSession>
+  );
 }
 export function useProblemTutor() {
   const value = useContext(Context);

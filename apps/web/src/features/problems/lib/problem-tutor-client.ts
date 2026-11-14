@@ -150,16 +150,14 @@ export async function askProblemTutor(
   input: TutorRequest,
   signal: AbortSignal,
   onEvent: (event: TutorEvent) => void,
+  endpoint = `/api/problems/${encodeURIComponent(problemId)}/tutor`,
 ) {
-  const response = await fetch(
-    `/api/problems/${encodeURIComponent(problemId)}/tutor`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(input),
-      cache: "no-store",
-      signal,
-    },
-  );
+  const response = await fetch(endpoint, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+    cache: "no-store",
+    signal,
+  });
   await readTutorStream(response, onEvent, signal);
 }
