@@ -6,6 +6,8 @@ Test whether Sandpack can run a React TypeScript exercise while retaining Code A
 
 This is an isolated, development-only spike on `codex/react-sandbox-spike`. From this worktree run `pnpm prototype:react`, then sign in at **http://localhost:3002/react/prototype**. Port 3000 remains available for the main app. The prototype page and tutor endpoint are unavailable in a production build.
 
+The Dashboard's **Explore React JS** button links directly to this prototype in development. Production retains the disabled Coming soon state.
+
 ## Scope and acceptance
 
 - One editable `/App.tsx`, React/React DOM pinned to the app's 19.3.1, and trusted hidden scaffold/CSS. Retain CodeMirror history, syntax highlighting, focus behavior, and themes. No file manager or dependency editing.

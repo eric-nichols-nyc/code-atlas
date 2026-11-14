@@ -74,6 +74,11 @@ export function DashboardContent() {
                   <Button asChild className="w-full">
                     <Link href={`/${subject.id}`}>Explore {subject.title}</Link>
                   </Button>
+                ) : subject.id === "react" &&
+                  process.env.NODE_ENV === "development" ? (
+                  <Button asChild className="w-full">
+                    <Link href="/react/prototype">Explore {subject.title}</Link>
+                  </Button>
                 ) : (
                   <Button variant="outline" disabled className="w-full">
                     Coming soon
