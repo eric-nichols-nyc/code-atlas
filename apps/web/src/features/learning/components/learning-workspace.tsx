@@ -25,10 +25,12 @@ export function LearningWorkspace({
   lesson,
   code,
   output,
+  notes,
 }: {
   lesson: ReactNode;
   code: ReactNode;
   output?: ReactNode;
+  notes?: ReactNode;
 }) {
   const layout = useWorkspaceLayout();
   const tools = useWorkspaceTools();
@@ -110,7 +112,7 @@ export function LearningWorkspace({
             tutor={
               docked && tutorOpen ? (
                 <div id="lesson-tutor" className="h-full">
-                  <TutorPanel />
+                  <TutorPanel notes={notes} />
                 </div>
               ) : undefined
             }
@@ -121,29 +123,28 @@ export function LearningWorkspace({
           />
         )}
       </div>
-      <Sheet
-        open={!docked && tutorOpen}
-        onOpenChange={(open) => setTutorOpen(open)}
-      >
-        <SheetContent
-          id="lesson-tutor"
-          side="right"
-          onCloseAutoFocus={(event) => {
-            event.preventDefault();
-            toolTrigger.current?.focus();
-          }}
-        >
-          <SheetHeader>
-            <SheetTitle>Learning tools</SheetTitle>
-            <SheetDescription>
-              Tutor and notes are coming soon.
-            </SheetDescription>
-          </SheetHeader>
-          <div className="min-h-0 flex-1 px-4 pb-4">
-            <TutorPanel />
-          </div>
-        </SheetContent>
-      </Sheet>
+      {!docked && (
+        <Sheet open={tutorOpen} onOpenChange={(open) => setTutorOpen(open)}>
+          <SheetContent
+            id="lesson-tutor"
+            side="right"
+            onCloseAutoFocus={(event) => {
+              event.preventDefault();
+              toolTrigger.current?.focus();
+            }}
+          >
+            <SheetHeader>
+              <SheetTitle>Learning tools</SheetTitle>
+              <SheetDescription>
+                Keep private notes for this problem. AI tutoring is coming soon.
+              </SheetDescription>
+            </SheetHeader>
+            <div className="min-h-0 flex-1 px-4 pb-4">
+              <TutorPanel notes={notes} />
+            </div>
+          </SheetContent>
+        </Sheet>
+      )}
     </main>
   );
 }

@@ -193,11 +193,11 @@ Last updated: 2026-11-09. Implemented in `apps/web/src/features/learning/`, `fea
 | Subject catalog          | Flat rows; fixed ordinal/action slots; title and concise topic tag on one line |
 | Unavailable lesson       | Coming soon text and clock icon; no dead navigation or paywall-style lock      |
 
-The coding workspace puts a problem description on the left, editable JavaScript above Testcase/Test Result in the center, and optional unavailable tutor/notes on the right. The visualization and multiple-choice checkpoint are removed. All three splitters resize; closing the tutor releases its column. Mobile uses a reading flow and drawers. Preserve source, editor selection/undo, cases and results above responsive branches.
+The coding workspace puts a problem description on the left, editable JavaScript above Testcase/Test Result in the center, and optional learning tools on the right. Notes is available; AI tutoring remains a placeholder. The visualization and multiple-choice checkpoint are removed. All three splitters resize; closing the tools panel releases its column. Mobile uses a reading flow and drawers. Preserve source, editor selection/undo, cases and results above responsive branches.
 
 Shared learning panels use `learning-panel` (`bg-card`, `border`, `rounded-md`, no shadow),42px headers and16–20px inner padding. Problem headings use24/32px; prose14/23px. CodeMirror uses Menlo13/24px, semantic light/dark syntax roles and local assets. Default Tab exits the editor; Mod-Enter runs. Lazy editor loading reserves its space. Show Saved to account only after a successful database write/read; ordinary typing is Unsaved edits and latest verdicts remain session results.
 
-The problem description is continuous, with no left-panel tabs or Submissions view. Hints and Solution use shared Accordion rows; Testcase/Test Result retain shared line Tabs. Cases use shared Buttons and labeled numeric Input. Verdicts are server results with text labels, bounded diagnostics and explicit stale-code warnings. Hidden cases never expose private values/logs. Tutor and Notes remain unavailable. Counter (Closures), Filter Elements from Array (Arrays), Debounce and Sleep (Async) are published practice problems. Learn remains future work.
+The problem description is continuous, with no left-panel tabs or Submissions view. Hints and Solution use shared Accordion rows; Testcase/Test Result retain shared line Tabs. Cases use shared Buttons and labeled numeric Input. Verdicts are server results with text labels, bounded diagnostics and explicit stale-code warnings. Hidden cases never expose private values/logs. Tutor remains unavailable; Notes uses the private note editor described below. Counter (Closures), Filter Elements from Array (Arrays), Debounce and Sleep (Async) are published practice problems. Learn remains future work.
 
 Feature CSS in `apps/web/src/app/globals.css` owns viewport containment and editor layout; shared primitives/tokens remain in UI. Split mode contains document scrolling; route exit removes the root mode attribute and restores ordinary scrolling. Sheets disable animation for reduced-motion preferences.
 
@@ -448,3 +448,31 @@ The server-unavailable screen is packaged native-shell HTML with no scripts: dar
 link styled as a button, and a visible keyboard focus ring. Keep it readable on narrow
 windows. Retry navigates to the configured origin. Do not imply offline execution or
 show an accepted/saved state without the server response.
+
+## Private problem notes
+
+Files: `features/problems/components/problem-notes.tsx`, `problem-notes-editor.tsx`,
+`state/problem-notes.tsx`, and the existing learning workspace/tools panel.
+Last updated: 2026-11-13.
+
+Keep the existing Notes tab, active icon state, 42px panel header, and mobile Sheet
+focus restoration. The notes body uses 12px padding, FieldGroup/Field/FieldTitle,
+a bordered rounded-md editor, and shared small Buttons. The wrapping formatting
+fieldset uses ghost icon Buttons with names, titles, and pressed state; it fits the
+existing 256–360px tools column. Links open a labeled inline URL field with Apply
+and Cancel; Escape closes that field and returns focus to its trigger.
+
+Load Quill on demand with core document CSS and app-scoped semantic colors. Body
+text is 14px with 1.65 line height and 12px editor padding. Blockquotes use the shared
+border token; code blocks use muted backgrounds and internal horizontal scrolling.
+Long links wrap inside the editor. Tab leaves the editor, including code blocks.
+Theme changes use CSS without reconstructing the editor.
+
+Mount the mobile Sheet only in non-docked layouts so its exiting portal cannot
+coexist with the desktop editor. Keep notes state above layout/tab branches. Show Loading your notes, No saved notes
+yet, Unsaved changes, Saving, Saved with the confirmed account timestamp, or Not saved
+to account. Use status text, inline FieldError, and explicit Retry loading/saving
+notes or Sign in. A failed initial read blocks editing. Preserve later typing when
+a save completes, and preserve drafts when tools close or resize. Display the draft
+lifetime near Save: unsaved changes end when leaving/reloading the problem. Notes
+Save, Reset code, progress, and Run/Submit have independent effects.
