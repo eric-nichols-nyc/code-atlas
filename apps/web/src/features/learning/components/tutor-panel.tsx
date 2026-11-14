@@ -7,7 +7,13 @@ import {
 } from "@workspace/ui/components/tabs";
 import type { ReactNode } from "react";
 import { useWorkspaceTools } from "../state/workspace-tools";
-export function TutorPanel({ notes }: { notes?: ReactNode }) {
+export function TutorPanel({
+  notes,
+  tutor,
+}: {
+  notes?: ReactNode;
+  tutor?: ReactNode;
+}) {
   const s = useWorkspaceTools();
   return (
     <section className="learning-panel h-full" aria-label="Learning tools">
@@ -22,14 +28,12 @@ export function TutorPanel({ notes }: { notes?: ReactNode }) {
             <TabsTrigger value="notes">Notes</TabsTrigger>
           </TabsList>
         </div>
-        <TabsContent value="tutor" className="p-5">
-          <p className="mb-2 text-sm font-semibold">
-            A little guidance, when you need it.
-          </p>
-          <p className="text-sm leading-relaxed text-muted-foreground">
-            AI tutoring is coming soon. For now, use the lesson, checkpoint
-            feedback, and guided walkthrough.
-          </p>
+        <TabsContent value="tutor" className="min-h-0 overflow-hidden">
+          {tutor ?? (
+            <p className="p-5 text-sm text-muted-foreground">
+              Open a practice problem to ask about your code.
+            </p>
+          )}
         </TabsContent>
         <TabsContent value="notes" className="min-h-0 overflow-hidden p-3">
           {notes}

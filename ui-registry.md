@@ -193,11 +193,11 @@ Last updated: 2026-11-09. Implemented in `apps/web/src/features/learning/`, `fea
 | Subject catalog          | Flat rows; fixed ordinal/action slots; title and concise topic tag on one line |
 | Unavailable lesson       | Coming soon text and clock icon; no dead navigation or paywall-style lock      |
 
-The coding workspace puts a problem description on the left, editable JavaScript above Testcase/Test Result in the center, and optional learning tools on the right. Notes is available; AI tutoring remains a placeholder. The visualization and multiple-choice checkpoint are removed. All three splitters resize; closing the tools panel releases its column. Mobile uses a reading flow and drawers. Preserve source, editor selection/undo, cases and results above responsive branches.
+The coding workspace puts a problem description on the left, editable JavaScript above Testcase/Test Result in the center, and optional learning tools on the right. Notes and the problem-aware AI tutor are available. The visualization and multiple-choice checkpoint are removed. All three splitters resize; closing the tools panel releases its column. Mobile uses a reading flow and drawers. Preserve source, editor selection/undo, cases and results above responsive branches.
 
 Shared learning panels use `learning-panel` (`bg-card`, `border`, `rounded-md`, no shadow),42px headers and16–20px inner padding. Problem headings use24/32px; prose14/23px. CodeMirror uses Menlo13/24px, semantic light/dark syntax roles and local assets. Default Tab exits the editor; Mod-Enter runs. Lazy editor loading reserves its space. Show Saved to account only after a successful database write/read; ordinary typing is Unsaved edits and latest verdicts remain session results.
 
-The problem description is continuous, with no left-panel tabs or Submissions view. Hints and Solution use shared Accordion rows; Testcase/Test Result retain shared line Tabs. Cases use shared Buttons and labeled numeric Input. Verdicts are server results with text labels, bounded diagnostics and explicit stale-code warnings. Hidden cases never expose private values/logs. Tutor remains unavailable; Notes uses the private note editor described below. Counter (Closures), Filter Elements from Array (Arrays), Debounce and Sleep (Async) are published practice problems. Learn remains future work.
+The problem description is continuous, with no left-panel tabs or Submissions view. Hints and Solution use shared Accordion rows; Testcase/Test Result retain shared line Tabs. Cases use shared Buttons and labeled numeric Input. Verdicts are server results with text labels, bounded diagnostics and explicit stale-code warnings. Hidden cases never expose private values/logs. Tutor uses the question-triggered chat described below; Notes uses the private note editor described below. Counter (Closures), Filter Elements from Array (Arrays), Debounce and Sleep (Async) are published practice problems. Learn remains future work.
 
 Feature CSS in `apps/web/src/app/globals.css` owns viewport containment and editor layout; shared primitives/tokens remain in UI. Split mode contains document scrolling; route exit removes the root mode attribute and restores ordinary scrolling. Sheets disable animation for reduced-motion preferences.
 
@@ -476,3 +476,30 @@ notes or Sign in. A failed initial read blocks editing. Preserve later typing wh
 a save completes, and preserve drafts when tools close or resize. Display the draft
 lifetime near Save: unsaved changes end when leaving/reloading the problem. Notes
 Save, Reset code, progress, and Run/Submit have independent effects.
+
+## Problem AI tutor
+
+Files: `features/problems/components/problem-tutor.tsx`, `state/problem-tutor.tsx`,
+and shared `message`, `message-scroller`, `bubble`, and `textarea` primitives.
+Last updated: 2026-11-14.
+
+Keep the existing AI/Notes tabs, 42px header, docked column and mobile Sheet. State
+belongs above adaptive branches; one tutor body is mounted at a time. Use the shared
+MessageScroller for streaming follow and its jump-to-latest control. Use Message with
+You/AI tutor headers, muted user Bubble and ghost assistant Bubble. The transcript has
+12px padding and a 20px exchange gap. Composer uses FieldGroup/Field/FieldLabel with
+shared Textarea and small Buttons. Enter inserts a newline; Mod-Enter sends only while
+the composer is focused. Preserve CodeMirror's separate Mod-Enter Run behavior.
+
+Use semantic card/background/muted/foreground/border tokens. Tutor Markdown is 14px
+with 1.65 line height; fenced code is Menlo 12px, 12px padding, shared border/muted
+background and 6px radius, with horizontal scrolling contained in the code block.
+Render no raw HTML or remote images; only safe HTTPS links are interactive. The textarea
+keeps mobile 16px type, a 64px minimum and 128px maximum height, and no resize handle.
+
+Keep current-code/context and visit-only chat lifetime copy near Send. Use a separate
+polite status row for sending/receiving/completed states rather than announcing every
+stream delta. Indicate changed code beside its earlier answer. Preserve partial output
+with stopped/failed feedback and an explicit Retry with current code action. Empty,
+loading, limit, configuration and sign-in states retain source/questions and never
+claim that code was executed or saved. Closing the mobile drawer restores its trigger.

@@ -1,3 +1,4 @@
+import { readFile } from "node:fs/promises";
 import { publicProblems, validProblemInput } from "@workspace/problems";
 import { javascriptPracticeCatalog } from "../src/content/javascript/practice/catalog";
 import { problemStatements } from "../src/content/javascript/practice/statements";
@@ -20,6 +21,21 @@ for (const entry of published)
     !problemStatements[entry.slug]
   )
     errors.push(`Missing problem ${entry.id}`);
+for (const entry of published) {
+  try {
+    const statement = await readFile(
+      new URL(
+        `../src/content/javascript/practice/${entry.slug}/problem.mdx`,
+        import.meta.url,
+      ),
+      "utf8",
+    );
+    if (!statement.trim() || Buffer.byteLength(statement, "utf8") > 16 * 1024)
+      errors.push(`Invalid tutor statement ${entry.id}`);
+  } catch {
+    errors.push(`Missing tutor statement ${entry.id}`);
+  }
+}
 for (const p of publicProblems)
   if (
     !p.starterCode.trim() ||

@@ -58,6 +58,8 @@ feedback, and improve.**
   suite that includes private cases. Only an accepted Submit marks a problem solved.
 - **Persistent progress:** Flag problems and restore the latest code saved after Run or
   Submit, regardless of verdict. Unsaved editor changes remain in memory.
+- **Context-aware AI tutor:** Ask for hints using your current unsaved code and the problem
+  context. Requests happen only when you send a question; chat lasts for this visit.
 - **Private problem notes:** Write formatted takeaways, lists, code blocks, and links in
   Notes, then select Save to keep them with your account. Unsaved notes last only until
   leaving or reloading the problem.
@@ -204,9 +206,9 @@ and the [full command list](docs/development.md#commands).
 
 ## What's next
 
-Guided Learn content, additional JavaScript and algorithm challenges, connected AI
-tutoring, note media embeds/uploads, submission history, and signed desktop distribution are planned.
-AI controls currently show placeholders. Hosted deployment is not yet configured.
+Guided Learn content, additional JavaScript and algorithm challenges, saved tutor history,
+note media embeds/uploads, submission history, and signed desktop distribution are planned.
+AI tutoring requires a server OpenAI key and model setting; see the [tutor setup](docs/development.md#ai-tutor). Hosted deployment is not yet configured.
 
 ## Documentation
 
