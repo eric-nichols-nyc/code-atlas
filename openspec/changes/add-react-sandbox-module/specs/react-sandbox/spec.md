@@ -37,7 +37,7 @@ The system MUST verify learner identity independently on the React page and tuto
 
 ### Requirement: Edit one React TypeScript source file
 
-The workspace SHALL expose one editable `/App.tsx` with TSX syntax highlighting, undo/redo and keyboard focus exit. Supporting files and dependency versions SHALL be trusted configuration without editing controls. Source, editor history and tutor conversation SHALL survive tab, theme and responsive-layout changes within the visit.
+The workspace SHALL expose one editable `/App.tsx` with TSX syntax highlighting, undo/redo and keyboard focus exit. Supporting files and dependency versions SHALL be trusted configuration without editing controls. Source, editor history and tutor conversation SHALL survive Submit, tab, theme and responsive-layout changes within the visit.
 
 #### Scenario: Change theme and width after editing
 
@@ -45,33 +45,44 @@ The workspace SHALL expose one editable `/App.tsx` with TSX syntax highlighting,
 - **THEN** the current source, undo history and conversation remain available
 - **AND** Tab can move focus out of the editor
 
-### Requirement: Render the latest source below the editor
+### Requirement: Render source only on Submit
 
-The workspace SHALL render React output beneath the editor after a short typing pause. An edit made during compilation SHALL eventually replace the earlier preview without another edit. The counter sample SHALL reset its mounted effects when its code changes so an old interval does not obscure a fix.
+The workspace SHALL provide Submit and Mod-Enter to render a snapshot of the current editor beneath it. It MUST NOT start a runtime before the first Submit or update the preview while typing. Each submission SHALL start a fresh output runtime, retaining draft/editor/chat state. Changes since submission SHALL be identified beside the previous output.
+
+#### Scenario: Edit before first submission
+
+- **WHEN** the learner opens the exercise and edits without submitting
+- **THEN** the output shows a Submit prompt and no guest runtime starts
+
+#### Scenario: Preserve last submitted output
+
+- **WHEN** the learner edits after a successful submission
+- **THEN** the existing preview continues using the submitted snapshot and a changed-code notice appears
+- **AND** only another Submit or Mod-Enter renders the new draft
 
 #### Scenario: Fix the stale closure
 
-- **WHEN** the learner replaces the starter's captured-count update with a functional state update
-- **THEN** the preview counter advances past 1 without a page reload
+- **WHEN** the learner replaces the starter's captured-count update with a functional state update and selects Submit
+- **THEN** the new preview counter advances past 1 without a page reload
 
 #### Scenario: Edit while compiling
 
-- **WHEN** another edit arrives before the previous compilation finishes
-- **THEN** the preview eventually reflects the latest source rather than silently retaining the earlier version
+- **WHEN** another edit arrives while a submitted snapshot is compiling
+- **THEN** the preview renders the submitted snapshot and leaves the newer draft unexecuted until another submission
 
 ### Requirement: Show recoverable browser diagnostics
 
-The workspace SHALL provide Preview and Console / errors views. Console messages SHALL remain bounded to the latest 100 entries, and syntax/runtime errors SHALL be visible as text. The preview SHALL remain mounted when viewing console output. Correcting the source SHALL recover the preview without discarding the draft or chat.
+The workspace SHALL provide Preview and Console / errors views for submitted code. Console messages SHALL remain bounded to the latest 100 entries, and syntax/runtime errors SHALL be visible as text. The preview SHALL remain mounted when viewing console output. Correcting the source and submitting again SHALL recover the preview without discarding the draft or chat.
 
 #### Scenario: Runtime error then correction
 
-- **WHEN** the current source throws during rendering and the learner subsequently corrects it
+- **WHEN** submitted source throws during rendering and the learner subsequently corrects it and submits again
 - **THEN** the error is visible in the output area and valid React output returns without reloading the workspace
 
 #### Scenario: Invalid TSX then correction
 
-- **WHEN** the source has mismatched JSX tags and is then corrected
-- **THEN** the output identifies a syntax failure and recovers after the valid edit
+- **WHEN** submitted source has mismatched JSX tags and is then corrected and resubmitted
+- **THEN** the output identifies a syntax failure and recovers after the valid submission
 
 #### Scenario: Inspect interval logs
 
@@ -80,18 +91,19 @@ The workspace SHALL provide Preview and Console / errors views. Console messages
 
 ### Requirement: Preserve work during preview service failures
 
-The workspace SHALL show loading and unavailable states for the preview service. A connection attempt SHALL time out within 30 seconds. Restart SHALL retry an unavailable preview using the current draft; Reset code SHALL restore the authored starter. Preview failures SHALL leave editing and question composition usable.
+The workspace SHALL show loading and unavailable states for the preview service after Submit. A connection attempt SHALL time out within 30 seconds. Submit SHALL retry an unavailable preview using the current draft. Reset code SHALL restore only the editable draft, preserving the last output until Submit. Preview failures SHALL leave editing and question composition usable.
 
 #### Scenario: Hosted runtime unavailable
 
 - **WHEN** the preview service cannot connect within 30 seconds
-- **THEN** the output explains that the service is unavailable and offers a retry
+- **THEN** the output explains that the service is unavailable and identifies Submit as the retry action
 - **AND** the current source and tutor draft remain intact
 
 #### Scenario: Reset explicitly
 
 - **WHEN** the learner selects Reset code
-- **THEN** `/App.tsx` returns to the starter and recompiles while the existing tutor conversation remains available
+- **THEN** the editable `/App.tsx` draft returns to the starter while the existing preview and tutor conversation remain available
+- **AND** the starter executes only after Submit or Mod-Enter
 
 ### Requirement: Tutor uses a fresh source snapshot on demand
 
@@ -99,7 +111,7 @@ Each tutor question SHALL include the exact current `/App.tsx` text, trusted exe
 
 #### Scenario: Ask immediately after editing
 
-- **WHEN** the learner sends a question immediately after an edit and before the preview recompiles
+- **WHEN** the learner sends a question immediately after an edit without submitting that draft to the preview
 - **THEN** the request contains that edit and the authored exercise context
 - **AND** no tutor request was made solely because the learner typed
 

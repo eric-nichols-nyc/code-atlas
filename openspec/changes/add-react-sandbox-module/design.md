@@ -11,9 +11,11 @@ See `proposal.md` for the outcome and `specs/react-sandbox/spec.md` for behavior
 
 ### Prototype evidence
 
-Local branch `codex/react-sandbox-spike`, commit `39440bb`, contains the completed exploratory code and `docs/features/react-sandbox-prototype.md`. Worktree: `work/react-sandbox-spike`; command: `pnpm prototype:react`; signed-in URL: `http://localhost:3002/react/prototype`. It is deliberately separate from this planning branch.
+Local branch `codex/react-sandbox-spike` contains initial commit `39440bb`, Dashboard entry `89ece2b`, and manual Submit revision `17be7ff`. It contains the completed exploratory code and `docs/features/react-sandbox-prototype.md`. Worktree: `work/react-sandbox-spike`; command: `pnpm prototype:react`; signed-in URL: `http://localhost:3002/react/prototype`. It is deliberately separate from this planning branch.
 
-Verified 14 Chromium journeys, including the actual stale-closure fix, overlapping recompilations, logs, runtime/syntax errors and recovery, current editor snapshots on tutor Send/follow-up, parent-DOM denial, three themes, 320px layout, Tab exit, reset and auth/origin rejection. Tutor browser responses were mocked; the real provider was not called. Twenty-five focused tests, lint, typecheck, production build and bundle analysis passed. Production review confirmed not-found page content and a 404 tutor endpoint. Evidence is local under ignored `outputs/react-sandbox-exploration/`.
+The initial automatic-preview version verified 14 Chromium journeys, including the actual stale-closure fix, overlapping recompilations, logs, runtime/syntax errors and recovery, current editor snapshots on tutor Send/follow-up, parent-DOM denial, three themes, 320px layout, Tab exit, reset and auth/origin rejection. Tutor browser responses were mocked; the real provider was not called. Twenty-five focused tests, lint, typecheck, production build and bundle analysis passed. Production review confirmed not-found page content and a 404 tutor endpoint. Evidence is local under ignored `outputs/react-sandbox-exploration/`.
+
+The manual Submit revision passed 12 signed-in Chromium journeys: no runtime before Submit; explicit snapshot rendering; unchanged preview during edits/reset; current unsent source for tutoring; chat retention; submitted-snapshot isolation during compilation; theme/tab preservation; Mod-Enter; counter fix, runtime/syntax errors and recovery after Submit; and 320px controls. Lint, typecheck, two React tutor boundary tests and production build passed. Browser tutor responses were mocked. Evidence: `outputs/react-sandbox-exploration/manual-submit-results.json`.
 
 ## Goals / Non-Goals
 
@@ -33,9 +35,11 @@ Alternatives: SandpackCodeEditor duplicates our editor styling/history/focus int
 
 ### 2. Own the draft above the output panels
 
-Update Sandpack from CodeMirror, but read the editor-state ref directly at tutor Send. Compilation timing must never decide which source the tutor sees. Keep editor refs and chat above tab/responsive remounts. Preview and console tabs remain mounted with inactive content hidden.
+Keep the editable source, editor refs and tutor session above the output runtime. Submit captures the editor-state ref synchronously into an immutable snapshot with a new revision; Mod-Enter calls the same action. Mount a fresh Sandpack output provider keyed by that revision. Do not mount a guest runtime before the first submission. Typing changes only the draft; Reset code also changes only the draft. Show a changed-since-submission notice when draft and snapshot differ.
 
-The spike found two separate lifecycle issues: overlapping client initialization during development effect replay can strand updates, and edits made while compilation is busy can be skipped. Retain deferred, cancellable startup and a completion-time comparison that flushes a newer file map. Keep the adapter small and test cold load, overlapping edits and restart rather than disabling application StrictMode. The counter starter uses `// @refresh reset`; without it, the tested runtime preserved the old interval effect after a callback edit even though other source changes rendered. A full Restart also resets state.
+The tutor reads the editor-state ref independently of the submitted preview, so questions always receive the latest draft even if it has never been rendered. Keep editor history and chat outside the keyed runtime; keep preview and console mounted when switching their tabs within a submission. Fresh output runtimes clear logs and mounted effects on every Submit, making repeated counter runs predictable.
+
+The initial automatic-preview experiment found overlapping initialization during development effect replay, edits skipped while compiling and effects preserved across Fast Refresh. Manual snapshots remove the need for automatic file-update flushing and `// @refresh reset`; retain only cancellable deferred runtime startup after effect replay. Test that a draft edit during compilation cannot replace the submitted snapshot. Do not disable application StrictMode.
 
 [Upstream PR 1297](https://github.com/codesandbox/sandpack/pull/1297) is still open and describes similar initialization/remount/update races. It is evidence for caution, not an installed fix. Do not vendor an unreviewed library fork for this pilot.
 
@@ -59,20 +63,20 @@ Use a custom iframe via Sandpack's client hook at the versioned hosted origin, c
 
 This is an exploratory browser guest, with a real mismatch against constitution VI: CPU, memory, stack, execution wall time and arbitrary guest network egress are **not enforceably bounded**. Browser origin separation prevents parent DOM access; it does not provide these resource budgets. The proposed module therefore remains development-only, as requested for a minimal experiment. Public deployment and any constitution/runtime policy revision belong to a separate decision/change. No production gate is removed by applying this proposal.
 
-Document actual budgets: one editable file, 100 retained logs, 350ms compile debounce, 30s connection timeout, one preview per workspace, 32 KiB UTF-8 tutor source and the existing tutor request/history/prompt/timeout/concurrency caps. These are host/context budgets, not guest execution limits. An infinite loop can hang the preview; do not test it in the user's active browser. A separate worker/supervised runtime or explicitly revised browser-preview policy would be needed for a public execution contract.
+Document actual budgets: one editable file, 100 retained logs, manual submitted snapshots, 30s connection timeout, one visible preview per workspace, 32 KiB UTF-8 tutor source and the existing tutor request/history/prompt/timeout/concurrency caps. These are host/context budgets, not guest execution limits. An infinite loop can hang the preview; do not test it in the user's active browser. A separate worker/supervised runtime or explicitly revised browser-preview policy would be needed for a public execution contract.
 
 ### 6. Preserve existing UI and honest status
 
 Reuse semantic theme tokens, learning-panel headers and the tutor's existing shared UI. Desktop columns mirror the reference; the center stacks the 380px editor and 300px preview. Below 1100px panels stack, with a 340px editor at narrow widths and a bounded 640px tutor. Use flow heights and internal horizontal editor scrolling; avoid a global fixed viewport layout in this pilot.
 
-Show loading/connection timeout with Restart retry, and syntax/runtime error text alongside the console. Keep source/chat during failures. Limit logs to 100 and clear on restart; diagnostic text is untrusted display data, not executable Markdown/HTML. The current hosted bundler sometimes wraps a JSX SyntaxError in an internal read-only-property TypeError; the useful file/tag message remains visible, but production-quality error presentation is not proven.
+Show an initial Submit prompt, then loading/connection timeout with Submit retry, and syntax/runtime error text alongside the console. Keep source/chat during failures. Limit logs to 100 and start a fresh console on each submission; diagnostic text is untrusted display data, not executable Markdown/HTML. The current hosted bundler sometimes wraps a JSX SyntaxError in an internal read-only-property TypeError; the useful file/tag message remains visible, but production-quality error presentation is not proven.
 
-Explicit copy describes visit-only drafts/chat, hosted sandbox file transfer and TSX transpilation without semantic type checking. The browser experiment rendered `const value: number = "text"`; do not show a type-check badge or infer correctness from a successful preview. No Submit/accepted/saved-progress controls are introduced.
+Explicit copy describes visit-only drafts/chat, hosted sandbox file transfer and TSX transpilation without semantic type checking. The browser experiment rendered `const value: number = "text"`; do not show a type-check badge or infer correctness from a successful preview. Submit only compiles and renders; it does not judge or save progress. No accepted/saved-progress controls are introduced.
 
 ## Risks / Trade-offs
 
 - Hosted runtime/CDN outage → 30s bounded connection attempt, visible unavailable state and retry without losing source; editing and tutor composition remain usable. Offline support is excluded.
-- Older lifecycle/runtime behavior → pinned dependency and local adapter regressions, stable provider inputs, no remount when switching tabs, explicit restart/reset; reassess upstream fixes before upgrades.
+- Older lifecycle/runtime behavior → pinned dependency and local adapter regressions, stable provider inputs, no remount when switching tabs, fresh runtime only on Submit, draft-only reset; reassess upstream fixes before upgrades.
 - Added browser payload → route-specific dynamic loading. The Webpack report attributed approximately 83.8 KB parsed / 23.2 KB gzip to Sandpack React itself, plus additional runtime/support chunks and remote runtime traffic. Module gzip estimates are not additive page-transfer totals. Review the final route graph before adoption.
 - Browser containment limits → development-only execution gate; no production safety/judging claims and no secrets in guest context.
 - Shared adapters regress existing problems → retain default wrappers and run existing editor/tutor/HTTP tests plus representative JavaScript and Algorithms browser journeys.
@@ -80,7 +84,7 @@ Explicit copy describes visit-only drafts/chat, hosted sandbox file transfer and
 
 ## Migration Plan
 
-Apply the pilot on a feature branch. Port or selectively cherry-pick `39440bb` after reviewing it against this spec; it is a spike, not a wholesale production patch. Replace prototype-only paths with the development module routes, move authored content, add accurate TS/visit-only copy and loading/retry behavior, and verify cold/blocked runtime journeys. Update the feature brief and UI registry with actual results. No database or account-data migration is needed.
+Apply the pilot on a feature branch. Port or selectively cherry-pick `39440bb` after reviewing it against this spec; it is a spike, not a wholesale production patch. Replace prototype-only paths with the development module routes, move authored content, retain manual Submit snapshots, add accurate TS/visit-only copy and loading/retry behavior, and verify cold/blocked runtime journeys. Update the feature brief and UI registry with actual results. No database or account-data migration is needed.
 
 Build and verify production denies execution before merging the pilot. Rollback removes the development entry/routes and specialized dependency while retaining backward-compatible editor/tutor defaults, or reverts the isolated feature commit(s). Existing JavaScript and Algorithms routes remain the regression baseline.
 

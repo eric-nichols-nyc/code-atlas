@@ -10,18 +10,18 @@ These tasks promote the reviewed spike into the development-only module. Commit 
 
 ## 2. Deliver one exercise with the existing editor
 
-- [ ] 2.1 Author trusted Stale Closure Counter metadata, requirements, scaffold/CSS and starter under `content/react/practice`; verify the starter sticks at 1 and includes the tested effect-reset behavior.
+- [ ] 2.1 Author trusted Stale Closure Counter metadata, requirements, scaffold/CSS and starter under `content/react/practice`; verify a submitted starter sticks at 1 and each later submission starts fresh mounted state.
 - [ ] 2.2 Port the narrow CodeMirror session/TSX adapter while retaining the original JavaScript wrapper; verify existing saved-code/editor tests and `pnpm typecheck` pass.
-- [ ] 2.3 Compose the route-specific client sandbox with stable provider inputs, one editable `/App.tsx`, pinned guest dependencies and the narrowed separate-origin iframe; verify rendering and parent-DOM denial in Chromium and inspect frame attributes.
-- [ ] 2.4 Retain cancellable deferred startup and flush newer edits after compilation; verify cold load, overlapping edits, reset and restart render the latest draft, including a counter fix that advances to 3+ without reloading the page.
-- [ ] 2.5 Add preview/console tabs, 100-message cap, error summaries and 30s connection failure/retry behavior; verify logs continue while the preview tab is hidden, invalid TSX/runtime errors recover, and a blocked bundler leaves source/question drafts usable through retry.
-- [ ] 2.6 Reuse shared panels and controls in the desktop/stacked layout, with bounded tutor height and accurate visit-only/hosted-preview/transpilation copy; verify three themes, 320px no-overflow, source/history preservation, keyboard focus exit and error visibility in the browser, then update `ui-registry.md`.
+- [ ] 2.3 Compose the route-specific client sandbox with stable provider inputs, one editable `/App.tsx`, pinned guest dependencies and the narrowed separate-origin iframe; verify no guest runtime before Submit, rendering after Submit and parent-DOM denial in Chromium; inspect frame attributes.
+- [ ] 2.4 Separate draft/editor/chat state from immutable output snapshots; Submit and Mod-Enter capture current code into a fresh output runtime with cancellable deferred startup. Verify edits/reset do not execute, edits during compilation stay out of the snapshot, repeated Submit restarts state, and a submitted counter fix advances to 3+ without reloading the page.
+- [ ] 2.5 Add preview/console tabs, 100-message cap, error summaries and 30s connection failure/retry behavior; verify logs continue while the preview tab is hidden, submitted invalid TSX/runtime errors recover on corrected resubmission, and a blocked bundler leaves source/question drafts usable through Submit retry.
+- [ ] 2.6 Reuse shared panels and controls in the desktop/stacked layout, with bounded tutor height and accurate visit-only/hosted-preview/transpilation copy plus initial Submit and changed-since-submission notices; verify three themes, 320px no-overflow, source/history preservation, keyboard focus exit and error visibility in the browser, then update `ui-registry.md`.
 
 ## 3. Connect the existing tutor
 
 - [ ] 3.1 Port the narrow tutor workspace adapter and source-only validation while preserving the judged-problem wrapper; verify the existing tutor state, UI and contract tests still pass with numeric Run feedback.
 - [ ] 3.2 Add the trusted React prompt resolver and development-only `/api/react/exercises/[exerciseId]/tutor` Route Handler using the shared authenticated streaming boundary; verify authored context/current TSX, unknown ids, missing auth, foreign origin, input limits and rejection of fabricated judge/authority fields with a fake provider.
-- [ ] 3.3 Wire current editor-ref snapshots into the reused tutor UI; verify no requests on typing, exact source immediately on Send, new source/history on follow-up and retry, streaming cancellation and changed-code notices with deterministic browser responses.
+- [ ] 3.3 Wire current editor-ref snapshots into the reused tutor UI; verify no requests on typing, exact unsubmitted draft source immediately on Send even when a different snapshot is rendered, new source/history on follow-up and retry, streaming cancellation and changed-code notices with deterministic browser responses.
 - [ ] 3.4 Document the tutor's source-only context and the absence of automatic preview/console capture; verify the prompt and visible disclosure agree and no sandbox/provider credentials appear in client files or request context.
 
 ## 4. Make the development module discoverable
