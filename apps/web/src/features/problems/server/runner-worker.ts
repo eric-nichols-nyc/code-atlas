@@ -86,7 +86,14 @@ const {
 }: typeof import("./adapters/valid-anagram.js") = await import(
   `./adapters/valid-anagram.${adapterExtension}`
 );
+const {
+  majorityElementHarness,
+  judgeMajorityElement,
+}: typeof import("./adapters/majority-element.js") = await import(
+  `./adapters/majority-element.${adapterExtension}`
+);
 const additionalHarnesses: Record<string, string> = {
+  "javascript.majority-element": majorityElementHarness,
   "algorithms.valid-anagram": anagramHarness,
   "javascript.map-array": mapArrayHarness,
   "javascript.reduce-array": reduceArrayHarness,
@@ -456,12 +463,31 @@ async function runCase(test: Work["cases"][number]): Promise<CaseResult> {
         outcome,
       );
     }
+    if (work.problemId === "javascript.majority-element") {
+      if (
+        typeof test.input === "number" ||
+        !("nums" in test.input) ||
+        !additionalCheck
+      )
+        return result("runtime-error", "Invalid majority input.");
+      const outcome = judgeMajorityElement(test.input, guest, additionalCheck);
+      return result(
+        outcome.verdict,
+        test.hidden
+          ? outcome.verdict === "accepted"
+            ? "Hidden case passed."
+            : "Hidden case failed."
+          : outcome.message,
+        undefined,
+        outcome,
+      );
+    }
     if (additionalCheck && typeof test.input !== "number") {
       const input = test.input;
       const outcome =
         work.problemId === "javascript.map-array" && "transform" in input
           ? judgeMapArray(input, guest, additionalCheck)
-          : work.problemId === "javascript.reduce-array" && "nums" in input
+          : work.problemId === "javascript.reduce-array" && "reducer" in input
             ? judgeReduceArray(input, guest, additionalCheck)
             : work.problemId === "javascript.chunk-array" && "size" in input
               ? judgeChunkArray(input, guest, additionalCheck)

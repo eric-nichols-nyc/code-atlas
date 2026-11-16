@@ -7,6 +7,19 @@ import type {
 // These inputs are server-only. Public content contains examples, never full suites.
 export const privateSuites: Record<ProblemDefinition["kind"], ProblemInput[]> =
   {
+    "majority-element": [
+      { nums: [-7] },
+      { nums: [8, 8] },
+      { nums: [-4, 2, -4, -4, 3] },
+      { nums: [0, 1, 0, 2, 0] },
+      { nums: [1, 2, 9, 9, 9] },
+      { nums: [9, 9, 9, 1, 2] },
+      { nums: [1, 2, 3, 3, 3, 3] },
+      { nums: [1e9, -1e9, 1e9] },
+      { nums: [-1e9, 1e9, -1e9] },
+      { nums: [1, 2, 2, 3, 2, 4, 2] },
+      { nums: Array.from({ length: 1000 }, (_, i) => (i < 499 ? i : -8)) },
+    ],
     "valid-anagram": [
       { s: "", t: "" },
       { s: "", t: "a" },

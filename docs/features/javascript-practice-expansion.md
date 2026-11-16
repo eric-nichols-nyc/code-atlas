@@ -87,3 +87,45 @@ the packaged app's test-account sign-in is verified. Authenticated Run/Submit an
 cross-session account persistence for these new problems remain unverified.
 
 Research references and adaptation rationale: [research note](javascript-practice-research.md).
+
+## Majority Element addition — 2026-11-16
+
+Expand JavaScript Practice from thirteen to fourteen exercises with **Majority
+Element** (Easy, Arrays), requested from [AlgoMaster](https://algomaster.io/practice/dsa/majority-element?list=am-300).
+It returns the value occurring strictly more than half the time, with a majority
+guaranteed. The canonical source allows 50,000 values; this workspace uses
+1–1000 integers from -1e9 to 1e9 to retain the existing request and runner limits.
+Keep the linear-time/constant-space follow-up while accepting other correct
+algorithms. Reuse existing auth, account progress, editor and Run/Submit controls.
+
+- [x] Register the Arrays/Recommended entry and trusted MDX route with starter code,
+  three examples, constraints, hints, source attribution and Boyer–Moore solution.
+- [x] Add a JSON-only `nums` field; reject empty, malformed, out-of-bounds and
+  majority-free custom cases before execution.
+- [x] Add a private isolated judge and eleven hidden cases, returning only numeric
+  output and redacting private values, logs and runtime diagnostics.
+- [x] Verify real Run/Submit, alternate correct approaches, wrong answers and
+  hostile code; check catalog/search and edited-input component journeys.
+- [x] Run repository checks/build and browser review; record results below.
+
+Verification (2026-11-16):
+
+- Root lint, typecheck, `git diff --check` and credential-free production build
+  passed. Content validation registers fifteen total problems across JavaScript
+  and Algorithms.
+- `pnpm test --maxWorkers=2`: **607 tests across 67 files passed**. New checks
+  cover numeric output including zero/negative values, strict-majority input
+  validation, three correct algorithms, captured intrinsics, malformed/hostile
+  source, wrong answers, full server-selected Submit suites and private redaction.
+  Component checks cover Arrays/search and edited `nums`/current-source requests.
+- `pnpm test:e2e --workers=2`: **67 public production checks passed**, including
+  the published link and the new route's authentication setup boundary.
+- `pnpm test:e2e:auth --grep 'authenticate the dedicated|Majority Element'`:
+  **2 checks passed** using the existing dedicated development learner. The new
+  journey finds the exercise through Arrays/search, rejects a majority-free
+  custom case, passes Run (3/3) and Submit (14/14), and restores saved code after
+  reload. No personal account progress was edited.
+- Browser review confirmed the public published link. Authenticated screenshots
+  at 1440px and 390px were inspected and show no document overflow; proof is in
+  ignored `test-results/learning-Majority-Element-*/majority-element-*.png`.
+  Packaged Electron was not tested for this content addition.

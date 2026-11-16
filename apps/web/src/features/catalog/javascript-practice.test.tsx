@@ -5,6 +5,25 @@ import { JavaScriptPractice } from "./components/javascript-practice";
 
 afterEach(() => vi.unstubAllGlobals());
 
+it("finds Majority Element in Recommended and Arrays through search", () => {
+  render(<JavaScriptPractice catalog={javascriptPracticeCatalog} />);
+  expect(
+    screen.getByRole("link", { name: "Majority Element" }),
+  ).toHaveAttribute("href", "/javascript/practice/majority-element");
+  fireEvent.mouseDown(screen.getByRole("tab", { name: "Arrays" }), {
+    button: 0,
+    ctrlKey: false,
+  });
+  fireEvent.change(screen.getByRole("searchbox", { name: "Search problems" }), {
+    target: { value: "majority" },
+  });
+  expect(screen.getByRole("link", { name: "Majority Element" })).toBeVisible();
+  expect(screen.getByRole("status")).toHaveTextContent("1 problem");
+  expect(
+    screen.getByRole("row", { name: /Majority Element/ }),
+  ).toHaveTextContent("Easy");
+});
+
 it("opens the Promise delay problem in Async and finds it through search", () => {
   render(<JavaScriptPractice catalog={javascriptPracticeCatalog} />);
   fireEvent.mouseDown(screen.getByRole("tab", { name: "Async" }), {
@@ -41,8 +60,8 @@ it("clears an empty query result back to the practice problems", () => {
   });
   expect(screen.getByRole("status")).toHaveTextContent("0 problems");
   fireEvent.click(screen.getByRole("button", { name: "Clear search" }));
-  expect(screen.getAllByRole("row")).toHaveLength(14);
-  expect(screen.getByRole("status")).toHaveTextContent("13 problems");
+  expect(screen.getAllByRole("row")).toHaveLength(15);
+  expect(screen.getByRole("status")).toHaveTextContent("14 problems");
 });
 
 it("opens the canonical practice problem without listing planned learning topics", () => {
@@ -316,7 +335,7 @@ it("finds Flatten Nested Array under Arrays and intersects search with Medium", 
     button: 0,
     ctrlKey: false,
   });
-  expect(screen.getByRole("status")).toHaveTextContent("5 problems");
+  expect(screen.getByRole("status")).toHaveTextContent("6 problems");
   fireEvent.keyDown(screen.getByRole("combobox", { name: "Difficulty" }), {
     key: "Enter",
   });

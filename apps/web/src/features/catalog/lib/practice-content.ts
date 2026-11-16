@@ -68,7 +68,12 @@ export async function validatePracticeContent(
       if (problem.kind === "valid-anagram")
         return typeof expected === "boolean";
       if (
-        ["curry", "reduce-array", "function-composition"].includes(problem.kind)
+        [
+          "curry",
+          "reduce-array",
+          "function-composition",
+          "majority-element",
+        ].includes(problem.kind)
       )
         return typeof expected === "number" && Number.isFinite(expected);
       if (problem.kind === "memoize")

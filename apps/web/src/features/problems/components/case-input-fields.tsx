@@ -26,6 +26,7 @@ export function CaseInputFields({ index }: { index: number }) {
       "chunk-array",
       "function-composition",
       "memoize",
+      "majority-element",
     ].includes(kind)
   )
     return <ExpandedCaseFields index={index} />;

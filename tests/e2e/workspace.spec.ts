@@ -495,6 +495,7 @@ for (const path of [
   "/javascript/practice/map-array",
   "/javascript/practice/reduce-array",
   "/javascript/practice/chunk-array",
+  "/javascript/practice/majority-element",
   "/javascript/practice/function-composition",
   "/javascript/practice/memoize",
   "/javascript/practice/debounce",

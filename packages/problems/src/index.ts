@@ -17,6 +17,7 @@ import {
   compositionFunctions,
   functionCompositionProblem,
 } from "./problems/function-composition.js";
+import { majorityElementProblem } from "./problems/majority-element.js";
 import { mapArrayProblem, mapTransforms } from "./problems/map-array.js";
 import { memoizeFunctions, memoizeProblem } from "./problems/memoize.js";
 import {
@@ -50,6 +51,7 @@ export {
   functionCompositionProblem,
   MAX_FLATTEN_DEPTH,
   MAX_FLATTEN_NODES,
+  majorityElementProblem,
   mapArrayProblem,
   mapTransforms,
   memoizeFunctions,
@@ -61,6 +63,7 @@ export {
 };
 export const publicProblems = [
   validAnagramProblem,
+  majorityElementProblem,
   mapArrayProblem,
   reduceArrayProblem,
   chunkArrayProblem,
@@ -124,6 +127,21 @@ export function validProblemInput(
   if (problem.kind === "delay") return validMillis(value);
   if (!value || typeof value !== "object" || Array.isArray(value)) return false;
   const input = value as Record<string, unknown>;
+  if (problem.kind === "majority-element") {
+    if (
+      Object.keys(input).length !== 1 ||
+      !numericArray(input.nums, 1000) ||
+      input.nums.length === 0
+    )
+      return false;
+    const counts = new Map<number, number>();
+    for (const num of input.nums) {
+      const count = (counts.get(num) ?? 0) + 1;
+      if (count > input.nums.length / 2) return true;
+      counts.set(num, count);
+    }
+    return false;
+  }
   if (problem.kind === "valid-anagram")
     return (
       Object.keys(input).length === 2 &&
@@ -262,7 +280,7 @@ export function formatProblemInput(input: ProblemInput) {
   if ("x" in input)
     return `functions = ${JSON.stringify(input.functions)}, x = ${input.x}`;
   if ("nums" in input)
-    return `nums = ${JSON.stringify(input.nums)}, fn = ${input.reducer}, init = ${input.init}`;
+    return `nums = ${JSON.stringify(input.nums)}${"reducer" in input ? `, fn = ${input.reducer}, init = ${input.init}` : ""}`;
   if ("fn" in input && "calls" in input)
     return `fn = ${input.fn}, calls = ${JSON.stringify(input.calls)}`;
   if ("groups" in input)

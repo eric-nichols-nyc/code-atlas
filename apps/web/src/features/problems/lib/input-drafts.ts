@@ -25,9 +25,10 @@ export function inputDraft(input: ProblemInput): InputDraft {
   if ("nums" in input)
     return {
       ...base,
-      value: String(input.init),
       json: JSON.stringify(input.nums),
-      callback: input.reducer,
+      ...("reducer" in input
+        ? { value: String(input.init), callback: input.reducer }
+        : {}),
     };
   if ("fn" in input && "calls" in input)
     return { ...base, json: JSON.stringify(input.calls), callback: input.fn };
@@ -77,11 +78,14 @@ export function parseInputDraft(
       problem.kind !== "filter-array" &&
       problem.kind !== "curry" &&
       problem.kind !== "flatten-array" &&
+      problem.kind !== "majority-element" &&
       !draft.value.trim()
     )
       return undefined;
     let input: unknown;
-    if (problem.kind === "map-array")
+    if (problem.kind === "majority-element")
+      input = { nums: JSON.parse(draft.json) };
+    else if (problem.kind === "map-array")
       input = { arr: JSON.parse(draft.json), transform: draft.callback };
     else if (problem.kind === "reduce-array")
       input = {

@@ -1,5 +1,9 @@
 import { expect, type Page, test } from "@playwright/test";
-import { fibonacciGeneratorProblem, sleepProblem } from "@workspace/problems";
+import {
+  fibonacciGeneratorProblem,
+  majorityElementProblem,
+  sleepProblem,
+} from "@workspace/problems";
 
 const path = "/javascript/practice/sleep";
 test("signed-in landing action opens Dashboard without the global header", async ({
@@ -29,6 +33,56 @@ async function noOverflow(page: Page) {
     ),
   ).toBe(true);
 }
+test("Majority Element → edited Run → accepted Submit → restored code", async ({
+  page,
+}) => {
+  await page.goto("/javascript/practice");
+  await page.getByRole("tab", { name: "Arrays", exact: true }).click();
+  await page
+    .getByRole("searchbox", { name: "Search problems" })
+    .fill("majority");
+  await page
+    .getByRole("link", { name: "Majority Element", exact: true })
+    .click();
+  await expect(
+    page.getByRole("heading", { name: "Majority Element", exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "Majority Element on AlgoMaster" }),
+  ).toHaveAttribute(
+    "href",
+    "https://algomaster.io/practice/dsa/majority-element?list=am-300",
+  );
+  await page
+    .getByRole("textbox", { name: "JavaScript solution" })
+    .fill(majorityElementProblem.solution);
+  await page
+    .getByRole("textbox", { name: "nums =", exact: true })
+    .fill("[1,2]");
+  await page.getByRole("button", { name: "Run", exact: true }).click();
+  await expect(
+    page.getByText(majorityElementProblem.inputError, { exact: true }),
+  ).toBeVisible();
+  await page
+    .getByRole("textbox", { name: "nums =", exact: true })
+    .fill("[0,1,0]");
+  await page.getByRole("button", { name: "Run", exact: true }).click();
+  await expect(page.getByText("3/3 tests passed · Run")).toBeVisible();
+  await page.getByRole("button", { name: "Submit", exact: true }).click();
+  await expect(page.getByText("14/14 tests passed · Submit")).toBeVisible();
+  await page.reload();
+  await expect(
+    page.getByRole("textbox", { name: "JavaScript solution" }),
+  ).toHaveText(majorityElementProblem.solution, { useInnerText: true });
+  for (const width of [1440, 390]) {
+    await page.setViewportSize({ width, height: 900 });
+    await noOverflow(page);
+    await page.screenshot({
+      path: test.info().outputPath(`majority-element-${width}.png`),
+      fullPage: true,
+    });
+  }
+});
 test("Generators → Fibonacci → edited Run → accepted Submit → restored code", async ({
   page,
 }) => {
