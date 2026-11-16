@@ -458,6 +458,8 @@ identity and sign-out, including explicit failure feedback.
 Map Array, Reduce Array and Memoize use the existing supplied-callback Select with
 its source preview. Their labeled JSON fields are `arr`, `nums` and `calls`.
 Reduce adds numeric `init`; Chunk Array uses JSON `arr` and numeric `size`.
+Majority Element uses only JSON `nums`, with a strict-majority guarantee and
+1–1000 integer bounds; its result is a number, including zero or negative values.
 Function Composition uses a JSON list of function IDs, the supplied functions'
 source preview and numeric `x`. Keep JSON help/bounds and validation inside the
 results pane, with shared Input/Label/Select controls and semantic tokens.

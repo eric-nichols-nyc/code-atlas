@@ -13,7 +13,7 @@ describe("practice categories", () => {
         id: "recommended",
         label: "Recommended",
         heading: "Recommended problems",
-        count: 13,
+        count: 14,
       },
       {
         id: "closures",
@@ -21,7 +21,7 @@ describe("practice categories", () => {
         heading: "Closures problems",
         count: 4,
       },
-      { id: "arrays", label: "Arrays", heading: "Arrays problems", count: 5 },
+      { id: "arrays", label: "Arrays", heading: "Arrays problems", count: 6 },
       {
         id: "generators",
         label: "Generators",
@@ -44,6 +44,7 @@ describe("practice categories", () => {
       "map-array",
       "reduce-array",
       "chunk-array",
+      "majority-element",
       "debounce",
       "delay-the-resolution-of-each-promise",
       "fibonacci-generator",

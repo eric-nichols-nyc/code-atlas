@@ -6,6 +6,7 @@ import {
   type ExecutionResult,
   flattenNestedArrayProblem,
   functionCompositionProblem,
+  majorityElementProblem,
   mapArrayProblem,
   memoizeProblem,
   type ProblemDefinition,
@@ -64,6 +65,69 @@ function Workspace({
   );
 }
 afterEach(() => vi.unstubAllGlobals());
+it("runs Majority Element with edited nums, rejects invalid cases and renders zero", async () => {
+  const fetch = vi.fn(async (_url: string, _init?: RequestInit) =>
+    Response.json({
+      ...accepted,
+      cases: [
+        {
+          id: "case-1",
+          input: { nums: [0, 1, 0] },
+          expected: 0,
+          actual: 0,
+          hidden: false,
+          passed: true,
+          verdict: "accepted",
+          message: "Correct.",
+          logs: [],
+        },
+      ],
+    }),
+  );
+  vi.stubGlobal("fetch", fetch);
+  render(<Workspace problem={majorityElementProblem} />);
+  expect(screen.queryByLabelText("init =")).toBeNull();
+  expect(screen.queryByRole("combobox", { name: "fn =" })).toBeNull();
+  const nums = screen.getByLabelText("nums =");
+  for (const value of ["bad", "[]", "[1,2]", "[1,1,2,2]"]) {
+    fireEvent.change(nums, { target: { value } });
+    fireEvent.click(screen.getByRole("button", { name: "Run" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      majorityElementProblem.inputError,
+    );
+    expect(fetch).not.toHaveBeenCalled();
+  }
+  fireEvent.change(
+    screen.getByRole("textbox", { name: "JavaScript solution" }),
+    {
+      target: { value: majorityElementProblem.solution },
+    },
+  );
+  fireEvent.change(nums, { target: { value: "[0,1,0]" } });
+  fireEvent.click(screen.getByRole("button", { name: "Run" }));
+  await screen.findByTestId("execution-verdict");
+  expect(fetch.mock.calls[0]?.[0]).toBe(
+    "/api/problems/javascript.majority-element/run",
+  );
+  expect(JSON.parse(fetch.mock.calls[0]?.[1]?.body as string)).toEqual({
+    code: majorityElementProblem.solution,
+    inputs: [
+      { nums: [0, 1, 0] },
+      ...majorityElementProblem.samples.slice(1).map((sample) => sample.input),
+    ],
+  });
+  expect(screen.getByText("Output")).toBeVisible();
+  expect(screen.getAllByText("0").length).toBeGreaterThanOrEqual(2);
+  fireEvent.click(screen.getByRole("button", { name: "Submit" }));
+  await waitFor(() => expect(fetch).toHaveBeenCalledTimes(2));
+  expect(fetch.mock.calls[1]?.[0]).toBe(
+    "/api/problems/javascript.majority-element/submit",
+  );
+  expect(JSON.parse(fetch.mock.calls[1]?.[1]?.body as string)).toEqual({
+    code: majorityElementProblem.solution,
+  });
+});
+
 it("runs edited nested arrays and validates unsupported values before making a request", async () => {
   const fetch = vi.fn(async (_url: string, _init?: RequestInit) =>
     Response.json({

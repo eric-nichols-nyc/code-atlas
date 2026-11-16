@@ -34,7 +34,7 @@ export function ExpandedCaseFields({ index }: { index: number }) {
           : [];
   const selected = callbacks.find((item) => item.id === draft.callback);
   const jsonName =
-    kind === "reduce-array"
+    kind === "reduce-array" || kind === "majority-element"
       ? "nums"
       : kind === "memoize"
         ? "calls"
@@ -51,13 +51,15 @@ export function ExpandedCaseFields({ index }: { index: number }) {
           : undefined;
   const prefix = `case-${index}`;
   const help =
-    kind === "map-array" || kind === "reduce-array"
-      ? "JSON integer array: up to 1000 values from -10000 to 10000. Empty arrays are allowed."
-      : kind === "chunk-array"
-        ? "JSON integer array: up to 1000 values from -1e9 to 1e9. Choose a chunk size from 1 to 1000."
-        : kind === "function-composition"
-          ? 'JSON list of up to 10 function IDs: "addOne", "double", "negate". Functions run right to left; [] is the identity.'
-          : "JSON argument groups: up to 100 calls of 0–4 integers from -100 to 100. Subtract takes exactly two arguments. Output shows values and underlying callCount.";
+    kind === "majority-element"
+      ? "JSON integer array: 1–1000 values from -1e9 to 1e9. One value must occur more than half the time."
+      : kind === "map-array" || kind === "reduce-array"
+        ? "JSON integer array: up to 1000 values from -10000 to 10000. Empty arrays are allowed."
+        : kind === "chunk-array"
+          ? "JSON integer array: up to 1000 values from -1e9 to 1e9. Choose a chunk size from 1 to 1000."
+          : kind === "function-composition"
+            ? 'JSON list of up to 10 function IDs: "addOne", "double", "negate". Functions run right to left; [] is the identity.'
+            : "JSON argument groups: up to 100 calls of 0–4 integers from -100 to 100. Subtract takes exactly two arguments. Output shows values and underlying callCount.";
   return (
     <div className="flex min-w-0 flex-col gap-4">
       <div>

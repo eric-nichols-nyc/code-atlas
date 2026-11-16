@@ -20,7 +20,7 @@ The coding workspace brings the problem, editor, and test cases together in resi
 <details>
 <summary>View the practice catalog and landing page</summary>
 
-Browse thirteen JavaScript challenges and the first Algorithms challenge by topic, search, or difficulty, with account-backed flags and solved status.
+Browse fourteen JavaScript challenges and the first Algorithms challenge by topic, search, or difficulty, with account-backed flags and solved status.
 
 ![JavaScript practice catalog with categories, difficulty filtering, search, and progress indicators](docs/images/practice-catalog.jpg)
 
@@ -91,6 +91,7 @@ feedback, and improve.**
 | Map Array                            | Easy       | Arrays and transformation callbacks    |
 | Reduce Array                         | Easy       | Arrays and accumulator callbacks       |
 | Chunk Array                          | Easy       | Array grouping and non-mutating copies |
+| Majority Element                     | Easy       | Arrays and Boyer–Moore voting          |
 | Flatten Nested Array                 | Medium     | Arrays and recursive traversal         |
 | Debounce                             | Medium     | Timers and async behavior              |
 | Delay the Resolution of Each Promise | Medium     | Promises and fulfillment timing        |

@@ -4,6 +4,7 @@ export const problemStatements: Record<
   string,
   () => Promise<{ default: ComponentType }>
 > = {
+  "majority-element": () => import("./majority-element/problem.mdx"),
   "map-array": () => import("./map-array/problem.mdx"),
   "reduce-array": () => import("./reduce-array/problem.mdx"),
   "chunk-array": () => import("./chunk-array/problem.mdx"),

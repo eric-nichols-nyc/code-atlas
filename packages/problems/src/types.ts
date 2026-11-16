@@ -91,8 +91,12 @@ export interface AnagramInput {
   s: string;
   t: string;
 }
+export interface MajorityElementInput {
+  nums: number[];
+}
 export type ProblemInput =
   | AnagramInput
+  | MajorityElementInput
   | number
   | CounterInput
   | DebounceInput
@@ -172,6 +176,7 @@ export interface ProblemDefinition {
     | "chunk-array"
     | "function-composition"
     | "memoize"
+    | "majority-element"
     | "valid-anagram";
   inputError: string;
   title: string;
