@@ -1,24 +1,23 @@
 import "server-only";
+import type { AiLimiter } from "@/features/ai/server/limits";
+import type { AiTextProvider as TutorProvider } from "@/features/ai/server/provider";
+import { streamAiResponse } from "@/features/ai/server/response";
 import { json, readJson, requireLearner } from "@/server/http";
 import {
   parseTutorRequest,
   TUTOR_LIMITS,
-  type TutorEvent,
   TutorInputError,
 } from "../lib/problem-tutor-contract";
-import { buildTutorPrompt, tutorProblem } from "./tutor-context";
-import { createTutorLimiter } from "./tutor-limits";
-import {
-  streamTutor,
-  type TutorProvider,
-  tutorFailure,
-} from "./tutor-provider";
+import { aiProblem } from "./problem-ai-context";
+import { buildTutorPrompt } from "./tutor-context";
+import { streamTutor } from "./tutor-provider";
 
 type Context = { params: Promise<{ problemId: string }> };
 export function createTutorHandler(
   options: {
     provider?: TutorProvider;
     timeout?: number;
+    limiter?: AiLimiter;
     preparePrompt?: (
       problemId: string,
       value: unknown,
@@ -26,12 +25,11 @@ export function createTutorHandler(
   } = {},
 ) {
   const provider = options.provider ?? streamTutor;
-  const limiter = createTutorLimiter();
   return async (request: Request, context: Context) => {
     const learner = await requireLearner(request);
     if (learner instanceof Response) return learner;
     const { problemId } = await context.params;
-    const problem = tutorProblem(problemId);
+    const problem = aiProblem(problemId);
     if (!problem && !options.preparePrompt)
       return json({ error: "Problem not found." }, 404);
     let prompt: Awaited<ReturnType<typeof buildTutorPrompt>>;
@@ -59,88 +57,13 @@ export function createTutorHandler(
         503,
       );
     }
-    const release = limiter.acquire(learner);
-    if (!release) {
-      const response = json(
-        {
-          error:
-            "Too many tutor questions. Wait a moment before sending again.",
-        },
-        429,
-      );
-      response.headers.set("Retry-After", "6");
-      return response;
-    }
-    const abort = new AbortController();
-    const signal = AbortSignal.any([request.signal, abort.signal]);
-    const timer = setTimeout(
-      () => abort.abort(),
-      options.timeout ?? TUTOR_LIMITS.timeout,
-    );
-    let finished = false;
-    // Hold the concurrency slot until streaming ends, fails or is cancelled.
-    const finish = () => {
-      if (finished) return;
-      finished = true;
-      clearTimeout(timer);
-      release();
-      abort.abort();
-    };
-    try {
-      const events = await provider(prompt, signal);
-      signal.throwIfAborted();
-      let cancelled = false;
-      const encoder = new TextEncoder();
-      const stream = new ReadableStream<Uint8Array>({
-        async start(controller) {
-          const emit = (event: TutorEvent) => {
-            if (!cancelled)
-              controller.enqueue(
-                encoder.encode(`data: ${JSON.stringify(event)}\n\n`),
-              );
-          };
-          try {
-            emit({ type: "start" });
-            let terminal = false;
-            for await (const event of events) {
-              signal.throwIfAborted();
-              emit(event);
-              if (event.type === "done" || event.type === "error") {
-                terminal = true;
-                break;
-              }
-            }
-            if (!terminal)
-              emit({
-                type: "error",
-                message: "The tutor connection ended early. Try sending again.",
-              });
-          } catch (error) {
-            emit({
-              type: "error",
-              message: tutorFailure(error, signal).message,
-            });
-          } finally {
-            finish();
-            if (!cancelled) controller.close();
-          }
-        },
-        cancel() {
-          cancelled = true;
-          finish();
-        },
-      });
-      return new Response(stream, {
-        headers: {
-          "Content-Type": "text/event-stream; charset=utf-8",
-          "Cache-Control": "no-store",
-          "X-Content-Type-Options": "nosniff",
-        },
-      });
-    } catch (error) {
-      const failure = tutorFailure(error, signal);
-      finish();
-      return json({ error: failure.message }, failure.status);
-    }
+    return streamAiResponse({
+      learner,
+      request,
+      prompt,
+      provider,
+      timeout: options.timeout,
+      limiter: options.limiter,
+    });
   };
 }

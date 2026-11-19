@@ -1,7 +1,7 @@
 import { beforeEach, expect, it, vi } from "vitest";
 import { staleClosureCounter as exercise } from "@/content/react/practice/stale-closure-counter/exercise";
+import type { AiTextProvider as TutorProvider } from "@/features/ai/server/provider";
 import { createTutorHandler } from "@/features/problems/server/tutor-handler";
-import type { TutorProvider } from "@/features/problems/server/tutor-provider";
 import { prepareReactTutorPrompt } from "./react-tutor";
 
 const auth = vi.hoisted(() => ({ learner: "react-pilot" as string | null }));

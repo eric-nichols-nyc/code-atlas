@@ -135,13 +135,17 @@ test("tutor requests only on Send, captures fresh code, survives panels, and end
     await expect(question(page)).toHaveValue("a newer unsent question");
   }
   await page.setViewportSize({ width: 320, height: 720 });
+  // Wait for the responsive drawer, rather than the still-visible docked body.
+  await expect(
+    page.getByRole("dialog", { name: "AI tutor", exact: true }),
+  ).toBeVisible();
   await expect(question(page)).toBeVisible();
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= innerWidth,
     ),
   ).toBe(true);
-  await page.keyboard.press("Escape");
+  await question(page).press("Escape");
   await expect(
     page.getByRole("button", { name: "Show AI tutor", exact: true }),
   ).toBeFocused();

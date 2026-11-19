@@ -1,6 +1,11 @@
 import type { ResponseStreamEvent } from "openai/resources/responses/responses";
 import { afterEach, expect, it, vi } from "vitest";
-import { normalizeTutorEvents, streamTutor } from "./tutor-provider";
+import { createAiTextProvider, normalizeAiEvents } from "./provider";
+
+const streamTutor = createAiTextProvider({
+  modelEnv: "OPENAI_TUTOR_MODEL",
+  outputTokens: 2000,
+});
 
 async function collect<T>(items: AsyncIterable<T>) {
   const result: T[] = [];
@@ -16,7 +21,7 @@ afterEach(() => {
 });
 it("forwards only visible text and confirmed completion", async () => {
   const output = await collect(
-    normalizeTutorEvents(
+    normalizeAiEvents(
       events([
         { type: "response.reasoning_text.delta", delta: "not user output" },
         { type: "response.output_text.delta", delta: "hint" },
@@ -39,9 +44,7 @@ it("does not report empty, refused, oversized, failed, incomplete or disconnecte
     [{ type: "error", message: "private error" }],
     [{ type: "response.output_text.delta", delta: "x".repeat(65537) }],
   ])
-    await expect(
-      collect(normalizeTutorEvents(events(items))),
-    ).rejects.toThrow();
+    await expect(collect(normalizeAiEvents(events(items)))).rejects.toThrow();
 });
 it("does not initialize a request without runtime credentials/model", async () => {
   const fetch = vi.fn();
@@ -85,4 +88,46 @@ it("uses the real SDK once with server configuration, no storage/tools and no au
     max_output_tokens: 2000,
     instructions: "hint-first",
   });
+});
+
+it("uses a capability-specific model or its fallback and requests the feature's structured format", async () => {
+  vi.stubEnv("OPENAI_API_KEY", "test-key");
+  vi.stubEnv("OPENAI_TUTOR_MODEL", "fallback-model");
+  vi.stubEnv("OPENAI_EVALUATION_MODEL", "");
+  const fetch = vi.fn(async (_url: RequestInfo | URL, _init?: RequestInit) =>
+    Response.json({ error: { message: "busy" } }, { status: 429 }),
+  );
+  vi.stubGlobal("fetch", fetch);
+  const format = {
+    name: "test_report",
+    schema: { type: "object", properties: {} },
+  };
+  const evaluate = createAiTextProvider({
+    modelEnv: "OPENAI_EVALUATION_MODEL",
+    fallbackModelEnv: "OPENAI_TUTOR_MODEL",
+    outputTokens: 3000,
+    format,
+  });
+  await expect(
+    evaluate(
+      { instructions: "evaluate", input: [] },
+      new AbortController().signal,
+    ),
+  ).rejects.toThrow();
+  expect(JSON.parse(fetch.mock.calls[0]?.[1]?.body as string)).toMatchObject({
+    model: "fallback-model",
+    max_output_tokens: 3000,
+    text: { format: { type: "json_schema", strict: true, ...format } },
+  });
+  vi.stubEnv("OPENAI_EVALUATION_MODEL", "evaluation-model");
+  await expect(
+    evaluate(
+      { instructions: "evaluate", input: [] },
+      new AbortController().signal,
+    ),
+  ).rejects.toThrow();
+  expect(JSON.parse(fetch.mock.calls[1]?.[1]?.body as string).model).toBe(
+    "evaluation-model",
+  );
+  expect(fetch).toHaveBeenCalledTimes(2);
 });

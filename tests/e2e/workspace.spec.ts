@@ -16,6 +16,20 @@ test("tutor access fails closed before auth configuration", async ({
   });
 });
 
+test("evaluation access fails closed before auth configuration", async ({
+  request,
+}) => {
+  const response = await request.post(
+    "/api/problems/javascript.majority-element/evaluate",
+    { data: { code: "function majorityElement(nums) { return nums[0]; }" } },
+  );
+  expect(response.status()).toBe(503);
+  expect(response.headers()["cache-control"]).toBe("no-store");
+  expect(await response.json()).toEqual({
+    error: "Authentication is not configured.",
+  });
+});
+
 test("home introduces the subjects and links to the dashboard", async ({
   page,
 }) => {
