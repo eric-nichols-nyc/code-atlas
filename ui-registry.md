@@ -488,15 +488,10 @@ Last updated: 2026-11-19.
 
 Use shared line Tabs in the 42px problem pane header, with Problem first and Notes
 second. The notes body uses 12px padding, FieldGroup/Field/FieldTitle,
-a bordered rounded-md editor, and shared small Buttons. The wrapping formatting
-fieldset uses ghost icon Buttons with names, titles, and pressed state; it wraps to fit the problem pane. Links open a labeled inline URL field with Apply
-and Cancel; Escape closes that field and returns focus to its trigger.
-
-Load Quill on demand with core document CSS and app-scoped semantic colors. Body
-text is 14px with 1.65 line height and 12px editor padding. Blockquotes use the shared
-border token; code blocks use muted backgrounds and internal horizontal scrolling.
-Long links wrap inside the editor. Tab leaves the editor, including code blocks.
-Theme changes use CSS without reconstructing the editor.
+a bordered rounded-md editor, and shared small Buttons. Load BlockNote on demand.
+Use its slash menu and selection toolbar for block insertion and rich-text
+formatting. Use the workspace card colors for the editor and the current theme
+for BlockNote controls. Keep long links wrapped and the note pane scrollable.
 
 Keep notes state and the selected tab above responsive layout branches. Show Loading your notes, No saved notes
 yet, Unsaved changes, Saving, Saved with the confirmed account timestamp, or Not saved

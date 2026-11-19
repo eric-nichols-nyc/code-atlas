@@ -1,6 +1,6 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, expect, it, vi } from "vitest";
-import type { NoteContent } from "../lib/problem-notes-contract";
+import type { QuillNoteContent } from "../lib/problem-notes-contract";
 import { ProblemNotesSession } from "../state/problem-notes";
 import { ProblemNotes } from "./problem-notes";
 
@@ -11,8 +11,8 @@ vi.mock("next/dynamic", () => ({
       onChange,
       labelId,
     }: {
-      content: NoteContent;
-      onChange: (content: NoteContent) => void;
+      content: QuillNoteContent;
+      onChange: (content: QuillNoteContent) => void;
       labelId: string;
     }) {
       return (

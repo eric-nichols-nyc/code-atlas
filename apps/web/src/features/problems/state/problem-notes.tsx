@@ -34,7 +34,7 @@ const errorView = (error: unknown): NotesError => ({
 });
 
 function useNotesState(problemId: string, learnerId?: string) {
-  const [draft, setDraftState] = useState(emptyNoteContent);
+  const [draft, setDraftState] = useState<NoteContent>(emptyNoteContent);
   const [saved, setSaved] = useState<PersonalProblemNote>({
     content: emptyNoteContent(),
     updatedAt: null,
@@ -102,7 +102,13 @@ function useNotesState(problemId: string, learnerId?: string) {
   );
 
   const setDraft = useCallback((content: NoteContent) => {
-    const normalized = parseNoteContent(content, false);
+    let normalized = content;
+    try {
+      normalized = parseNoteContent(content, false);
+    } catch (error) {
+      if (!(error instanceof NoteContentError)) throw error;
+      // Keep an invalid draft available to edit. Save reports the validation error.
+    }
     if (!noteContentsEqual(normalized, current.current)) edits.current++;
     current.current = normalized;
     setDraftState(normalized);

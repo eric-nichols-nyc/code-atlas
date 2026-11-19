@@ -73,8 +73,8 @@ export function ProblemNotes() {
           ) : null}
         </Field>
         <FieldDescription id={description}>
-          Save to keep notes with your account. Unsaved changes last until you
-          leave or reload this problem.
+          Type / for commands. Save to keep notes with your account. Unsaved
+          changes last until you leave or reload this problem.
         </FieldDescription>
       </FieldGroup>
       {error && <FieldError>{error.message}</FieldError>}

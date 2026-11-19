@@ -29,6 +29,7 @@ it("round trips each supported format and canonicalizes equivalent documents", (
     { insert: "\n" },
   ]);
   const parsed = parseNoteContent(document);
+  if (parsed.formatVersion !== 1) throw new Error("Expected legacy format");
   expect(parsed.document.ops[0]).toEqual({
     insert: "AB",
     attributes: { bold: true, italic: true },
@@ -147,4 +148,49 @@ it("validates timestamps, absent notes, and successful response envelopes", () =
   expect(() =>
     parsePersonalNote({ content: text("not absent\n"), updatedAt: null }),
   ).toThrow();
+});
+
+it("accepts supported BlockNote blocks and rejects unsafe links and media", () => {
+  const first = {
+    id: "heading-1",
+    type: "heading",
+    props: { level: 2 },
+    content: [{ type: "text", text: "Takeaway", styles: { bold: true } }],
+    children: [],
+  };
+  const second = {
+    id: "code-2",
+    type: "codeBlock",
+    props: { language: "javascript" },
+    content: [{ type: "text", text: "const x = 0;", styles: {} }],
+    children: [],
+  };
+  const document = (blocks: unknown[]) => ({
+    formatVersion: 2,
+    document: { blocks },
+  });
+  const valid = document([first, second]);
+  expect(parseNoteContent(valid)).toEqual(valid);
+  expect(() => parseNoteContent(document([first, first]))).toThrow(
+    NoteContentError,
+  );
+  expect(() =>
+    parseNoteContent(document([{ ...first, type: "image" }])),
+  ).toThrow(NoteContentError);
+  expect(() =>
+    parseNoteContent(
+      document([
+        {
+          ...first,
+          content: [
+            {
+              type: "link",
+              href: "javascript:alert(1)",
+              content: first.content,
+            },
+          ],
+        },
+      ]),
+    ),
+  ).toThrow(NoteContentError);
 });

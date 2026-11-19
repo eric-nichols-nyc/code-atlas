@@ -7,8 +7,8 @@ select Save, reload, and see the confirmed account note restored.
 ## Scope and decisions
 
 - Place Notes second in the problem pane tab list, after the default Problem tab.
-  Keep the existing editor with bold, italic, quotes, ordered/bulleted
-  lists, code blocks, links, and clearing formatting. The editor loads on demand.
+  Use BlockNote with a slash menu for headings, quotes, lists, checklists, and code
+  blocks. Rich-text formatting and links remain available. Load the editor on demand.
 - Explicit Save persists a validated versioned document through authenticated Next.js
   GET/PUT `/api/problems/{problemId}/notes` and a separate Prisma user/problem model.
   Ownership comes only from the verified Neon identity. Notes never enter public
@@ -44,6 +44,19 @@ solution. The AI tutor opens independently from its toolbar icon.
   retention across resizing and tab switches, and independent tutor behavior.
 - An initial fresh-context check timed out before restoring the dedicated test
   learner's Sleep and Counter fixtures. The corrected check passed.
+
+## BlockNote editor update
+
+Replace Quill with BlockNote in the Notes tab. Typing `/` opens the block
+menu. Keep explicit Save, problem-specific account storage, and in-session drafts.
+New edits save as versioned blocks in the existing JSON column. Existing Quill
+documents can open in BlockNote and are converted when the learner edits and saves.
+The supported document schema excludes media and embeds.
+
+Lint, typecheck, the web production build, and all 608 repository tests passed.
+Signed-in Chromium checks passed for slash commands, safe paste, save and reload,
+retry, problem-specific storage, and draft retention across tabs and resizing.
+Direct browser review confirmed that the slash menu fits a 320px viewport.
 
 ## Original verification — 2026-11-13
 
