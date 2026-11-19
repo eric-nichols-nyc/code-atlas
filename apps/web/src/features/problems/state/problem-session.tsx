@@ -27,6 +27,7 @@ import {
   inputDraft,
   parseInputDraft,
 } from "../lib/input-drafts";
+import { useCodeEvaluation } from "./code-evaluation";
 
 interface ResultSnapshot {
   result: ExecutionResult;
@@ -66,6 +67,12 @@ function useProblemState(problem: ProblemDefinition, learnerId?: string) {
   const [error, setError] = useState("");
   const [latest, setLatest] = useState<ResultSnapshot | null>(null);
   const controller = useRef<AbortController | null>(null);
+  const evaluation = useCodeEvaluation({
+    problemId: problem.id,
+    readCode: () => sourceRef.current,
+    onStart: () => setOutputTab("test-result"),
+    isExecuting: () => Boolean(controller.current),
+  });
   const setSource = (next: string) => {
     if (next !== sourceRef.current) interactions.current++;
     sourceRef.current = next;
@@ -105,7 +112,7 @@ function useProblemState(problem: ProblemDefinition, learnerId?: string) {
   }, [learnerId, problem.id, restoreAttempt]);
   useEffect(() => () => controller.current?.abort(), []);
   const execute = async (action: ExecutionAction) => {
-    if (controller.current) return;
+    if (controller.current || evaluation.isActive()) return;
     interactions.current++;
     if (action === "run" && parsedInputs.some((input) => input === undefined)) {
       setError(problem.inputError);
@@ -203,6 +210,7 @@ function useProblemState(problem: ProblemDefinition, learnerId?: string) {
             ? "Loading saved code…"
             : "Unsaved edits · Run or Submit to save";
   return {
+    evaluation,
     problem,
     source,
     readCurrentSource: () => sourceRef.current,

@@ -1,6 +1,12 @@
 import { beforeEach, expect, it, vi } from "vitest";
-import { createTutorHandler } from "./tutor-handler";
-import type { TutorProvider } from "./tutor-provider";
+import { createAiLimiter } from "@/features/ai/server/limits";
+import { createTutorHandler as createHandler } from "./tutor-handler";
+
+const createTutorHandler = (
+  options: Parameters<typeof createHandler>[0] = {},
+) => createHandler({ ...options, limiter: createAiLimiter() });
+
+import type { AiTextProvider as TutorProvider } from "@/features/ai/server/provider";
 
 const auth = vi.hoisted(() => ({
   configured: true,

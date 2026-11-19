@@ -1,24 +1,12 @@
 import "server-only";
-import { existsSync } from "node:fs";
-import { readFile } from "node:fs/promises";
-import { resolve } from "node:path";
-import {
-  compositionFunctions,
-  curryFunctions,
-  filterPredicates,
-  findProblem,
-  mapTransforms,
-  memoizeFunctions,
-  type ProblemDefinition,
-  reduceFunctions,
-} from "@workspace/problems";
-import { publishedPractice } from "@/features/catalog/lib/published-practice";
+import type { ProblemDefinition } from "@workspace/problems";
 import {
   TUTOR_LIMITS,
   TutorInputError,
   type TutorRequest,
   utf8Bytes,
 } from "../lib/problem-tutor-contract";
+import { problemAiContext } from "./problem-ai-context";
 
 export const TUTOR_INSTRUCTIONS = `You are the Code Atlas coding practice tutor.
 Give concise, specific, hint-first guidance grounded in the current problem and current_code.
@@ -33,73 +21,6 @@ Do not claim to have run, tested, accepted or saved code. You have no tools and 
 Do not invent hidden tests, access private notes, or infer account data. If information is missing, say so.
 Use readable Markdown with short paragraphs and fenced JavaScript snippets when needed.`;
 
-export function tutorProblem(id: string) {
-  const problem = findProblem(id);
-  return problem &&
-    publishedPractice.some(
-      (entry) =>
-        entry.id === problem.id &&
-        entry.slug === problem.slug &&
-        entry.status === "published",
-    )
-    ? problem
-    : undefined;
-}
-const statements = new Map<string, Promise<string>>();
-export async function tutorProblemContext(problem: ProblemDefinition) {
-  const registered = tutorProblem(problem.id);
-  if (
-    !registered ||
-    registered.slug !== problem.slug ||
-    registered.subjectId !== problem.subjectId
-  )
-    throw new TutorInputError(
-      "This problem's tutor context is unavailable.",
-      503,
-    );
-  let statement = statements.get(problem.id);
-  if (!statement) {
-    const local = resolve(
-      process.cwd(),
-      `src/content/${problem.subjectId}/practice`,
-    );
-    const root = existsSync(local)
-      ? local
-      : resolve(
-          process.cwd(),
-          `apps/web/src/content/${problem.subjectId}/practice`,
-        );
-    statement = readFile(resolve(root, problem.slug, "problem.mdx"), "utf8");
-    statements.set(problem.id, statement);
-    statement.catch(() => statements.delete(problem.id));
-  }
-  const callbacks = {
-    curry: curryFunctions,
-    "filter-array": filterPredicates,
-    "map-array": mapTransforms,
-    "reduce-array": reduceFunctions,
-    "function-composition": compositionFunctions,
-    memoize: memoizeFunctions,
-  };
-  // Project public fields explicitly; whole definitions also contain solutions.
-  const context = {
-    id: problem.id,
-    title: problem.title,
-    topic: problem.topicId,
-    difficulty: problem.difficulty,
-    entryFunction: problem.entryFunction,
-    statement: await statement,
-    constraints: problem.constraints,
-    examples: problem.samples,
-    callbacks: callbacks[problem.kind as keyof typeof callbacks] ?? [],
-  };
-  if (utf8Bytes(JSON.stringify(context)) > TUTOR_LIMITS.problem)
-    throw new TutorInputError(
-      "This problem's tutor context is unavailable.",
-      503,
-    );
-  return context;
-}
 export async function buildTutorPrompt(
   problem: ProblemDefinition,
   request: TutorRequest,
@@ -112,7 +33,7 @@ export async function buildTutorPrompt(
       {
         role: "user" as const,
         content: JSON.stringify({
-          problem: await tutorProblemContext(problem),
+          problem: await problemAiContext(problem),
           current_code: request.code,
           question: request.question,
           learner_supplied_visible_run_feedback: request.runFeedback ?? null,

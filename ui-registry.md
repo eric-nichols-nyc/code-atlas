@@ -371,7 +371,7 @@ and `state/problem-session.tsx`. Last updated: 2026-11-09.
 | Motion               | Default accordion reveal; reduced-motion disables reveal and chevron transitions                 |
 | Code header actions  | Shared ghost icon Buttons for Share and Reset code, followed by the shared theme switcher        |
 | Availability         | Share is visibly disabled and named Share code (coming soon)                                     |
-| Execution actions    | Run and Submit stay beneath the editor; no Reset layout action                                   |
+| Execution actions    | Evaluate, Run and Submit stay beneath the editor; no Reset layout action                         |
 
 Keep help expansion in the problem session above adaptive branches. Solution reveals
 the authored code and explanation below the hints in the Problem tab. Keep the
@@ -527,6 +527,29 @@ stream delta. Indicate changed code beside its earlier answer. Preserve partial 
 with stopped/failed feedback and an explicit Retry with current code action. Empty,
 loading, limit, configuration and sign-in states retain source/questions and never
 claim that code was executed or saved. Closing the mobile drawer restores its trigger.
+
+## Inline code evaluation
+
+Files: `features/problems/components/code-evaluation.tsx`, `code-panel.tsx`,
+`result-panel.tsx` and `state/code-evaluation.ts`. Last updated: 2026-11-19.
+
+Evaluate uses the shared small outline Button and decorative Sparkles icon before
+Run and Submit in the wrapping editor action row. While evaluating, its label becomes
+Evaluating… and execution buttons are disabled; Stop evaluation lives in the result.
+Keep the two existing Testcase/Test Result tabs. Select Test Result on Evaluate and
+show AI Evaluation above preserved judge results, with its own heading and status.
+
+Use shared Card/Header/Title/Description/Content for the derived score and summary
+(CardTitle's `lg` preset for the score),
+secondary Badges for criterion scores, semantic foreground/muted/destructive tokens,
+14px body copy with relaxed leading and a 20px gap between rubric sections. Retain
+the Card's existing border, radius, padding and shadow. Report prose is plain text,
+wraps anywhere inside its panel and never renders model HTML, images or links.
+Keep loading/completed announcements in a separate polite status row. Stale source,
+failed/stopped requests, sign-in recovery and Retry with current code are explicit.
+Previous complete reports survive retries; partial structured output is never shown.
+State belongs in the problem session above responsive branches and resets on
+learner/problem exit. Evaluation and judge verdicts retain separate labels.
 
 ## JavaScript learning catalog and module preview
 

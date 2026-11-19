@@ -388,7 +388,8 @@ request; incomplete replies remain labeled and explicit Retry captures current c
 
 Initial limits: 32 KiB source, 4 KiB question, four recent exchanges/16 KiB history,
 8 KiB optional feedback, 2,000 output tokens, 60 seconds. Each Node process permits
-10 questions/minute per verified learner, one active request per learner and four total.
+10 AI requests/minute per verified learner, one active request per learner and four total,
+shared across the problem tutor, React tutor and code evaluation.
 These controls do not represent a distributed or monetary budget. Provider retention is
 separate from the app's session-only chat lifetime.
 
@@ -396,6 +397,57 @@ Deterministic tutor tests inject streams and make no paid inference calls. Real 
 and signed-in Electron reviews are recorded separately in the
 [tutor brief](features/problem-ai-tutor.md). Keep the dedicated development learner and
 existing production/desktop test setup; coordinate free port 3000 with a running app.
+
+## AI capabilities
+
+Evaluate sits beside Run and Submit in published JavaScript and Algorithms practice.
+It captures the latest unsaved code on click and displays its report above existing
+judge results inside Test Result. It runs static AI review, not tests, and never saves
+code, changes notes or marks a problem solved. Reports last for this learner/problem
+visit and show a stale warning after code changes. Stop and deliberate Retry preserve
+the draft; Retry captures fresh source. Reports are displayed only after completion
+and server/client validation, so partial JSON never appears as an assessment.
+
+`POST /api/problems/[problemId]/evaluate` authenticates and validates origin/input
+before selecting public problem context. The version 1 rubric awards correctness /4,
+efficiency /3, quality /2 and edge cases /1; the application computes the total.
+The report includes time/space complexity, evidence and up to five improvements.
+Validation rejects efficiency credit for nonfunctional code and full efficiency
+credit for substantially incomplete code. The total is derived from validated
+criterion scores, never a separately supplied model total.
+The prompt does not claim executed tests or require checks outside the problem's
+constraints. Scores are generated assessments, not acceptance verdicts.
+
+Use the existing `OPENAI_API_KEY` and `OPENAI_TUTOR_MODEL`. Optional
+`OPENAI_EVALUATION_MODEL` selects a separate evaluation model; an empty value falls
+back to the tutor model. Evaluation allows 32 KiB source, 3,000 output tokens and
+60 seconds. Only empty configuration examples are tracked.
+
+AI code ownership:
+
+| Location                                         | Owns                                                                                            |
+| ------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
+| `features/ai/lib`                                | Browser-safe streaming protocol, byte limits and stream reader                                  |
+| `features/ai/server`                             | Runtime provider SDK, sanitized failures, cancellation, response lifecycle and shared admission |
+| `features/problems/server/problem-ai-context.ts` | Public problem selection and explicit context projection for both capabilities                  |
+| Feature-owned contracts, prompts, state and UI   | Input validation, rubric/schema, output validation, source snapshots and presentation           |
+
+To add a capability, define its feature-owned input/output contract and prompt,
+configure `createAiTextProvider`, authenticate/validate its thin route, then call
+`streamAiResponse`. Supply `validateOutput` for structured reports. Prompts and schemas
+stay with the feature; provider transport never imports problem content or UI. The
+SDK and credentials remain server-only. Do not import server modules from client
+components. No provider plugin registry or additional package is needed for the
+current consumers; the `AiTextProvider` interface supports deterministic tests and
+future provider adapters without changing feature prompts or browser transport.
+
+Admission is shared across capabilities **within each Node process** and held until
+completion, cancellation, failure or timeout. Before a replicated deployment, replace
+the in-memory limiter through its `AiLimiter` interface with shared atomic admission,
+durable usage/spend accounting and deployment-wide budgets. Current limits make no
+claim of a distributed or monetary quota. Add capability/model metrics without logging
+raw source, prompts, notes or credentials. Provider retention remains separate from
+the app's visit-only lifetime and `store: false`.
 
 ## Deployment and future work
 

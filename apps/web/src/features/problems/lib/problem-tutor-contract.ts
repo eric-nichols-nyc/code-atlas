@@ -7,32 +7,34 @@ import {
   verdicts,
 } from "@workspace/problems";
 
+import {
+  AI_LIMITS,
+  type AiTextEvent,
+  isObject,
+  AiInputError as TutorInputError,
+  utf8Bytes,
+} from "@/features/ai/lib/contract";
+
+export {
+  AiInputError as TutorInputError,
+  isObject,
+  parseAiTextEvent as parseTutorEvent,
+  utf8Bytes,
+} from "@/features/ai/lib/contract";
+
 export const TUTOR_LIMITS = {
-  body: 128 * 1024,
+  ...AI_LIMITS,
   question: 4 * 1024,
   history: 16 * 1024,
   historyMessages: 8,
   feedback: 8 * 1024,
   problem: 16 * 1024,
   prompt: 96 * 1024,
-  output: 64 * 1024,
   outputTokens: 2000,
-  timeout: 60000,
 } as const;
-export const utf8Bytes = (text: string) =>
-  new TextEncoder().encode(text).length;
-export const isObject = (value: unknown): value is Record<string, unknown> =>
-  Boolean(value) && typeof value === "object" && !Array.isArray(value);
+
 const only = (value: Record<string, unknown>, keys: string[]) =>
   Object.keys(value).every((key) => keys.includes(key));
-export class TutorInputError extends Error {
-  constructor(
-    message: string,
-    public status = 400,
-  ) {
-    super(message);
-  }
-}
 export interface TutorHistoryMessage {
   role: "user" | "assistant";
   content: string;
@@ -57,11 +59,7 @@ export interface TutorRequest {
   runFeedback?: TutorRunFeedback;
   feedbackOmitted?: boolean;
 }
-export type TutorEvent =
-  | { type: "start" }
-  | { type: "delta"; text: string }
-  | { type: "done" }
-  | { type: "error"; message: string };
+export type TutorEvent = AiTextEvent;
 
 export function trimTutorHistory(messages: TutorHistoryMessage[]) {
   let history = messages.slice(-TUTOR_LIMITS.historyMessages);
@@ -230,26 +228,4 @@ export function parseTutorRequest(
     ...(runFeedback ? { runFeedback } : {}),
     ...(value.feedbackOmitted === true ? { feedbackOmitted: true } : {}),
   };
-}
-
-export function parseTutorEvent(value: unknown): TutorEvent {
-  if (!isObject(value)) throw new Error("The tutor returned an invalid reply.");
-  if (
-    (value.type === "start" || value.type === "done") &&
-    only(value, ["type"])
-  )
-    return { type: value.type };
-  if (
-    value.type === "delta" &&
-    typeof value.text === "string" &&
-    only(value, ["type", "text"])
-  )
-    return { type: "delta", text: value.text };
-  if (
-    value.type === "error" &&
-    typeof value.message === "string" &&
-    only(value, ["type", "message"])
-  )
-    return { type: "error", message: value.message };
-  throw new Error("The tutor returned an invalid reply.");
 }

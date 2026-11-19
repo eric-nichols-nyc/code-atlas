@@ -8,7 +8,11 @@ setup("authenticate the dedicated development learner", async ({ page }) => {
   if (!email || !password) throw new Error("Dedicated test learner is missing");
   await page.goto("/sign-in");
   await page.getByRole("textbox", { name: "Email", exact: true }).fill(email);
-  await page.getByLabel("Password", { exact: true }).fill(password);
+  // Streamed authentication can briefly retain a hidden server-rendered form.
+  await page
+    .getByLabel("Password", { exact: true })
+    .filter({ visible: true })
+    .fill(password);
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
   await expect(page).toHaveURL(/\/dashboard$/);
   await expect(

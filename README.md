@@ -66,6 +66,9 @@ feedback, and improve.**
   Submit, regardless of verdict. Unsaved editor changes remain in memory.
 - **Context-aware AI tutor:** Ask for hints using your current unsaved code and the problem
   context. Requests happen only when you send a question; chat lasts for this visit.
+- **AI code evaluation:** Select Evaluate beside Run and Submit for a scored review of
+  correctness, efficiency, code quality and edge cases in the existing Test Result area.
+  Reports review the captured code without executing it and last for this visit.
 - **React development pilot:** In development, explore React from Dashboard and select Practice for a
   Stale Closure Counter exercise with a TypeScript/JSX editor, Submit-based browser
   preview, console and the existing tutor. Drafts/chat are visit-only. The pilot is
@@ -221,6 +224,9 @@ and the [full command list](docs/development.md#commands).
 Individual Learn lessons, additional JavaScript and Algorithms challenges, saved tutor history,
 note media embeds/uploads, submission history, and signed desktop distribution are planned.
 AI tutoring requires a server OpenAI key and model setting; see the [tutor setup](docs/development.md#ai-tutor). Hosted deployment is not yet configured.
+Evaluation reuses that configuration; `OPENAI_EVALUATION_MODEL` optionally selects a
+separate model. See [AI capabilities](docs/development.md#ai-capabilities) for shared
+infrastructure and the [evaluation brief](docs/features/code-evaluation.md) for scope.
 
 ## Documentation
 

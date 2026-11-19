@@ -5,10 +5,10 @@ import {
 } from "@workspace/problems";
 import { expect, it } from "vitest";
 import {
-  buildTutorPrompt,
-  tutorProblem,
-  tutorProblemContext,
-} from "./tutor-context";
+  aiProblem as tutorProblem,
+  problemAiContext as tutorProblemContext,
+} from "./problem-ai-context";
+import { buildTutorPrompt } from "./tutor-context";
 
 it("loads the authored statement and public metadata for every published problem", async () => {
   for (const problem of publicProblems) {

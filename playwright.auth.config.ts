@@ -1,6 +1,9 @@
 import { existsSync } from "node:fs";
 import { defineConfig, devices } from "@playwright/test";
 
+const port = process.env.PLAYWRIGHT_PORT ?? "3000";
+const baseURL = `http://localhost:${port}`;
+
 // Use an isolated Neon branch and dedicated test account, never a personal session.
 for (const path of [".env.test.local", "apps/web/.env.local"]) {
   if (existsSync(path)) process.loadEnvFile(path);
@@ -21,7 +24,7 @@ export default defineConfig({
   workers: 1,
   reporter: [["list"], ["html", { open: "never" }]],
   use: {
-    baseURL: "http://localhost:3000",
+    baseURL,
     trace: "off",
     screenshot: "off",
     video: "off",
@@ -30,15 +33,14 @@ export default defineConfig({
     { name: "auth-setup", testMatch: /auth\.setup\.ts/ },
     {
       name: "authenticated-chromium",
-      testMatch: /(learning|tutor)\.spec\.ts/,
+      testMatch: /(learning|tutor|evaluation)\.spec\.ts/,
       dependencies: ["auth-setup"],
       use: { ...devices["Desktop Chrome"], storageState: ".auth/learner.json" },
     },
   ],
   webServer: {
-    command:
-      "pnpm --filter @workspace/web build && pnpm --filter @workspace/web start",
-    url: "http://localhost:3000",
+    command: `pnpm --filter @workspace/web build && pnpm --filter @workspace/web exec next start --port ${port}`,
+    url: baseURL,
     reuseExistingServer: false,
     timeout: 180000,
     env: {

@@ -1,6 +1,10 @@
 "use client";
 import { Button } from "@workspace/ui/components/button";
-import { RotateCcwIcon, Share2Icon } from "@workspace/ui/components/icons";
+import {
+  RotateCcwIcon,
+  Share2Icon,
+  SparklesIcon,
+} from "@workspace/ui/components/icons";
 import { ThemeSwitcher } from "@workspace/ui/components/theme-switcher";
 import dynamic from "next/dynamic";
 import { useProblemSession } from "../state/problem-session";
@@ -65,17 +69,28 @@ export function CodePanel() {
         </div>
         <div className="flex gap-2">
           <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => void s.evaluation.evaluate()}
+            disabled={Boolean(s.pending) || s.evaluation.busy}
+            aria-label={s.evaluation.busy ? "Evaluating code" : "Evaluate"}
+          >
+            <SparklesIcon aria-hidden="true" data-icon="inline-start" />
+            {s.evaluation.busy ? "Evaluating…" : "Evaluate"}
+          </Button>
+          <Button
             variant="outline"
             size="sm"
             onClick={() => void s.execute("run")}
-            disabled={Boolean(s.pending)}
+            disabled={Boolean(s.pending) || s.evaluation.busy}
           >
             {s.pending === "run" ? "Running…" : "Run"}
           </Button>
           <Button
             size="sm"
             onClick={() => void s.execute("submit")}
-            disabled={Boolean(s.pending)}
+            disabled={Boolean(s.pending) || s.evaluation.busy}
           >
             {s.pending === "submit" ? "Submitting…" : "Submit"}
           </Button>

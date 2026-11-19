@@ -10,6 +10,7 @@ import {
 import { inputDraft } from "../lib/input-drafts";
 import { useProblemSession } from "../state/problem-session";
 import { CaseInputFields } from "./case-input-fields";
+import { CodeEvaluationResult } from "./code-evaluation";
 import { verdictLabels } from "./description-panel";
 export function ResultPanel() {
   const s = useProblemSession();
@@ -77,6 +78,7 @@ export function ResultPanel() {
             </p>
           </TabsContent>
           <TabsContent value="test-result">
+            <CodeEvaluationResult />
             <div role="status" aria-live="polite">
               {s.pending ? (
                 <p className="py-4 text-sm text-muted-foreground">
@@ -167,7 +169,8 @@ export function ResultPanel() {
                   </ol>
                 </>
               ) : (
-                !s.error && (
+                !s.error &&
+                s.evaluation.attemptSource === null && (
                   <p className="py-5 text-sm text-muted-foreground">
                     Run your code to see test results.
                   </p>
