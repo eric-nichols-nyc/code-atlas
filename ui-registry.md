@@ -213,11 +213,11 @@ Last updated: 2026-11-09. Implemented in `apps/web/src/features/learning/`, `fea
 | Subject catalog          | Flat rows; fixed ordinal/action slots; title and concise topic tag on one line |
 | Unavailable lesson       | Coming soon text and clock icon; no dead navigation or paywall-style lock      |
 
-The coding workspace puts a problem description on the left, editable JavaScript above Testcase/Test Result in the center, and optional learning tools on the right. Notes and the problem-aware AI tutor are available. The visualization and multiple-choice checkpoint are removed. All three splitters resize; closing the tools panel releases its column. Mobile uses a reading flow and drawers. Preserve source, editor selection/undo, cases and results above responsive branches.
+The coding workspace puts Problem and Notes tabs on the left, editable JavaScript above Testcase/Test Result in the center, and the optional AI tutor on the right. The visualization and multiple-choice checkpoint are removed. All three splitters resize; closing the tools panel releases its column. Mobile uses a reading flow and drawers. Preserve source, editor selection/undo, cases and results above responsive branches.
 
 Shared learning panels use `learning-panel` (`bg-card`, `border`, `rounded-md`, no shadow),42px headers and16–20px inner padding. Problem headings use24/32px; prose14/23px. CodeMirror uses Menlo13/24px, semantic light/dark syntax roles and local assets. Default Tab exits the editor; Mod-Enter runs. Lazy editor loading reserves its space. Show Saved to account only after a successful database write/read; ordinary typing is Unsaved edits and latest verdicts remain session results.
 
-The problem description is continuous, with no left-panel tabs or Submissions view. Hints and Solution use shared Accordion rows; Testcase/Test Result retain shared line Tabs. Cases use shared Buttons and labeled numeric Input. Verdicts are server results with text labels, bounded diagnostics and explicit stale-code warnings. Hidden cases never expose private values/logs. Tutor uses the question-triggered chat described below; Notes uses the private note editor described below. Counter (Closures), Filter Elements from Array (Arrays), Debounce and Sleep (Async) are published practice problems. Learn has a module catalog and read-only Two Pointers preview; guided lessons remain future work.
+The Problem tab shows the continuous problem description and is selected by default. Notes is the second tab. Hints and Solution use shared Accordion rows; Testcase/Test Result retain shared line Tabs. Cases use shared Buttons and labeled numeric Input. Verdicts are server results with text labels, bounded diagnostics and explicit stale-code warnings. Hidden cases never expose private values/logs. Tutor uses the question-triggered chat described below; Notes uses the private note editor described below. Counter (Closures), Filter Elements from Array (Arrays), Debounce and Sleep (Async) are published practice problems. Learn has a module catalog and read-only Two Pointers preview; guided lessons remain future work.
 
 Feature CSS in `apps/web/src/app/globals.css` owns viewport containment and editor layout; shared primitives/tokens remain in UI. Split mode contains document scrolling; route exit removes the root mode attribute and restores ordinary scrolling. Sheets disable animation for reduced-motion preferences.
 
@@ -347,14 +347,13 @@ Last updated: 2026-11-09. Reference: TraceCode binary-search workspace.
 | Global navigation | Omitted on individual JavaScript problem routes; retained on catalog and Learn pages                 |
 | Back action       | Shared ghost Button, small size, decorative ArrowLeft icon and a real link to `/javascript/practice` |
 | Workspace toolbar | Existing background/border, `px-3 py-2`, wrapping controls with `gap-2`; no brand or subject links   |
-| Tools             | Back link with AI tutor and Notes icons; editor header owns its icon controls                        |
+| Tools             | Back link with AI tutor icon; editor header owns its icon controls                                   |
 
 Keep authentication and theme providers mounted. The compact toolbar participates in
 workspace height measurement, allowing panes to use the space released by the global
 header. Back always returns to Practice, including after directly opening a problem.
-The Problems drawer and Reset layout control are removed. AI uses Sparkles and
-Notes uses NotebookPen, both shared icon Buttons. Each opens its matching tab in
-the existing panel/drawer; clicking the active icon closes the panel. Use a visible
+The AI tutor uses a shared icon Button with Sparkles. Clicking the icon toggles
+the docked panel or mobile drawer. Use a visible
 active state, accessible Show/Hide names and titles, and `aria-expanded`. Closing
 the mobile drawer restores focus to the icon that opened it.
 
@@ -375,8 +374,8 @@ and `state/problem-session.tsx`. Last updated: 2026-11-09.
 | Execution actions    | Run and Submit stay beneath the editor; no Reset layout action                                   |
 
 Keep help expansion in the problem session above adaptive branches. Solution reveals
-the authored code and explanation below the hints. Remove left-tab selection and
-submission-history state; keep the latest real result in Test Result. Reset code is
+the authored code and explanation below the hints in the Problem tab. Keep the
+latest real result in Test Result. Reset code is
 only enabled for an edited source and restores starter code. Icons have accessible
 names; tooltips identify the reset/share actions.
 
@@ -484,14 +483,13 @@ show an accepted/saved state without the server response.
 ## Private problem notes
 
 Files: `features/problems/components/problem-notes.tsx`, `problem-notes-editor.tsx`,
-`state/problem-notes.tsx`, and the existing learning workspace/tools panel.
-Last updated: 2026-11-13.
+`state/problem-notes.tsx`, and `problem-experience.tsx`.
+Last updated: 2026-11-19.
 
-Keep the existing Notes tab, active icon state, 42px panel header, and mobile Sheet
-focus restoration. The notes body uses 12px padding, FieldGroup/Field/FieldTitle,
+Use shared line Tabs in the 42px problem pane header, with Problem first and Notes
+second. The notes body uses 12px padding, FieldGroup/Field/FieldTitle,
 a bordered rounded-md editor, and shared small Buttons. The wrapping formatting
-fieldset uses ghost icon Buttons with names, titles, and pressed state; it fits the
-existing 256–360px tools column. Links open a labeled inline URL field with Apply
+fieldset uses ghost icon Buttons with names, titles, and pressed state; it wraps to fit the problem pane. Links open a labeled inline URL field with Apply
 and Cancel; Escape closes that field and returns focus to its trigger.
 
 Load Quill on demand with core document CSS and app-scoped semantic colors. Body
@@ -500,12 +498,11 @@ border token; code blocks use muted backgrounds and internal horizontal scrollin
 Long links wrap inside the editor. Tab leaves the editor, including code blocks.
 Theme changes use CSS without reconstructing the editor.
 
-Mount the mobile Sheet only in non-docked layouts so its exiting portal cannot
-coexist with the desktop editor. Keep notes state above layout/tab branches. Show Loading your notes, No saved notes
+Keep notes state and the selected tab above responsive layout branches. Show Loading your notes, No saved notes
 yet, Unsaved changes, Saving, Saved with the confirmed account timestamp, or Not saved
 to account. Use status text, inline FieldError, and explicit Retry loading/saving
 notes or Sign in. A failed initial read blocks editing. Preserve later typing when
-a save completes, and preserve drafts when tools close or resize. Display the draft
+a save completes, and preserve drafts when switching tabs or resizing. Display the draft
 lifetime near Save: unsaved changes end when leaving/reloading the problem. Notes
 Save, Reset code, progress, and Run/Submit have independent effects.
 
@@ -515,7 +512,7 @@ Files: `features/problems/components/problem-tutor.tsx`, `state/problem-tutor.ts
 and shared `message`, `message-scroller`, `bubble`, and `textarea` primitives.
 Last updated: 2026-11-14.
 
-Keep the existing AI/Notes tabs, 42px header, docked column and mobile Sheet. State
+Use an AI tutor heading in the 42px docked panel header and as the mobile Sheet title. State
 belongs above adaptive branches; one tutor body is mounted at a time. Use the shared
 MessageScroller for streaming follow and its jump-to-latest control. Use Message with
 You/AI tutor headers, muted user Bubble and ghost assistant Bubble. The transcript has

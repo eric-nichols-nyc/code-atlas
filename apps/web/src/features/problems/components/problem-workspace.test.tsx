@@ -1,4 +1,10 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
 import {
   chunkArrayProblem,
   counterProblem,
@@ -319,24 +325,27 @@ describe("real coding workspace", () => {
       screen.getByRole("textbox", { name: "JavaScript solution" }),
     ).toHaveValue(sleepProblem.starterCode);
   });
-  it("opens the matching tool tab and restores drawer focus", async () => {
+  it("places Notes beside Problem and restores focus after closing the AI tutor", async () => {
     render(<Workspace />);
     const editor = screen.getByRole("textbox", { name: "JavaScript solution" });
     fireEvent.change(editor, { target: { value: "// My work" } });
-    const notes = screen.getByRole("button", { name: "Show notes" });
-    fireEvent.click(notes);
-    expect(screen.getByRole("tab", { name: "Notes" })).toHaveAttribute(
-      "aria-selected",
-      "true",
-    );
-    fireEvent.click(screen.getByRole("button", { name: "Close" }));
-    await waitFor(() => expect(notes).toHaveFocus());
+    const tabs = screen.getByRole("tablist", { name: "Problem workspace" });
+    const problem = within(tabs).getByRole("tab", { name: "Problem" });
+    const notes = within(tabs).getByRole("tab", { name: "Notes" });
+    expect(within(tabs).getAllByRole("tab")).toEqual([problem, notes]);
+    expect(problem).toHaveAttribute("aria-selected", "true");
+    fireEvent.mouseDown(notes, { button: 0 });
+    expect(screen.getByRole("tabpanel", { name: "Notes" })).toBeVisible();
+    expect(screen.getByRole("form", { name: "Problem notes" })).toBeVisible();
+    expect(screen.queryByRole("dialog")).toBeNull();
+    fireEvent.mouseDown(problem, { button: 0 });
+    expect(
+      screen.getByRole("region", { name: "Problem description" }),
+    ).toBeVisible();
     const ai = screen.getByRole("button", { name: "Show AI tutor" });
     fireEvent.click(ai);
-    expect(screen.getByRole("tab", { name: "AI tutor" })).toHaveAttribute(
-      "aria-selected",
-      "true",
-    );
+    const drawer = screen.getByRole("dialog", { name: "AI tutor" });
+    expect(within(drawer).queryByRole("tab", { name: "Notes" })).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: "Close" }));
     await waitFor(() => expect(ai).toHaveFocus());
     expect(editor).toHaveValue("// My work");

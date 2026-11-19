@@ -1,10 +1,6 @@
 "use client";
 import { Button } from "@workspace/ui/components/button";
-import {
-  ArrowLeftIcon,
-  NotebookPenIcon,
-  SparklesIcon,
-} from "@workspace/ui/components/icons";
+import { ArrowLeftIcon, SparklesIcon } from "@workspace/ui/components/icons";
 import {
   Sheet,
   SheetContent,
@@ -15,17 +11,14 @@ import {
 import Link from "next/link";
 import { type ReactNode, useRef, useState } from "react";
 import { useWorkspaceLayout } from "../hooks/use-workspace-layout";
-import { useWorkspaceTools } from "../state/workspace-tools";
 import {
   ResizableWorkspace,
   type WorkspaceHandle,
 } from "./resizable-workspace";
-import { TutorPanel } from "./tutor-panel";
 export function LearningWorkspace({
   lesson,
   code,
   output,
-  notes,
   tutor,
   backHref = "/javascript/practice",
   subjectTitle = "JavaScript",
@@ -33,25 +26,20 @@ export function LearningWorkspace({
   lesson: ReactNode;
   code: ReactNode;
   output?: ReactNode;
-  notes?: ReactNode;
-  tutor?: ReactNode;
+  tutor: ReactNode;
   backHref?: string;
   subjectTitle?: string;
 }) {
   const layout = useWorkspaceLayout();
-  const tools = useWorkspaceTools();
   const [tutorOpen, setTutorOpen] = useState(false);
   const toolTrigger = useRef<HTMLButtonElement>(null);
   const api = useRef<WorkspaceHandle>(null);
   const docked = layout.mode === "wide";
-  const toggleTool = (tab: "tutor" | "notes", trigger: HTMLButtonElement) => {
+  const toggleTutor = (trigger: HTMLButtonElement) => {
     api.current?.capture();
     toolTrigger.current = trigger;
-    setTutorOpen(!tutorOpen || tools.tab !== tab);
-    tools.setTab(tab);
+    setTutorOpen(!tutorOpen);
   };
-  const aiActive = tutorOpen && tools.tab === "tutor";
-  const notesActive = tutorOpen && tools.tab === "notes";
   return (
     <main
       className="min-w-0 flex-1"
@@ -69,32 +57,18 @@ export function LearningWorkspace({
             </Link>
           </Button>
         </nav>
-        <div className="flex items-center gap-1">
-          <Button
-            type="button"
-            variant={aiActive ? "secondary" : "outline"}
-            size="icon"
-            aria-label={aiActive ? "Hide AI tutor" : "Show AI tutor"}
-            title={aiActive ? "Hide AI tutor" : "Show AI tutor"}
-            aria-expanded={aiActive}
-            aria-controls="lesson-tutor"
-            onClick={(event) => toggleTool("tutor", event.currentTarget)}
-          >
-            <SparklesIcon aria-hidden="true" />
-          </Button>
-          <Button
-            type="button"
-            variant={notesActive ? "secondary" : "outline"}
-            size="icon"
-            aria-label={notesActive ? "Hide notes" : "Show notes"}
-            title={notesActive ? "Hide notes" : "Show notes"}
-            aria-expanded={notesActive}
-            aria-controls="lesson-tutor"
-            onClick={(event) => toggleTool("notes", event.currentTarget)}
-          >
-            <NotebookPenIcon aria-hidden="true" />
-          </Button>
-        </div>
+        <Button
+          type="button"
+          variant={tutorOpen ? "secondary" : "outline"}
+          size="icon"
+          aria-label={tutorOpen ? "Hide AI tutor" : "Show AI tutor"}
+          title={tutorOpen ? "Hide AI tutor" : "Show AI tutor"}
+          aria-expanded={tutorOpen}
+          aria-controls="lesson-tutor"
+          onClick={(event) => toggleTutor(event.currentTarget)}
+        >
+          <SparklesIcon aria-hidden="true" />
+        </Button>
       </header>
       <div
         ref={layout.host}
@@ -120,9 +94,19 @@ export function LearningWorkspace({
             output={output}
             tutor={
               docked && tutorOpen ? (
-                <div id="lesson-tutor" className="h-full">
-                  <TutorPanel notes={notes} tutor={tutor} />
-                </div>
+                <section
+                  id="lesson-tutor"
+                  className="learning-panel"
+                  aria-labelledby="lesson-tutor-title"
+                >
+                  <h2
+                    id="lesson-tutor-title"
+                    className="learning-panel-header font-medium"
+                  >
+                    AI tutor
+                  </h2>
+                  <div className="min-h-0 flex-1 overflow-hidden">{tutor}</div>
+                </section>
               ) : undefined
             }
             preferences={layout.preferences}
@@ -143,15 +127,10 @@ export function LearningWorkspace({
             }}
           >
             <SheetHeader>
-              <SheetTitle>Learning tools</SheetTitle>
-              <SheetDescription>
-                Ask about your current code or keep private notes for this
-                problem.
-              </SheetDescription>
+              <SheetTitle>AI tutor</SheetTitle>
+              <SheetDescription>Ask about your current code.</SheetDescription>
             </SheetHeader>
-            <div className="min-h-0 flex-1 px-4 pb-4">
-              <TutorPanel notes={notes} tutor={tutor} />
-            </div>
+            <div className="min-h-0 flex-1 px-4 pb-4">{tutor}</div>
           </SheetContent>
         </Sheet>
       )}

@@ -1,9 +1,14 @@
 "use client";
 import type { ProblemDefinition } from "@workspace/problems";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@workspace/ui/components/tabs";
 import dynamic from "next/dynamic";
-import type { ReactNode } from "react";
+import { type ReactNode, useState } from "react";
 import { LearningWorkspace } from "../../learning/components/learning-workspace";
-import { WorkspaceTools } from "../../learning/state/workspace-tools";
 import { ProblemNotesSession } from "../state/problem-notes";
 import { ProblemSession } from "../state/problem-session";
 import { ProblemTutorSession } from "../state/problem-tutor";
@@ -39,21 +44,50 @@ export function ProblemExperience({
     >
       <ProblemNotesSession problemId={problem.id} learnerId={learnerId}>
         <ProblemTutorSession>
-          <WorkspaceTools>
-            <LearningWorkspace
-              backHref={`/${problem.subjectId}/practice`}
-              subjectTitle={
-                problem.subjectId === "algorithms" ? "Algorithms" : "JavaScript"
-              }
-              lesson={<DescriptionPanel>{children}</DescriptionPanel>}
-              code={<CodePanel />}
-              output={<ResultPanel />}
-              notes={<ProblemNotes />}
-              tutor={<ProblemTutor />}
-            />
-          </WorkspaceTools>
+          <ProblemWorkspace problem={problem}>{children}</ProblemWorkspace>
         </ProblemTutorSession>
       </ProblemNotesSession>
     </ProblemSession>
+  );
+}
+
+function ProblemWorkspace({
+  problem,
+  children,
+}: {
+  problem: ProblemDefinition;
+  children: ReactNode;
+}) {
+  const [tab, setTab] = useState("problem");
+  return (
+    <LearningWorkspace
+      backHref={`/${problem.subjectId}/practice`}
+      subjectTitle={
+        problem.subjectId === "algorithms" ? "Algorithms" : "JavaScript"
+      }
+      lesson={
+        <Tabs
+          value={tab}
+          onValueChange={setTab}
+          className="learning-panel gap-0"
+        >
+          <div className="learning-panel-header">
+            <TabsList variant="line" aria-label="Problem workspace">
+              <TabsTrigger value="problem">Problem</TabsTrigger>
+              <TabsTrigger value="notes">Notes</TabsTrigger>
+            </TabsList>
+          </div>
+          <TabsContent value="problem" className="min-h-0 overflow-y-auto">
+            <DescriptionPanel>{children}</DescriptionPanel>
+          </TabsContent>
+          <TabsContent value="notes" className="min-h-0 overflow-y-auto p-3">
+            <ProblemNotes />
+          </TabsContent>
+        </Tabs>
+      }
+      code={<CodePanel />}
+      output={<ResultPanel />}
+      tutor={<ProblemTutor />}
+    />
   );
 }

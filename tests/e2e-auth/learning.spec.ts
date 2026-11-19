@@ -664,7 +664,7 @@ test("source/results survive resize and tools", async ({ page }) => {
 
 const notesApi = "/api/problems/javascript.sleep/notes";
 async function openNotes(page: Page) {
-  await page.getByRole("button", { name: "Show notes", exact: true }).click();
+  await page.getByRole("tab", { name: "Notes", exact: true }).click();
   await expect(page.getByRole("textbox", { name: "Your notes" })).toBeVisible({
     timeout: 20000,
   });
@@ -809,6 +809,8 @@ test("private formatted notes save, reload, survive tools/layout, and clear inde
       .getByRole("button", { name: "Clear formatting", exact: true })
       .click();
     await expect(editor.locator("strong,em")).toHaveCount(0);
+    const problemTab = page.getByRole("tab", { name: "Problem", exact: true });
+    await problemTab.click();
     await solution(page);
     await page.getByLabel("millis =", { exact: true }).fill("25");
     await page.getByRole("button", { name: "Hint 1", exact: true }).click();
@@ -820,6 +822,7 @@ test("private formatted notes save, reload, survive tools/layout, and clear inde
     await page
       .getByRole("textbox", { name: "JavaScript solution" })
       .fill("// In-session code remains intact");
+    await openNotes(page);
     await editor.fill("Unsaved note preserved across layouts");
     await editor.focus();
     await page.keyboard.press("Tab");
@@ -841,13 +844,6 @@ test("private formatted notes save, reload, survive tools/layout, and clear inde
           includeHidden: true,
         }),
       ).toHaveText("// In-session code remains intact");
-      await expect(
-        page.getByRole("button", {
-          name: "Hint 1",
-          exact: true,
-          includeHidden: true,
-        }),
-      ).toHaveAttribute("aria-expanded", "true");
       await expect(page.getByTestId("execution-verdict")).toHaveText(
         "Accepted",
       );
@@ -855,22 +851,17 @@ test("private formatted notes save, reload, survive tools/layout, and clear inde
       await expect(editor).toHaveCount(1);
     }
     await page.setViewportSize({ width: 390, height: 844 });
-    await page.getByRole("button", { name: "Close", exact: true }).click();
-    const trigger = page.getByRole("button", {
-      name: "Show notes",
-      exact: true,
-    });
-    await expect(trigger).toBeFocused();
+    await problemTab.click();
+    await expect(
+      page.getByRole("button", { name: "Hint 1", exact: true }),
+    ).toHaveAttribute("aria-expanded", "true");
     await page.getByRole("tab", { name: "Testcase", exact: true }).click();
     await expect(page.getByLabel("millis =", { exact: true })).toHaveValue(
       "25",
     );
     await page.getByRole("tab", { name: "Test Result", exact: true }).click();
     await expect(page.getByTestId("execution-verdict")).toHaveText("Accepted");
-    await trigger.click();
-    await expect(editor).toHaveText("Unsaved note preserved across layouts");
-    await page.getByRole("tab", { name: "AI tutor", exact: true }).click();
-    await page.getByRole("tab", { name: "Notes", exact: true }).click();
+    await openNotes(page);
     await expect(editor).toHaveText("Unsaved note preserved across layouts");
     await editor.fill("");
     await form.getByRole("button", { name: "Save", exact: true }).click();
@@ -911,7 +902,7 @@ test("notes load/save failures retain the draft and support explicit recovery", 
     } else await route.continue();
   });
   try {
-    await page.getByRole("button", { name: "Show notes", exact: true }).click();
+    await page.getByRole("tab", { name: "Notes", exact: true }).click();
     const form = page.getByRole("form", { name: "Problem notes" });
     await expect(
       form.getByRole("button", { name: "Save", exact: true }),
@@ -938,6 +929,7 @@ test("notes load/save failures retain the draft and support explicit recovery", 
 test("account notes stay problem-specific and restore in a fresh browser context", async ({
   page,
   browser,
+  baseURL,
 }) => {
   const counterApi = "/api/problems/javascript.counter/notes";
   await page.goto(path);
@@ -946,15 +938,17 @@ test("account notes stay problem-specific and restore in a fresh browser context
       (await page.request.get(api)).json(),
     ),
   );
+  const run = Date.now();
+  const fixtures = [
+    ["sleep", `Sleep account notes fixture ${run}`],
+    ["counter", `Counter account notes fixture ${run}`],
+  ] as const;
   const fresh = await browser.newContext({
-    baseURL: "http://localhost:3000",
+    baseURL,
     storageState: await page.context().storageState(),
   });
   try {
-    for (const [problem, text] of [
-      ["sleep", "Sleep account notes fixture"],
-      ["counter", "Counter account notes fixture"],
-    ] as const) {
+    for (const [problem, text] of fixtures) {
       await page.goto(`/javascript/practice/${problem}`);
       await openNotes(page);
       await page.getByRole("textbox", { name: "Your notes" }).fill(text);
@@ -964,10 +958,7 @@ test("account notes stay problem-specific and restore in a fresh browser context
       ).toHaveText(/^Saved /);
     }
     const restored = await fresh.newPage();
-    for (const [problem, text] of [
-      ["sleep", "Sleep account notes fixture"],
-      ["counter", "Counter account notes fixture"],
-    ] as const) {
+    for (const [problem, text] of fixtures) {
       await restored.goto(`/javascript/practice/${problem}`);
       await openNotes(restored);
       await expect(
@@ -980,15 +971,19 @@ test("account notes stay problem-specific and restore in a fresh browser context
       "/api/practice-progress",
     ]) {
       const response = await page.request.get(publicPath);
-      expect(await response.text()).not.toContain(
-        "Sleep account notes fixture",
-      );
+      expect(await response.text()).not.toContain(fixtures[0][1]);
     }
   } finally {
-    await fresh.close();
-    for (const [index, api] of [notesApi, counterApi].entries())
-      await page.request.put(api, {
-        data: { content: originals[index].content },
-      });
+    try {
+      await Promise.all(
+        [notesApi, counterApi].map((api, index) =>
+          page.request.put(api, {
+            data: { content: originals[index].content },
+          }),
+        ),
+      );
+    } finally {
+      await fresh.close();
+    }
   }
 });

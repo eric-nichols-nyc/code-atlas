@@ -25,8 +25,8 @@ export function DescriptionPanel({ children }: { children: ReactNode }) {
   const s = useProblemSession();
   const topic = topics.find((item) => item.id === s.problem.topicId);
   return (
-    <section className="learning-panel" aria-label="Problem description">
-      <div className="min-h-0 flex-1 overflow-y-auto p-5 [overflow-wrap:anywhere]">
+    <section aria-label="Problem description">
+      <div className="p-5 [overflow-wrap:anywhere]">
         <h1 className="mb-3 text-2xl leading-8 font-bold tracking-tight">
           {s.problem.title}
         </h1>

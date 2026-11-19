@@ -19,7 +19,7 @@ from Array, Debounce, and Sleep.
   Learn/Practice have book/code icons, centered desktop navigation, and text-only
   hover states. Mobile keeps Dashboard/topic visible above the section links.
   Current Learn availability is described in the linked learning brief.
-- Problem routes use Back to Practice and AI/Notes icon toggles instead of the global
+- Problem routes use Back to Practice and an AI tutor toggle in place of the global
   header. A continuous description contains examples, constraints, independent hint
   accordions, and Solution last. No visualization or Submissions view is included.
 - The shared editor supports Reset code, theme, a disabled Share icon, Run, Submit,

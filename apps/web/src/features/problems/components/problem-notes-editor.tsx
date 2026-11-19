@@ -302,7 +302,10 @@ export default function ProblemNotesEditor({
         </Field>
       )}
       {error && <FieldError className="shrink-0 px-3 py-2">{error}</FieldError>}
-      <div ref={host} className="min-h-0 flex-1 overflow-hidden" />
+      <div
+        ref={host}
+        className="min-h-0 flex-1 overflow-hidden [[data-layout=flow]_&]:min-h-40"
+      />
     </div>
   );
 }

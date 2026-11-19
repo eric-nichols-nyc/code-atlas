@@ -167,7 +167,7 @@ test("Anagram edited Run, private Submit, saved code, flags and private notes", 
       )
       .not.toBeNull();
     await expect(page.getByText(/^Saved to account ·/)).toBeVisible();
-    await page.getByRole("button", { name: "Show notes", exact: true }).click();
+    await page.getByRole("tab", { name: "Notes", exact: true }).click();
     const noteEditor = page.getByRole("textbox", {
       name: "Your notes",
       exact: true,
@@ -194,9 +194,9 @@ test("Anagram edited Run, private Submit, saved code, flags and private notes", 
     await expect(editor).toHaveText(validAnagramProblem.solution, {
       useInnerText: true,
     });
-    await page.getByRole("button", { name: "Show notes", exact: true }).click();
+    await page.getByRole("tab", { name: "Notes", exact: true }).click();
     await expect(noteEditor).toContainText("two forward pointers");
-    await page.getByRole("button", { name: "Hide notes", exact: true }).click();
+    await page.getByRole("tab", { name: "Problem", exact: true }).click();
     await page.setViewportSize({ width: 320, height: 900 });
     await noOverflow(page);
     await expect(editor).toHaveText(validAnagramProblem.solution, {
@@ -280,11 +280,11 @@ test("Algorithms workspace preserves drafts through themes, tools and narrow lay
   await expect(
     page.getByRole("textbox", { name: "t =", exact: true }),
   ).toBeFocused();
-  await page.getByRole("button", { name: "Show notes", exact: true }).click();
+  await page.getByRole("tab", { name: "Notes", exact: true }).click();
   await expect(
     page.getByRole("textbox", { name: "Your notes", exact: true }),
   ).toBeVisible();
-  await page.getByRole("button", { name: "Hide notes", exact: true }).click();
+  await page.getByRole("tab", { name: "Problem", exact: true }).click();
   // A second tab changes the existing theme preference without leaving the draft.
   const themePage = await context.newPage();
   await themePage.goto("/algorithms/learn");
