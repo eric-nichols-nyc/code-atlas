@@ -6,13 +6,14 @@ select Save, reload, and see the confirmed account note restored.
 
 ## Scope and decisions
 
-- Reuse the tools panel and mobile drawer with bold, italic, quotes, ordered/bulleted
+- Place Notes second in the problem pane tab list, after the default Problem tab.
+  Keep the existing editor with bold, italic, quotes, ordered/bulleted
   lists, code blocks, links, and clearing formatting. The editor loads on demand.
 - Explicit Save persists a validated versioned document through authenticated Next.js
   GET/PUT `/api/problems/{problemId}/notes` and a separate Prisma user/problem model.
   Ownership comes only from the verified Neon identity. Notes never enter public
   content, progress payloads, judging, or tutor context.
-- Drafts survive tools, tabs, resizing, and theme changes in the current session.
+- Drafts survive switching between Problem and Notes, resizing, and theme changes in the current session.
   Unsaved changes end on navigation/reload; confirmed saves follow the account.
   Concurrent sessions use last successful database write wins.
 - Failed initial reads block editing until retry. Failed saves preserve edits. Late
@@ -30,7 +31,21 @@ select Save, reload, and see the confirmed account note restored.
 - [x] Verify keyboard/focus, narrow layouts, web, and online Electron behavior.
 - [x] Run repository checks and separate credential-free and signed-in results.
 
-## Verification — 2026-11-13
+## Problem pane tabs — 2026-11-19
+
+Notes moved from the tutor panel and toolbar into the problem pane on desktop
+and mobile. Problem opens first and contains the description, hints, and
+solution. The AI tutor opens independently from its toolbar icon.
+
+- Lint, typecheck, web production build, and 77 focused tests passed.
+- Signed-in Chromium review confirmed tab order, keyboard switching, desktop
+  placement, and mobile rendering. Authenticated checks passed for note
+  formatting, saving, reload, retry, account isolation by problem, draft
+  retention across resizing and tab switches, and independent tutor behavior.
+- An initial fresh-context check timed out before restoring the dedicated test
+  learner's Sleep and Counter fixtures. The corrected check passed.
+
+## Original verification — 2026-11-13
 
 - `pnpm lint`, `pnpm typecheck`, `pnpm test`: **378 tests across 37 files passed**.
   Credential-free `pnpm build` passed. A concurrent build/test attempt hit two existing

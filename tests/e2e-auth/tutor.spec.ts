@@ -90,7 +90,6 @@ test("tutor requests only on Send, captures fresh code, survives panels, and end
   await expect(
     page.getByRole("textbox", { name: "Your notes", exact: true }),
   ).toBeVisible();
-  await page.getByRole("tab", { name: "AI tutor", exact: true }).click();
   await page.setViewportSize({ width: 390, height: 844 });
   await expect(question(page)).toHaveValue("draft while waiting");
   await expect(

@@ -31,8 +31,8 @@ JavaScript, React and Algorithms catalogs and Learn pages identify the topic wit
 an icon and name beside an arrow + Dashboard link. Learn/Practice are centered on
 desktop and remain visible on a second row below 1024px; account controls use the
 existing mobile disclosure. Learn/Practice have book/code icons and text-only hover states. Individual problem pages use a focused workspace
-with Back to Practice and AI/Notes icons. Each icon opens its corresponding tab; clicking the active
-icon closes the tools panel. Legacy `/learn/javascript` URLs redirect to Practice.
+with Back to Practice and an AI tutor toggle. The problem pane opens on Problem,
+with private notes in the second tab. Legacy `/learn/javascript` URLs redirect to Practice.
 
 The public landing page uses standalone Code Atlas hero branding and no global navigation.
 Its white Start practicing button opens Dashboard for a verified signed-in learner or Sign in
