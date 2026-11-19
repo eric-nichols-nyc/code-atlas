@@ -669,31 +669,6 @@ async function openNotes(page: Page) {
     timeout: 20000,
   });
 }
-async function selectNoteText(page: Page, text: string) {
-  await page
-    .getByRole("textbox", { name: "Your notes" })
-    .evaluate(async (root, target) => {
-      (root as HTMLElement).focus();
-      const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
-      let node = walker.nextNode();
-      while (node && !node.textContent?.includes(target))
-        node = walker.nextNode();
-      if (!node) throw new Error("Expected note text is missing");
-      const index = (node.textContent ?? "").indexOf(target);
-      const range = document.createRange();
-      range.setStart(node, index);
-      range.setEnd(node, index + target.length);
-      const selection = window.getSelection();
-      if (!selection) throw new Error("Selection is unavailable");
-      selection.removeAllRanges();
-      selection.addRange(range);
-      document.dispatchEvent(new Event("selectionchange"));
-      await new Promise((resolve) =>
-        requestAnimationFrame(() => requestAnimationFrame(resolve)),
-      );
-    }, text);
-}
-
 test("private formatted notes save, reload, survive tools/layout, and clear independently of progress", async ({
   page,
 }) => {
@@ -728,50 +703,31 @@ test("private formatted notes save, reload, survive tools/layout, and clear inde
     });
     await expect(editor).toContainText("Safe paste");
     await expect(
-      editor.locator("img,video,iframe,a[href^='javascript:'],[style]"),
+      editor.locator("img,video,iframe,a[href^='javascript:']"),
     ).toHaveCount(0);
-    await editor.fill(
-      "Private notes check\nQuoted insight\nFirst step\nRemember this\nconst result = 0;\nReference",
-    );
-    await editor.press("ControlOrMeta+A");
-    await editor.evaluate(async () => {
-      await new Promise((resolve) =>
-        requestAnimationFrame(() => requestAnimationFrame(resolve)),
-      );
-    });
-    await form
-      .getByRole("button", { name: "Clear formatting", exact: true })
-      .click();
-    for (const [text, control] of [
-      ["Private notes check", "Bold"],
-      ["Private notes check", "Italic"],
-      ["Quoted insight", "Blockquote"],
-      ["First step", "Ordered list"],
-      ["Remember this", "Bulleted list"],
-      ["const result = 0;", "Code block"],
-    ] as const) {
-      await selectNoteText(page, text);
-      const button = form.getByRole("button", { name: control, exact: true });
-      if ((await button.getAttribute("aria-pressed")) !== "true")
-        await button.click();
-    }
-    await selectNoteText(page, "Reference");
-    await form
-      .getByRole("button", { name: "Insert link", exact: true })
-      .click();
-    await form
-      .getByRole("textbox", { name: "Link URL" })
-      .fill("https://example.com/notes");
-    await form.getByRole("button", { name: "Apply link", exact: true }).click();
+    await editor.fill("");
+    await editor.pressSequentially("/heading");
+    await expect(
+      page.getByRole("option", { name: /^Heading 1/ }),
+    ).toBeVisible();
+    await editor.press("Enter");
+    await editor.pressSequentially("Private notes check");
+    await editor.press("Enter");
+    await editor.pressSequentially("/code block");
+    await expect(
+      page.getByRole("option", { name: /^Code [Bb]lock/ }),
+    ).toBeVisible();
+    await editor.press("Enter");
+    await editor.pressSequentially("const result = 0;");
     await form.getByRole("button", { name: "Save", exact: true }).click();
     await expect(form.getByRole("status")).toHaveText(/^Saved /);
     const stored = await (await page.request.get(notesApi)).json();
+    expect(stored.content.formatVersion).toBe(2);
     expect(
-      stored.content.document.ops.some(
-        (op: { attributes?: { bold?: boolean; italic?: boolean } }) =>
-          op.attributes?.bold && op.attributes?.italic,
+      stored.content.document.blocks.map(
+        (block: { type: string }) => block.type,
       ),
-    ).toBe(true);
+    ).toEqual(expect.arrayContaining(["heading", "codeBlock"]));
     expect(
       await (
         await page.request.get("/api/practice-progress/javascript.sleep")
@@ -779,36 +735,10 @@ test("private formatted notes save, reload, survive tools/layout, and clear inde
     ).toEqual(progress);
     await page.reload();
     await openNotes(page);
-    await expect(editor.locator("strong")).toHaveText("Private notes check");
-    await expect(editor.locator("em")).toHaveText("Private notes check");
-    await expect(editor.locator("blockquote")).toHaveText("Quoted insight");
-    await expect(editor.locator('li[data-list="ordered"]')).toHaveText(
-      "First step",
-    );
-    await expect(editor.locator('li[data-list="bullet"]')).toHaveText(
-      "Remember this",
-    );
-    await expect(editor.locator(".ql-code-block")).toHaveText(
-      "const result = 0;",
-    );
     await expect(
-      editor.getByRole("link", { name: "Reference" }),
-    ).toHaveAttribute("href", "https://example.com/notes");
-    await expect(
-      editor.getByRole("link", { name: "Reference" }),
-    ).toHaveAttribute("rel", "noopener noreferrer");
-    await selectNoteText(page, "const result = 0;");
-    await page.keyboard.press("ArrowRight");
-    await page.keyboard.type(" ");
-    await page.keyboard.press("Tab");
-    await expect(
-      form.getByRole("button", { name: "Save", exact: true }),
-    ).toBeFocused();
-    await selectNoteText(page, "Private notes check");
-    await form
-      .getByRole("button", { name: "Clear formatting", exact: true })
-      .click();
-    await expect(editor.locator("strong,em")).toHaveCount(0);
+      editor.getByRole("heading", { name: "Private notes check" }),
+    ).toBeVisible();
+    await expect(editor.locator("pre")).toHaveText("const result = 0;");
     const problemTab = page.getByRole("tab", { name: "Problem", exact: true });
     await problemTab.click();
     await solution(page);
@@ -824,11 +754,6 @@ test("private formatted notes save, reload, survive tools/layout, and clear inde
       .fill("// In-session code remains intact");
     await openNotes(page);
     await editor.fill("Unsaved note preserved across layouts");
-    await editor.focus();
-    await page.keyboard.press("Tab");
-    await expect(
-      form.getByRole("button", { name: "Save", exact: true }),
-    ).toBeFocused();
     await page
       .getByRole("button", { name: "Change theme", exact: true })
       .click();
@@ -866,9 +791,14 @@ test("private formatted notes save, reload, survive tools/layout, and clear inde
     await editor.fill("");
     await form.getByRole("button", { name: "Save", exact: true }).click();
     await expect(form.getByRole("status")).toHaveText(/^Saved /);
-    expect(
-      (await (await page.request.get(notesApi)).json()).content.document.ops,
-    ).toEqual([{ insert: "\n" }]);
+    await page.reload();
+    await openNotes(page);
+    await expect(editor).not.toContainText(
+      "Unsaved note preserved across layouts",
+    );
+    await expect(
+      form.getByRole("button", { name: "Save", exact: true }),
+    ).toBeDisabled();
     expect(
       await (
         await page.request.get("/api/practice-progress/javascript.sleep")

@@ -1,3 +1,5 @@
+import type { PartialBlock, StyledText } from "@blocknote/core";
+
 export const MAX_NOTE_BYTES = 65_536;
 export const MAX_NOTE_OPS = 4_096;
 export const MAX_NOTE_REQUEST_BYTES = 512 * 1_024;
@@ -11,16 +13,34 @@ export type NoteAttributes = {
   "code-block"?: "plain";
 };
 export type NoteOperation = { insert: string; attributes?: NoteAttributes };
-export type NoteContent = {
+export type QuillNoteContent = {
   formatVersion: 1;
   document: { ops: NoteOperation[] };
 };
+export const noteBlockTypes = [
+  "paragraph",
+  "heading",
+  "bulletListItem",
+  "numberedListItem",
+  "checkListItem",
+  "quote",
+  "codeBlock",
+  "divider",
+] as const;
+type NoteBlockType = (typeof noteBlockTypes)[number];
+export type NoteBlock = Extract<PartialBlock, { type?: NoteBlockType }>;
+export type BlockNoteContent = {
+  formatVersion: 2;
+  document: { blocks: NoteBlock[] };
+};
+export type NoteContent = QuillNoteContent | BlockNoteContent;
+
 export type PersonalProblemNote = {
   content: NoteContent;
   updatedAt: string | null;
 };
 
-export const emptyNoteContent = (): NoteContent => ({
+export const emptyNoteContent = (): QuillNoteContent => ({
   formatVersion: 1,
   document: { ops: [{ insert: "\n" }] },
 });
@@ -119,9 +139,18 @@ function checkBytes(value: unknown) {
 }
 
 /** Disable size limits only for a local editor draft; network/storage always use the default. */
+export function parseNoteContent(
+  value: QuillNoteContent,
+  bounded?: boolean,
+): QuillNoteContent;
+export function parseNoteContent(
+  value: unknown,
+  bounded?: boolean,
+): NoteContent;
 export function parseNoteContent(value: unknown, bounded = true): NoteContent {
   if (!isObject(value)) throw new NoteContentError();
   keys(value, ["formatVersion", "document"]);
+  if (value.formatVersion === 2) return parseBlockNote(value, bounded);
   if (value.formatVersion !== 1 || !isObject(value.document))
     throw new NoteContentError();
   keys(value.document, ["ops"]);
@@ -157,6 +186,142 @@ export function parseNoteContent(value: unknown, bounded = true): NoteContent {
   return content;
 }
 
+const colors = [
+  "default",
+  "gray",
+  "brown",
+  "red",
+  "orange",
+  "yellow",
+  "green",
+  "blue",
+  "purple",
+  "pink",
+];
+
+function noteText(
+  value: unknown,
+): StyledText<import("@blocknote/core").DefaultStyleSchema> {
+  if (
+    !isObject(value) ||
+    value.type !== "text" ||
+    typeof value.text !== "string" ||
+    !isObject(value.styles)
+  )
+    throw new NoteContentError();
+  keys(value, ["type", "text", "styles"]);
+  const styles: Record<string, true | string> = {};
+  for (const [key, style] of Object.entries(value.styles).sort()) {
+    if (
+      (["bold", "italic", "underline", "strike", "code"].includes(key) &&
+        style === true) ||
+      (["textColor", "backgroundColor"].includes(key) &&
+        typeof style === "string" &&
+        colors.includes(style))
+    )
+      styles[key] = style;
+    else throw new NoteContentError();
+  }
+  return { type: "text", text: value.text, styles };
+}
+
+function noteInline(value: unknown) {
+  if (!isObject(value) || value.type !== "link") return noteText(value);
+  keys(value, ["type", "href", "content"]);
+  const href = value.href;
+  if (typeof href !== "string" || !isNoteLink(href))
+    throw new NoteContentError("Use a complete http:// or https:// link.");
+  if (!Array.isArray(value.content)) throw new NoteContentError();
+  return { type: "link" as const, href, content: value.content.map(noteText) };
+}
+
+function parseBlockNote(
+  value: Record<string, unknown>,
+  bounded: boolean,
+): BlockNoteContent {
+  if (!isObject(value.document) || !Array.isArray(value.document.blocks))
+    throw new NoteContentError();
+  keys(value.document, ["blocks"]);
+  if (bounded) checkBytes(value);
+  const ids = new Set<string>();
+  const parseBlock = (value: unknown, depth: number): NoteBlock => {
+    if (
+      depth > 24 ||
+      !isObject(value) ||
+      typeof value.id !== "string" ||
+      !/^[A-Za-z0-9_-]{1,128}$/.test(value.id) ||
+      ids.has(value.id) ||
+      typeof value.type !== "string" ||
+      !noteBlockTypes.some((type) => type === value.type) ||
+      !isObject(value.props) ||
+      !Array.isArray(value.children)
+    )
+      throw new NoteContentError();
+    ids.add(value.id);
+    if (bounded && ids.size > MAX_NOTE_OPS) throw new NoteContentError();
+    keys(value, ["id", "type", "props", "content", "children"]);
+    const type = value.type;
+    const props: Record<string, string | number | boolean> = {};
+    for (const [key, prop] of Object.entries(value.props).sort()) {
+      if (
+        (["backgroundColor", "textColor"].includes(key) &&
+          type !== "codeBlock" &&
+          type !== "divider" &&
+          typeof prop === "string" &&
+          colors.includes(prop)) ||
+        (key === "textAlignment" &&
+          !["quote", "codeBlock", "divider"].includes(type) &&
+          typeof prop === "string" &&
+          ["left", "center", "right", "justify"].includes(prop)) ||
+        (type === "heading" &&
+          key === "level" &&
+          typeof prop === "number" &&
+          [1, 2, 3, 4, 5, 6].includes(prop)) ||
+        (type === "heading" &&
+          key === "isToggleable" &&
+          typeof prop === "boolean") ||
+        (type === "checkListItem" &&
+          key === "checked" &&
+          typeof prop === "boolean") ||
+        (type === "numberedListItem" &&
+          key === "start" &&
+          typeof prop === "number" &&
+          Number.isSafeInteger(prop)) ||
+        (type === "codeBlock" &&
+          key === "language" &&
+          typeof prop === "string" &&
+          /^[\w+.#-]{1,40}$/.test(prop))
+      )
+        props[key] = prop;
+      else throw new NoteContentError();
+    }
+    let content: string | ReturnType<typeof noteInline>[] | undefined;
+    if (type === "codeBlock" && typeof value.content === "string")
+      content = value.content;
+    else if (type !== "divider" && Array.isArray(value.content)) {
+      content = value.content.map(
+        type === "codeBlock"
+          ? (item: unknown) => {
+              const text = noteText(item);
+              if (Object.keys(text.styles).length) throw new NoteContentError();
+              return text;
+            }
+          : noteInline,
+      );
+    } else if (type !== "divider" || value.content !== undefined)
+      throw new NoteContentError();
+    return {
+      id: value.id,
+      type,
+      props,
+      ...(content === undefined ? {} : { content }),
+      children: value.children.map((child) => parseBlock(child, depth + 1)),
+    } as NoteBlock;
+  };
+  const blocks = value.document.blocks.map((block) => parseBlock(block, 0));
+  return { formatVersion: 2, document: { blocks } };
+}
+
 export const noteContentsEqual = (a: NoteContent, b: NoteContent) =>
   JSON.stringify(a) === JSON.stringify(b);
 
@@ -173,7 +338,11 @@ export function parsePersonalNote(value: unknown): PersonalProblemNote {
       new Date(timestamp).toISOString() !== timestamp)
   )
     throw new NoteContentError();
-  if (timestamp === null && !noteContentsEqual(content, emptyNoteContent()))
+  if (
+    timestamp === null &&
+    !noteContentsEqual(content, emptyNoteContent()) &&
+    !(content.formatVersion === 2 && content.document.blocks.length === 0)
+  )
     throw new NoteContentError();
   return { content, updatedAt: timestamp as string | null };
 }
