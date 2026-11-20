@@ -4,6 +4,7 @@ import createMDX from "@next/mdx";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  distDir: process.env.CODE_ATLAS_DIST_DIR ?? ".next",
   pageExtensions: ["ts", "tsx", "md", "mdx"],
   transpilePackages: ["@workspace/ui"],
   serverExternalPackages: ["@workspace/db"],

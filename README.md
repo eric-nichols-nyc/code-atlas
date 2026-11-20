@@ -67,7 +67,7 @@ feedback, and improve.**
 - **Context-aware AI tutor:** Ask for hints using your current unsaved code and the problem
   context. Requests happen only when you send a question; chat lasts for this visit.
 - **AI code evaluation:** Select Evaluate beside Run and Submit for a scored review of
-  correctness, efficiency, code quality and edge cases in the existing Test Result area.
+  correctness, efficiency, code quality and edge cases in a dedicated Feedback tab.
   Reports review the captured code without executing it and last for this visit.
 - **React development pilot:** In development, explore React from Dashboard and select Practice for a
   Stale Closure Counter exercise with a TypeScript/JSX editor, Submit-based browser

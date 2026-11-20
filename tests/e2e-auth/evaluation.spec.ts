@@ -8,7 +8,7 @@ const endpoint = "/api/problems/javascript.majority-element/evaluate";
 const source =
   "function majorityElement(nums) { let candidate; let count = 0; for (const num of nums) { if (count === 0) candidate = num; count += num === candidate ? 1 : -1; } return candidate; }";
 
-test("Evaluate captures unsaved source, preserves results and notes, and uses the existing Test Result tab at desktop and mobile sizes", async ({
+test("Evaluate captures unsaved source, preserves results and notes, and keeps evaluation in Feedback at desktop and mobile sizes", async ({
   page,
 }) => {
   const requests: { code: string }[] = [];
@@ -72,12 +72,20 @@ test("Evaluate captures unsaved source, preserves results and notes, and uses th
   await expect(
     page.getByText(/Code changed since this evaluation/),
   ).toBeVisible();
+  await expect(
+    page.getByRole("tab", { name: "Feedback", exact: true }),
+  ).toHaveAttribute("aria-selected", "true");
+  await expect(page.getByTestId("execution-verdict")).toHaveCount(0);
+  await page.getByRole("tab", { name: "Test Result", exact: true }).click();
   await expect(page.getByTestId("execution-verdict")).toHaveText("Accepted");
+  await expect(page.getByTestId("evaluation-score")).toHaveCount(0);
+  await page.getByRole("tab", { name: "Feedback", exact: true }).click();
+  await expect(page.getByTestId("evaluation-score")).toHaveText("10/10");
   await expect(
     page
       .getByRole("region", { name: "Test cases and results" })
       .getByRole("tab"),
-  ).toHaveCount(2);
+  ).toHaveCount(3);
   await page.getByRole("tab", { name: "Notes", exact: true }).click();
   const noteEditor = page.getByRole("textbox", {
     name: "Your notes",
@@ -197,4 +205,74 @@ test("production evaluation endpoint validates before inference", async ({
     data: { code: source },
   });
   expect(missing.status()).toBe(404);
+});
+
+test("sample mode gives repeatable colored feedback with zero API calls and preserves the draft across tabs and layouts", async ({
+  page,
+}) => {
+  let evaluationCalls = 0;
+  let writes = 0;
+  page.on("request", (request) => {
+    if (
+      request.url().includes("/api/") &&
+      ["POST", "PUT", "PATCH", "DELETE"].includes(request.method())
+    )
+      writes++;
+  });
+  await page.route(`**${endpoint}`, async (route) => {
+    evaluationCalls++;
+    await route.fulfill({
+      status: 503,
+      json: { error: "No AI calls are expected in sample mode." },
+    });
+  });
+  await page.goto("/javascript/practice/majority-element");
+  const editor = page.getByRole("textbox", {
+    name: "JavaScript solution",
+    exact: true,
+  });
+  await expect(editor).toBeVisible();
+  await expect(page.getByText("Loading saved code…")).toHaveCount(0);
+  await editor.fill("// unsaved layout review draft");
+  await page.getByRole("tab", { name: "Feedback", exact: true }).click();
+  const sample = page.getByRole("button", {
+    name: "Use sample feedback",
+    exact: true,
+  });
+  await sample.click();
+  await expect(sample).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByTestId("evaluation-score")).toHaveText("6/10");
+  await expect(
+    page.getByText("Sample feedback", { exact: true }),
+  ).toBeVisible();
+  await expect(page.getByText("2/2 · Strong", { exact: true })).toBeVisible();
+  await expect(page.getByText("3/4 · Improve", { exact: true })).toBeVisible();
+  await expect(
+    page.getByText("0/1 · Needs attention", { exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Evaluate", exact: true }).focus();
+  for (let i = 0; i < 3; i++) await page.keyboard.press("Enter");
+  expect(evaluationCalls).toBe(0);
+  expect(writes).toBe(0);
+  await page.getByRole("tab", { name: "Test Result", exact: true }).click();
+  await expect(page.getByTestId("evaluation-score")).toHaveCount(0);
+  await expect(
+    page.getByText("Run your code to see test results."),
+  ).toBeVisible();
+  await page.getByRole("tab", { name: "Feedback", exact: true }).click();
+  for (const width of [390, 320, 1440]) {
+    await page.setViewportSize({ width, height: 960 });
+    await expect(page.getByTestId("evaluation-score")).toHaveText("6/10");
+    await expect(editor).toContainText("// unsaved layout review draft");
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+  }
+  await sample.click();
+  await expect(sample).toHaveAttribute("aria-pressed", "false");
+  await expect(page.getByTestId("evaluation-score")).toHaveCount(0);
+  expect(evaluationCalls).toBe(0);
+  expect(writes).toBe(0);
 });

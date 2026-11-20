@@ -32,10 +32,11 @@ export function ResultPanel() {
           <TabsList variant="line">
             <TabsTrigger value="testcase">Testcase</TabsTrigger>
             <TabsTrigger value="test-result">Test Result</TabsTrigger>
+            <TabsTrigger value="feedback">Feedback</TabsTrigger>
           </TabsList>
         </div>
         <div className="min-h-0 flex-1 overflow-auto p-4">
-          {s.error && (
+          {s.error && s.outputTab !== "feedback" && (
             <p
               role="alert"
               className="mb-4 text-sm leading-relaxed text-destructive"
@@ -78,7 +79,6 @@ export function ResultPanel() {
             </p>
           </TabsContent>
           <TabsContent value="test-result">
-            <CodeEvaluationResult />
             <div role="status" aria-live="polite">
               {s.pending ? (
                 <p className="py-4 text-sm text-muted-foreground">
@@ -169,14 +169,16 @@ export function ResultPanel() {
                   </ol>
                 </>
               ) : (
-                !s.error &&
-                s.evaluation.attemptSource === null && (
+                !s.error && (
                   <p className="py-5 text-sm text-muted-foreground">
                     Run your code to see test results.
                   </p>
                 )
               )}
             </div>
+          </TabsContent>
+          <TabsContent value="feedback">
+            <CodeEvaluationResult />
           </TabsContent>
         </div>
       </Tabs>

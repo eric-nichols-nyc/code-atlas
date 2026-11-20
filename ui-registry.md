@@ -213,7 +213,7 @@ Last updated: 2026-11-09. Implemented in `apps/web/src/features/learning/`, `fea
 | Subject catalog          | Flat rows; fixed ordinal/action slots; title and concise topic tag on one line |
 | Unavailable lesson       | Coming soon text and clock icon; no dead navigation or paywall-style lock      |
 
-The coding workspace puts Problem and Notes tabs on the left, editable JavaScript above Testcase/Test Result in the center, and the optional AI tutor on the right. The visualization and multiple-choice checkpoint are removed. All three splitters resize; closing the tools panel releases its column. Mobile uses a reading flow and drawers. Preserve source, editor selection/undo, cases and results above responsive branches.
+The coding workspace puts Problem and Notes tabs on the left, editable JavaScript above Testcase/Test Result/Feedback in the center, and the optional AI tutor on the right. The visualization and multiple-choice checkpoint are removed. All three splitters resize; closing the tools panel releases its column. Mobile uses a reading flow and drawers. Preserve source, editor selection/undo, cases and results above responsive branches.
 
 Shared learning panels use `learning-panel` (`bg-card`, `border`, `rounded-md`, no shadow),42px headers and16–20px inner padding. Problem headings use24/32px; prose14/23px. CodeMirror uses Menlo13/24px, semantic light/dark syntax roles and local assets. Default Tab exits the editor; Mod-Enter runs. Lazy editor loading reserves its space. Show Saved to account only after a successful database write/read; ordinary typing is Unsaved edits and latest verdicts remain session results.
 
@@ -528,28 +528,37 @@ with stopped/failed feedback and an explicit Retry with current code action. Emp
 loading, limit, configuration and sign-in states retain source/questions and never
 claim that code was executed or saved. Closing the mobile drawer restores its trigger.
 
-## Inline code evaluation
+## Code evaluation feedback
 
 Files: `features/problems/components/code-evaluation.tsx`, `code-panel.tsx`,
 `result-panel.tsx` and `state/code-evaluation.ts`. Last updated: 2026-11-19.
 
-Evaluate uses the shared small outline Button and decorative Sparkles icon before
-Run and Submit in the wrapping editor action row. While evaluating, its label becomes
-Evaluating… and execution buttons are disabled; Stop evaluation lives in the result.
-Keep the two existing Testcase/Test Result tabs. Select Test Result on Evaluate and
-show AI Evaluation above preserved judge results, with its own heading and status.
+Evaluate remains a small outline Button with Sparkles beside Run/Submit. It selects
+Feedback; Run/Submit select Test Result. Keep the three shared line tabs in the same
+panel, with visit-owned state above responsive branches. Switching tabs preserves
+both results and the current draft. Loading, Stop, retry and stale-source states
+belong to Feedback; Test Result contains judge verdicts only.
 
-Use shared Card/Header/Title/Description/Content for the derived score and summary
-(CardTitle's `lg` preset for the score),
-secondary Badges for criterion scores, semantic foreground/muted/destructive tokens,
-14px body copy with relaxed leading and a 20px gap between rubric sections. Retain
-the Card's existing border, radius, padding and shadow. Report prose is plain text,
-wraps anywhere inside its panel and never renders model HTML, images or links.
-Keep loading/completed announcements in a separate polite status row. Stale source,
-failed/stopped requests, sign-in recovery and Retry with current code are explicit.
-Previous complete reports survive retries; partial structured output is never shown.
-State belongs in the problem session above responsive branches and resets on
-learner/problem exit. Evaluation and judge verdicts retain separate labels.
+The score uses CardTitle's `lg` preset with green/amber/rose semantic accents and a
+shared easy/amber/rose Badge label. Overall thresholds: 9–10 strong, 6–8 needs
+improvement, 0–5 needs attention. Rubric scores use green for full credit, amber for
+partial credit and rose for zero, paired with text labels. Each rubric section has
+a 4px colored left border, shared border/card tokens, rounded-lg corners, 16px
+padding and 12px gaps. Body copy stays 14px with relaxed leading. Time/Space use
+shared blue Badges and 12px monospaced values. Improvements use a blue-accented
+border/heading. Use existing theme tokens; never rely on color alone.
+
+In local sample-enabled previews, Feedback offers a small toggle Button labeled
+Use sample feedback with `aria-pressed`. Show Sample feedback above the report and
+Sample mode beside Evaluate. Explain that the fixed example does not assess current
+code or call AI; expose its source in a keyboard-operable details disclosure. Sample
+mode survives layout/tab changes, keeps the previous AI report, and resets on visit
+exit. Controls are disabled during execution or an active evaluation. Sample reports
+do not receive misleading stale-code warnings.
+
+Use shared Card composition, a separate polite status row, readable error text and
+contained code overflow. Prose is plain text with wrapping; model HTML, images and
+links are never rendered. Keep focus rings and numeric/status labels in every theme.
 
 ## JavaScript learning catalog and module preview
 

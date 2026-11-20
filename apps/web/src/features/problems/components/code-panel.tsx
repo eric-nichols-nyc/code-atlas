@@ -1,4 +1,5 @@
 "use client";
+import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
 import {
   RotateCcwIcon,
@@ -67,7 +68,10 @@ export function CodePanel() {
             </Button>
           )}
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          {s.evaluation.sampleMode && (
+            <Badge variant="amber">Sample mode</Badge>
+          )}
           <Button
             type="button"
             variant="outline"
