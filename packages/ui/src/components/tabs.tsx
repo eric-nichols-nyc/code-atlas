@@ -34,9 +34,15 @@ const tabsListVariants = cva(
           "gap-1 rounded-md border bg-card p-3 [&_[data-slot=tabs-trigger][data-state=active]]:border-transparent [&_[data-slot=tabs-trigger][data-state=active]]:bg-accent [&_[data-slot=tabs-trigger][data-state=active]]:shadow-none",
         line: "gap-1 bg-transparent",
       },
+      tone: {
+        default: "",
+        accent:
+          "[&_[data-slot=tabs-trigger][data-state=active]]:text-interactive [&_[data-slot=tabs-trigger]]:after:bg-interactive",
+      },
     },
     defaultVariants: {
       variant: "default",
+      tone: "default",
     },
   },
 );
@@ -44,6 +50,7 @@ const tabsListVariants = cva(
 function TabsList({
   className,
   variant = "default",
+  tone = "default",
   ...props
 }: React.ComponentProps<typeof TabsPrimitive.List> &
   VariantProps<typeof tabsListVariants>) {
@@ -51,7 +58,7 @@ function TabsList({
     <TabsPrimitive.List
       data-slot="tabs-list"
       data-variant={variant}
-      className={cn(tabsListVariants({ variant }), className)}
+      className={cn(tabsListVariants({ variant, tone }), className)}
       {...props}
     />
   );

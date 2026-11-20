@@ -25,7 +25,7 @@ export function DescriptionPanel({ children }: { children: ReactNode }) {
   const s = useProblemSession();
   const topic = topics.find((item) => item.id === s.problem.topicId);
   return (
-    <section aria-label="Problem description">
+    <section className="problem-description" aria-label="Problem description">
       <div className="p-5 [overflow-wrap:anywhere]">
         <h1 className="mb-3 text-2xl leading-8 font-bold tracking-tight">
           {s.problem.title}
@@ -39,7 +39,7 @@ export function DescriptionPanel({ children }: { children: ReactNode }) {
           {s.problem.samples.map((example, i) => (
             <section key={example.id}>
               <h2 className="mb-2 text-sm font-semibold">Example {i + 1}</h2>
-              <div className="rounded-md border-l-2 bg-background p-3 text-sm leading-relaxed">
+              <div className="rounded-md border-l-2 border-interactive/50 bg-interactive/5 p-3 text-sm leading-relaxed">
                 <p className="font-mono [overflow-wrap:anywhere]">
                   Input: {formatProblemInput(example.input)}
                 </p>
