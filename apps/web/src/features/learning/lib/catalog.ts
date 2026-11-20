@@ -8,7 +8,9 @@ export const topics: {
   { id: "functions", label: "Functions", variant: "amber" },
   { id: "closures", label: "Closures", variant: "amber" },
   { id: "arrays", label: "Arrays", variant: "blue" },
+  { id: "hash-maps", label: "Hash Maps", variant: "blue" },
   { id: "two-pointers", label: "Two Pointers", variant: "blue" },
+  { id: "sliding-window", label: "Sliding Window", variant: "amber" },
   { id: "generators", label: "Generators", variant: "amber" },
   { id: "async", label: "Async", variant: "rose" },
 ];

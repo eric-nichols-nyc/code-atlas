@@ -64,6 +64,8 @@ export async function validatePracticeContent(
   }
   for (const problem of definitions) {
     const validExpected = (expected: unknown) => {
+      if (problem.kind === "most-frequent-character")
+        return typeof expected === "string" && [...expected].length <= 1;
       if (problem.kind === "delay") return true;
       if (problem.kind === "valid-anagram")
         return typeof expected === "boolean";
@@ -73,6 +75,7 @@ export async function validatePracticeContent(
           "reduce-array",
           "function-composition",
           "majority-element",
+          "longest-substring-two-distinct",
         ].includes(problem.kind)
       )
         return typeof expected === "number" && Number.isFinite(expected);

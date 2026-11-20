@@ -12,6 +12,7 @@ import {
   type ExecutionResult,
   flattenNestedArrayProblem,
   functionCompositionProblem,
+  longestSubstringTwoDistinctProblem,
   majorityElementProblem,
   mapArrayProblem,
   memoizeProblem,
@@ -71,6 +72,34 @@ function Workspace({
   );
 }
 afterEach(() => vi.unstubAllGlobals());
+it("edits one case-sensitive substring field, rejects empty input and sends the current source", async () => {
+  const fetch = vi.fn(async (_url: string, _init?: RequestInit) =>
+    Response.json(accepted),
+  );
+  vi.stubGlobal("fetch", fetch);
+  render(<Workspace problem={longestSubstringTwoDistinctProblem} />);
+  expect(screen.getByText("Sliding Window")).toBeVisible();
+  expect(screen.queryByLabelText("t =")).toBeNull();
+  const field = screen.getByRole("textbox", { name: "s =" });
+  fireEvent.change(field, { target: { value: "" } });
+  expect(field).toHaveAttribute("aria-invalid", "true");
+  fireEvent.click(screen.getByRole("button", { name: "Run" }));
+  expect(fetch).not.toHaveBeenCalled();
+  fireEvent.change(field, { target: { value: "aAaAb" } });
+  fireEvent.change(
+    screen.getByRole("textbox", { name: "JavaScript solution" }),
+    { target: { value: longestSubstringTwoDistinctProblem.solution } },
+  );
+  fireEvent.click(screen.getByRole("button", { name: "Run" }));
+  await screen.findByText("Accepted", { selector: "h2" });
+  expect(fetch.mock.calls[0]?.[0]).toBe(
+    `/api/problems/${longestSubstringTwoDistinctProblem.id}/run`,
+  );
+  expect(JSON.parse(fetch.mock.calls[0]?.[1]?.body as string)).toMatchObject({
+    code: longestSubstringTwoDistinctProblem.solution,
+    inputs: [{ s: "aAaAb" }, { s: "ccaabbb" }, { s: "a" }],
+  });
+});
 it("runs Majority Element with edited nums, rejects invalid cases and renders zero", async () => {
   const fetch = vi.fn(async (_url: string, _init?: RequestInit) =>
     Response.json({

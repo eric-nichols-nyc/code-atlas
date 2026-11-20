@@ -65,3 +65,32 @@ it("lists only Algorithms problems and uses the supplied Two Pointers category",
   );
   expect(screen.getByRole("status")).toHaveTextContent("1 problem");
 });
+it("discovers the new Medium problem in Sliding Window and search", () => {
+  render(
+    <PracticeCatalog
+      title="Algorithms practice"
+      topics={algorithmTopics}
+      catalog={algorithmsPracticeCatalog}
+    />,
+  );
+  expect(screen.getByRole("status")).toHaveTextContent(
+    `${algorithmsPracticeCatalog.length} problems`,
+  );
+  fireEvent.mouseDown(screen.getByRole("tab", { name: "Sliding Window" }), {
+    button: 0,
+    ctrlKey: false,
+  });
+  expect(
+    screen.getByRole("link", {
+      name: "Longest Substring with At Most Two Distinct Characters",
+    }),
+  ).toHaveAttribute(
+    "href",
+    "/algorithms/practice/longest-substring-two-distinct",
+  );
+  expect(screen.queryByRole("link", { name: "Valid Anagram" })).toBeNull();
+  fireEvent.change(screen.getByRole("searchbox"), {
+    target: { value: "distinct" },
+  });
+  expect(screen.getByRole("status")).toHaveTextContent("1 problem");
+});

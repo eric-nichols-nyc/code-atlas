@@ -92,7 +92,21 @@ const {
 }: typeof import("./adapters/majority-element.js") = await import(
   `./adapters/majority-element.${adapterExtension}`
 );
+const {
+  twoDistinctHarness,
+  judgeTwoDistinct,
+}: typeof import("./adapters/longest-substring-two-distinct.js") = await import(
+  `./adapters/longest-substring-two-distinct.${adapterExtension}`
+);
+const {
+  mostFrequentCharacterHarness,
+  judgeMostFrequentCharacter,
+}: typeof import("./adapters/most-frequent-character.js") = await import(
+  `./adapters/most-frequent-character.${adapterExtension}`
+);
 const additionalHarnesses: Record<string, string> = {
+  "algorithms.most-frequent-character": mostFrequentCharacterHarness,
+  "algorithms.longest-substring-two-distinct": twoDistinctHarness,
   "javascript.majority-element": majorityElementHarness,
   "algorithms.valid-anagram": anagramHarness,
   "javascript.map-array": mapArrayHarness,
@@ -444,10 +458,53 @@ async function runCase(test: Work["cases"][number]): Promise<CaseResult> {
       errorText,
       exceeded: () => interrupted || cpu > 250,
     };
+    if (work.problemId === "algorithms.longest-substring-two-distinct") {
+      if (
+        typeof test.input === "number" ||
+        !("s" in test.input) ||
+        !additionalCheck
+      )
+        return result("runtime-error", "Invalid substring input.");
+      const outcome = judgeTwoDistinct(test.input, guest, additionalCheck);
+      return result(
+        outcome.verdict,
+        test.hidden
+          ? outcome.verdict === "accepted"
+            ? "Hidden case passed."
+            : "Hidden case failed."
+          : outcome.message,
+        undefined,
+        outcome,
+      );
+    }
+    if (work.problemId === "algorithms.most-frequent-character") {
+      if (
+        typeof test.input === "number" ||
+        !("str" in test.input) ||
+        !additionalCheck
+      )
+        return result("runtime-error", "Invalid character frequency input.");
+      const outcome = judgeMostFrequentCharacter(
+        test.input,
+        guest,
+        additionalCheck,
+      );
+      return result(
+        outcome.verdict,
+        test.hidden
+          ? outcome.verdict === "accepted"
+            ? "Hidden case passed."
+            : "Hidden case failed."
+          : outcome.message,
+        undefined,
+        outcome,
+      );
+    }
     if (work.problemId === "algorithms.valid-anagram") {
       if (
         typeof test.input === "number" ||
         !("s" in test.input) ||
+        !("t" in test.input) ||
         !additionalCheck
       )
         return result("runtime-error", "Invalid anagram input.");

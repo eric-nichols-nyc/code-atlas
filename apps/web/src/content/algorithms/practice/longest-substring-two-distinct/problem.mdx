@@ -1,0 +1,11 @@
+Write `lengthOfLongestSubstringTwoDistinct(s)`. Return the length of the longest **contiguous substring** of `s` that contains **at most two distinct characters**.
+
+A substring must keep characters next to each other in the original string. You cannot skip letters to build a longer answer. A window with just one distinct character also qualifies.
+
+For `"eceba"`, the longest valid substring is `"ece"`, so return `3`. For `"ccaabbb"`, `"aabbb"` has length `5`. For `"a"`, return `1`.
+
+The input contains **1–100000 English letters**, uppercase or lowercase. Comparisons are case-sensitive: `"aA"` contains two distinct characters, while `"aAb"` contains three. Do not trim, normalize, or change case.
+
+Try a **Sliding Window** approach. Expand the right boundary and keep counts of letters inside the window. When a third distinct letter enters, advance the left boundary until the window is valid again. Track the largest valid window length. Aim for O(n) time and O(1) extra space.
+
+Edit `s` in the testcase panel as a plain string without surrounding quotes. Empty strings, spaces, digits, and punctuation are outside this problem's constraints. Return an integer length rather than the substring itself, a numeric string, or a Promise.

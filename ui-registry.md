@@ -710,6 +710,17 @@ spell checking disabled. Do not trim drafts or substitute a numeric/JSON field.
 Empty text means the empty string; result formatting quotes it and renders both
 boolean values through explicit undefined checks.
 
+Most Frequent Character uses the same Field primitives with a shared Textarea
+for `str`, preserving case, Unicode, whitespace and line breaks. Blank text is
+valid; drafts over 1000 UTF-16 code units stay visible and show invalid state.
+Hash Maps uses the existing braces icon with the semantic Arrays accent.
+
+The Sliding Window substring problem uses one plain `s` field with the same shared
+field composition. Help states its 1–100000 English-letter limit and case-sensitive
+comparison. Empty input is invalid and remains visible for correction. The category
+uses the existing amber badge accent; the long problem title wraps within the
+description panel. Reuse the current editor, Run/Submit/Evaluate controls and result tabs.
+
 ## React practice pilot
 
 Files: `features/react-sandbox/components/react-workspace.tsx`,

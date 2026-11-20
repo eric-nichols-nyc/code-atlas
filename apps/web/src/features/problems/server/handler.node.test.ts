@@ -1,6 +1,7 @@
 import {
   type ExecutionResult,
   fibonacciGeneratorProblem,
+  longestSubstringTwoDistinctProblem,
 } from "@workspace/problems";
 import { beforeEach, expect, it, vi } from "vitest";
 import type { ProgressService } from "@/features/catalog/server/progress-service";
@@ -58,6 +59,29 @@ it("authenticates and rejects foreign origins before execution or database acces
   ).toBe(403);
   expect(execute).not.toHaveBeenCalled();
   expect(progress.recordExecution).not.toHaveBeenCalled();
+});
+it("accepts five maximum-size substring cases within a bounded request and the existing source cap", async () => {
+  const post = make();
+  const target = context("run", longestSubstringTwoDistinctProblem.id);
+  const inputs = Array.from({ length: 5 }, () => ({ s: "a".repeat(100000) }));
+  expect(
+    (
+      await post(
+        req({ code: longestSubstringTwoDistinctProblem.solution, inputs }),
+        target,
+      )
+    ).status,
+  ).toBe(200);
+  expect(execute).toHaveBeenCalledWith(expect.objectContaining({ inputs }));
+  execute.mockClear();
+  expect(
+    (await post(req({ code: "x".repeat(33000), inputs }), target)).status,
+  ).toBe(400);
+  expect(
+    (await post(req({ code: "source", padding: "a".repeat(560000) }), target))
+      .status,
+  ).toBe(413);
+  expect(execute).not.toHaveBeenCalled();
 });
 
 it("bounds source and JSON and validates all current problem inputs before scheduling work", async () => {

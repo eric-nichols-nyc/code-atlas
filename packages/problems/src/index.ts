@@ -17,9 +17,11 @@ import {
   compositionFunctions,
   functionCompositionProblem,
 } from "./problems/function-composition.js";
+import { longestSubstringTwoDistinctProblem } from "./problems/longest-substring-two-distinct.js";
 import { majorityElementProblem } from "./problems/majority-element.js";
 import { mapArrayProblem, mapTransforms } from "./problems/map-array.js";
 import { memoizeFunctions, memoizeProblem } from "./problems/memoize.js";
+import { mostFrequentCharacterProblem } from "./problems/most-frequent-character.js";
 import {
   reduceArrayProblem,
   reduceFunctions,
@@ -49,6 +51,7 @@ export {
   filterPredicates,
   flattenNestedArrayProblem,
   functionCompositionProblem,
+  longestSubstringTwoDistinctProblem,
   MAX_FLATTEN_DEPTH,
   MAX_FLATTEN_NODES,
   majorityElementProblem,
@@ -56,13 +59,16 @@ export {
   mapTransforms,
   memoizeFunctions,
   memoizeProblem,
+  mostFrequentCharacterProblem,
   reduceArrayProblem,
   reduceFunctions,
   sleepProblem,
   validAnagramProblem,
 };
 export const publicProblems = [
+  mostFrequentCharacterProblem,
   validAnagramProblem,
+  longestSubstringTwoDistinctProblem,
   majorityElementProblem,
   mapArrayProblem,
   reduceArrayProblem,
@@ -127,6 +133,20 @@ export function validProblemInput(
   if (problem.kind === "delay") return validMillis(value);
   if (!value || typeof value !== "object" || Array.isArray(value)) return false;
   const input = value as Record<string, unknown>;
+  if (problem.kind === "most-frequent-character")
+    return (
+      Object.keys(input).length === 1 &&
+      typeof input.str === "string" &&
+      input.str.length <= 1000
+    );
+  if (problem.kind === "longest-substring-two-distinct")
+    return (
+      Object.keys(input).length === 1 &&
+      typeof input.s === "string" &&
+      input.s.length >= 1 &&
+      input.s.length <= 100000 &&
+      !/[^a-zA-Z]/.test(input.s)
+    );
   if (problem.kind === "majority-element") {
     if (
       Object.keys(input).length !== 1 ||
@@ -275,8 +295,9 @@ export function validRunInputs(
 }
 export function formatProblemInput(input: ProblemInput) {
   if (typeof input === "number") return `millis = ${input}`;
+  if ("str" in input) return `str = ${JSON.stringify(input.str)}`;
   if ("s" in input)
-    return `s = ${JSON.stringify(input.s)}, t = ${JSON.stringify(input.t)}`;
+    return `s = ${JSON.stringify(input.s)}${"t" in input ? `, t = ${JSON.stringify(input.t)}` : ""}`;
   if ("x" in input)
     return `functions = ${JSON.stringify(input.functions)}, x = ${input.x}`;
   if ("nums" in input)

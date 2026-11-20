@@ -40,7 +40,12 @@ export function createExecutionHandler(
       return json({ error: "Problem or action unavailable." }, 404);
     let value: unknown;
     try {
-      value = await readJson(request, 64 * 1024);
+      // Five maximum-length ASCII strings plus the existing 32 KiB source cap.
+      const limit =
+        action === "run" && problem.kind === "longest-substring-two-distinct"
+          ? 544 * 1024
+          : 64 * 1024;
+      value = await readJson(request, limit);
     } catch (error) {
       if (error instanceof Response) return error;
       throw error;
