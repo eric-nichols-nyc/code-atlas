@@ -29,7 +29,7 @@ export function ResultPanel() {
         className="min-h-0 flex-1 gap-0"
       >
         <div className="learning-panel-header">
-          <TabsList variant="line">
+          <TabsList variant="line" tone="accent">
             <TabsTrigger value="testcase">Testcase</TabsTrigger>
             <TabsTrigger value="test-result">Test Result</TabsTrigger>
             <TabsTrigger value="feedback">Feedback</TabsTrigger>
@@ -49,7 +49,7 @@ export function ResultPanel() {
               {s.inputs.map((_, i) => (
                 <Button
                   key={s.inputIds.current[i]}
-                  variant={i === index ? "secondary" : "ghost"}
+                  variant={i === index ? "success" : "ghost"}
                   size="sm"
                   onClick={() => s.setSelectedCase(String(i))}
                   aria-pressed={i === index}

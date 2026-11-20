@@ -75,7 +75,11 @@ function ProblemWorkspace({
           className="learning-panel gap-0"
         >
           <div className="learning-panel-header">
-            <TabsList variant="line" aria-label="Problem workspace">
+            <TabsList
+              variant="line"
+              tone="accent"
+              aria-label="Problem workspace"
+            >
               <TabsTrigger value="problem">Problem</TabsTrigger>
               <TabsTrigger value="notes">Notes</TabsTrigger>
             </TabsList>

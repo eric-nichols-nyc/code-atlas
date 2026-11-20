@@ -2,7 +2,9 @@
 import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
 import {
+  PlayIcon,
   RotateCcwIcon,
+  SendIcon,
   Share2Icon,
   SparklesIcon,
 } from "@workspace/ui/components/icons";
@@ -74,7 +76,7 @@ export function CodePanel() {
           )}
           <Button
             type="button"
-            variant="outline"
+            variant="warning"
             size="sm"
             onClick={() => void s.evaluation.evaluate()}
             disabled={Boolean(s.pending) || s.evaluation.busy}
@@ -84,18 +86,21 @@ export function CodePanel() {
             {s.evaluation.busy ? "Evaluating…" : "Evaluate"}
           </Button>
           <Button
-            variant="outline"
+            variant="success"
             size="sm"
             onClick={() => void s.execute("run")}
             disabled={Boolean(s.pending) || s.evaluation.busy}
           >
+            <PlayIcon aria-hidden="true" data-icon="inline-start" />
             {s.pending === "run" ? "Running…" : "Run"}
           </Button>
           <Button
+            variant="info"
             size="sm"
             onClick={() => void s.execute("submit")}
             disabled={Boolean(s.pending) || s.evaluation.busy}
           >
+            <SendIcon aria-hidden="true" data-icon="inline-start" />
             {s.pending === "submit" ? "Submitting…" : "Submit"}
           </Button>
         </div>

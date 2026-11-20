@@ -38,6 +38,10 @@
   text-decoration: underline;
   text-underline-offset: 3px;
 }
+.problem-description :not(pre) > code {
+  color: var(--interactive);
+  background: color-mix(in srgb, var(--interactive) 8%, var(--card));
+}
 @source "../**/*.{ts,tsx}";
 
 @layer components {

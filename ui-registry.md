@@ -36,19 +36,24 @@ Primary actions use lavender `#c4a7f5` with deep plum labels; foreground
 ## Buttons
 
 File: `packages/ui/src/components/button.tsx`.
-Last updated: 2026-11-09.
+Last updated: 2026-11-20.
 
-| Property         | Pattern                                          |
-| ---------------- | ------------------------------------------------ |
-| Primary action   | Default Button variant; semantic primary colors  |
-| Secondary action | `outline` or `ghost` Button variant              |
-| Button radius    | `rounded-md`                                     |
-| Button text      | `text-sm font-medium`                            |
-| Button spacing   | Default `h-9 px-4 py-2 gap-2`                    |
-| Hover            | Variant-defined semantic hover colors            |
-| Focus            | `focus-visible` ring using the shared ring token |
+| Property         | Pattern                                                                            |
+| ---------------- | ---------------------------------------------------------------------------------- |
+| Primary action   | Default Button variant; semantic primary colors                                    |
+| Secondary action | `outline` or `ghost` Button variant                                                |
+| Colored actions  | `success` (green), `warning` (amber), `info` (blue), with paired foreground tokens |
+| Button radius    | `rounded-md`                                                                       |
+| Button text      | `text-sm font-medium`                                                              |
+| Button spacing   | Default `h-9 px-4 py-2 gap-2`                                                      |
+| Hover            | Variant-defined semantic hover colors                                              |
+| Focus            | `focus-visible` ring using the shared ring token                                   |
 
 Use `asChild` for links. The optional `navigation` Button variant changes text color without a hover background, retaining the shared focus ring. Prefer component variants over overriding their colors or typography.
+Colored variants use their matching focus ring and 90% hover background. Shared
+theme tokens pair green `#34d399` with `#052e24`, amber `#fbbf24` with `#422006`,
+and blue `#60a5fa` with `#102a4c` in every theme. Use `interactive` for green
+text/indicators: `#087a4b` in Light and `#34d399` in both dark palettes.
 The unused starter preview and Alert, Dialog, Field, RadioGroup, and Separator
 primitives were removed; add shared primitives through shadcn when a feature needs them.
 
@@ -218,6 +223,17 @@ The coding workspace puts Problem and Notes tabs on the left, editable JavaScrip
 Shared learning panels use `learning-panel` (`bg-card`, `border`, `rounded-md`, no shadow),42px headers and16–20px inner padding. Problem headings use24/32px; prose14/23px. CodeMirror uses Menlo13/24px, semantic light/dark syntax roles and local assets. Default Tab exits the editor; Mod-Enter runs. Lazy editor loading reserves its space. Show Saved to account only after a successful database write/read; ordinary typing is Unsaved edits and latest verdicts remain session results.
 
 The Problem tab shows the continuous problem description and is selected by default. Notes is the second tab. Hints and Solution use shared Accordion rows; Testcase/Test Result retain shared line Tabs. Cases use shared Buttons and labeled numeric Input. Verdicts are server results with text labels, bounded diagnostics and explicit stale-code warnings. Hidden cases never expose private values/logs. Tutor uses the question-triggered chat described below; Notes uses the private note editor described below. Counter (Closures), Filter Elements from Array (Arrays), Debounce and Sleep (Async) are published practice problems. Learn has a module catalog and read-only Two Pointers preview; guided lessons remain future work.
+
+Practice color accents updated 2026-11-20, using the
+[AlgoMaster solution workspace](https://algomaster.io/practice/dsa/contains-duplicate-ii/solution?list=am-300)
+as a reference. Shared `TabsList variant="line" tone="accent"` makes selected
+Problem/Notes and output tabs use green text and an underline. Selected cases
+and Run use the `success` Button variant; Evaluate uses `warning`, and Submit
+uses `info`. Run/Submit include decorative Play/Send icons alongside their
+labels. Problem inline code uses `interactive` text over an 8% green tint;
+example blocks use `border-interactive/50 bg-interactive/5`. Keep these colors
+in shared semantic tokens and retain the existing panel surfaces, spacing,
+visible labels, pressed/selected semantics and disabled behavior.
 
 Feature CSS in `apps/web/src/app/globals.css` owns viewport containment and editor layout; shared primitives/tokens remain in UI. Split mode contains document scrolling; route exit removes the root mode attribute and restores ordinary scrolling. Sheets disable animation for reduced-motion preferences.
 
