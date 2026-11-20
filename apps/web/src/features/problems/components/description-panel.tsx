@@ -11,7 +11,10 @@ import { Badge } from "@workspace/ui/components/badge";
 import type { ReactNode } from "react";
 import { DifficultyBadge } from "../../catalog/components/difficulty-badge";
 import { topics } from "../../learning/lib/catalog";
-import { useProblemSession } from "../state/problem-session";
+import {
+  useProblemDefinition,
+  useProblemHints,
+} from "../state/problem-context";
 
 export const verdictLabels = {
   accepted: "Accepted",
@@ -22,7 +25,7 @@ export const verdictLabels = {
 };
 
 export function DescriptionPanel({ children }: { children: ReactNode }) {
-  const s = useProblemSession();
+  const s = { problem: useProblemDefinition(), ...useProblemHints() };
   const topic = topics.find((item) => item.id === s.problem.topicId);
   return (
     <section className="problem-description" aria-label="Problem description">

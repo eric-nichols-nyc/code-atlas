@@ -14,12 +14,16 @@ import {
 import { StrictMode } from "react";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { evaluationFixture } from "../../../../../../tests/fixtures/code-evaluation";
-import { ProblemSession, useProblemSession } from "../state/problem-session";
+import {
+  useProblemEditor,
+  useProblemEvaluation,
+} from "../state/problem-context";
+import { ProblemSession } from "../state/problem-session";
 import { CodePanel } from "./code-panel";
 import { ResultPanel } from "./result-panel";
 
 function Editor() {
-  const s = useProblemSession();
+  const s = { ...useProblemEditor(), evaluation: useProblemEvaluation() };
   return (
     <>
       <textarea

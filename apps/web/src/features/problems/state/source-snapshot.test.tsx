@@ -1,11 +1,12 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { counterProblem } from "@workspace/problems";
 import { afterEach, expect, it, vi } from "vitest";
-import { ProblemSession, useProblemSession } from "./problem-session";
+import { useProblemControls, useProblemEditor } from "./problem-context";
+import { ProblemSession } from "./problem-session";
 
 afterEach(() => vi.unstubAllGlobals());
 function Harness({ capture }: { capture: (value: string) => void }) {
-  const session = useProblemSession();
+  const session = { ...useProblemEditor(), ...useProblemControls() };
   return (
     <>
       <p>{session.source}</p>

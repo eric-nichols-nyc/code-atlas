@@ -8,10 +8,13 @@ import {
 } from "@workspace/ui/components/field";
 import { Textarea } from "@workspace/ui/components/textarea";
 import { useId } from "react";
-import { useProblemSession } from "../state/problem-session";
+import {
+  useProblemCases,
+  useProblemDefinition,
+} from "../state/problem-context";
 
 export function MostFrequentCharacterCaseField({ index }: { index: number }) {
-  const session = useProblemSession();
+  const session = { ...useProblemCases(), problem: useProblemDefinition() };
   const draft = session.inputs[index];
   const id = useId();
   if (!draft) return null;

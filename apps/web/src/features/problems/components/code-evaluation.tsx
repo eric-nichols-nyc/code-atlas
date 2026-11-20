@@ -16,7 +16,7 @@ import {
   evaluationScore,
 } from "../lib/code-evaluation-contract";
 import { SAMPLE_EVALUATION_SOURCE } from "../lib/code-evaluation-sample";
-import { useProblemSession } from "../state/problem-session";
+import { useProblemEvaluation } from "../state/problem-context";
 
 const tones = {
   strong: {
@@ -40,10 +40,11 @@ const tones = {
 } as const;
 
 export function CodeEvaluationResult() {
-  const { evaluation: s, source, pending } = useProblemSession();
+  const s = useProblemEvaluation();
+  const pending = s.pending;
   const report = s.latest?.report;
   const sample = s.latest?.kind === "sample";
-  const stale = s.latest?.kind === "ai" && s.latest.source !== source;
+  const stale = s.stale;
   const score = report ? evaluationScore(report) : 0;
   const tone =
     tones[score >= 9 ? "strong" : score >= 6 ? "partial" : "attention"];
@@ -102,7 +103,7 @@ export function CodeEvaluationResult() {
                 ? "Evaluation complete."
                 : "Select Evaluate to get feedback on your current code."}
       </p>
-      {s.busy && s.attemptSource !== source && (
+      {s.attemptStale && (
         <p className="text-muted-foreground">
           Code changed while evaluating. The report will describe the earlier
           version.

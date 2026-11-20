@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AI_LIMITS } from "@/features/ai/lib/contract";
 import {
   AiRequestError,
@@ -48,7 +48,7 @@ export function useCodeEvaluation(options: {
     };
   }, []);
 
-  const setSamplePreview = (enabled: boolean) => {
+  const setSamplePreview = useCallback((enabled: boolean) => {
     if (
       !current.current.sampleEnabled ||
       active.current ||
@@ -58,9 +58,9 @@ export function useCodeEvaluation(options: {
     sampleModeRef.current = enabled;
     setSampleMode(enabled);
     if (enabled) current.current.onStart();
-  };
+  }, []);
 
-  const evaluate = async () => {
+  const evaluate = useCallback(async () => {
     if (active.current || current.current.isExecuting()) return;
     current.current.onStart();
     // A separate local path: no source validation, network call, execution or save.
@@ -130,18 +130,35 @@ export function useCodeEvaluation(options: {
         if (mounted.current) setBusy(false);
       }
     }
-  };
-  return {
-    busy,
-    error: sampleMode ? "" : error,
-    signIn: sampleMode ? false : signIn,
-    latest: sampleMode ? sampleSnapshot : latest,
-    sampleEnabled: options.sampleEnabled,
-    sampleMode,
-    setSamplePreview,
-    attemptSource,
-    evaluate,
-    stop: () => active.current?.abort(),
-    isActive: () => Boolean(active.current),
-  };
+  }, []);
+  const stop = useCallback(() => active.current?.abort(), []);
+  const isActive = useCallback(() => Boolean(active.current), []);
+  return useMemo(
+    () => ({
+      busy,
+      error: sampleMode ? "" : error,
+      signIn: sampleMode ? false : signIn,
+      latest: sampleMode ? sampleSnapshot : latest,
+      sampleEnabled: options.sampleEnabled,
+      sampleMode,
+      setSamplePreview,
+      attemptSource,
+      evaluate,
+      stop,
+      isActive,
+    }),
+    [
+      busy,
+      error,
+      signIn,
+      latest,
+      options.sampleEnabled,
+      sampleMode,
+      setSamplePreview,
+      attemptSource,
+      evaluate,
+      stop,
+      isActive,
+    ],
+  );
 }

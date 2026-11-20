@@ -25,11 +25,12 @@ import {
 } from "@workspace/problems";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { readPracticeRecord } from "../../catalog/state/practice-records";
-import { useProblemSession } from "../state/problem-session";
+import { useProblemEditor } from "../state/problem-context";
+
 import { ProblemExperience } from "./problem-experience";
 
 function TestEditor() {
-  const s = useProblemSession();
+  const s = useProblemEditor();
   return (
     <textarea
       aria-label="JavaScript solution"

@@ -10,7 +10,7 @@ import {
 } from "@workspace/ui/components/icons";
 import { ThemeSwitcher } from "@workspace/ui/components/theme-switcher";
 import dynamic from "next/dynamic";
-import { useProblemSession } from "../state/problem-session";
+import { useProblemControls } from "../state/problem-context";
 
 const JavaScriptEditor = dynamic(() => import("./javascript-editor"), {
   ssr: false,
@@ -21,7 +21,7 @@ const JavaScriptEditor = dynamic(() => import("./javascript-editor"), {
   ),
 });
 export function CodePanel() {
-  const s = useProblemSession();
+  const s = useProblemControls();
   return (
     <section className="learning-panel" aria-label="Code editor">
       <div className="learning-panel-header justify-between">
@@ -49,7 +49,7 @@ export function CodePanel() {
             aria-label="Reset code"
             title="Reset code"
             onClick={s.resetCode}
-            disabled={Boolean(s.pending) || s.source === s.problem.starterCode}
+            disabled={Boolean(s.pending) || !s.canReset}
           >
             <RotateCcwIcon aria-hidden="true" data-icon="inline-start" />
           </Button>

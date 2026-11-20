@@ -26,7 +26,7 @@ import { Textarea } from "@workspace/ui/components/textarea";
 import Link from "next/link";
 import { useId } from "react";
 import Markdown from "react-markdown";
-import { useProblemTutor } from "../state/problem-tutor";
+import { useProblemTutor, useTutorSourceChanged } from "../state/problem-tutor";
 
 // Render model text without raw HTML/images; allow only safe HTTPS links.
 export function TutorAnswer({ children }: { children: string }) {
@@ -135,11 +135,7 @@ export function ProblemTutor() {
                               )}
                             </BubbleContent>
                           </Bubble>
-                          {turn.source !== s.source && (
-                            <MessageFooter>
-                              Code changed since this question.
-                            </MessageFooter>
-                          )}
+                          <SourceChangeNotice source={turn.source} />
                           {turn.error && <FieldError>{turn.error}</FieldError>}
                           {turn.signIn && (
                             <Button asChild variant="outline" size="sm">
@@ -243,4 +239,11 @@ export function ProblemTutor() {
       </form>
     </section>
   );
+}
+
+function SourceChangeNotice({ source }: { source: string }) {
+  const changed = useTutorSourceChanged(source);
+  return changed ? (
+    <MessageFooter>Code changed since this question.</MessageFooter>
+  ) : null;
 }
