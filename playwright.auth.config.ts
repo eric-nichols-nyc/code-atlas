@@ -46,6 +46,7 @@ export default defineConfig({
     env: {
       NEON_AUTH_BASE_URL: process.env.NEON_AUTH_BASE_URL,
       NEON_AUTH_COOKIE_SECRET: process.env.NEON_AUTH_COOKIE_SECRET,
+      CODE_ATLAS_EVALUATION_SAMPLES: "true",
     },
   },
 });

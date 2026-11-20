@@ -1,63 +1,65 @@
 # Code evaluation
 
 Outcome: select **Evaluate** beside Run and Submit to review the latest unsaved
-JavaScript against the current problem. The existing Test Result tab shows an AI
-evaluation above the preserved judge results; no new tab is added. First review:
-Majority Element, then an incorrect version and an edit during an active request.
+JavaScript against the current problem. **Feedback** owns the assessment; **Test
+Result** owns Run/Submit verdicts. First review: Majority Element, mixed sample
+scores, then tab/theme/layout changes with the draft intact.
 
-Scope: published JavaScript and Algorithms practice, score out of ten with an
-explicit rubric, correctness, time/space complexity, quality, edge cases and
-actionable improvements. Evaluation is static analysis, makes no execution or
-persistence calls, and does not award solved status. Reports last for this visit.
-Saved history, React evaluation, automatic edits and additional providers are later
-work. Use the existing server OpenAI key; an optional `OPENAI_EVALUATION_MODEL`
-overrides the existing tutor model for this capability.
+Scope: published JavaScript and Algorithms practice, score out of ten with a fixed
+rubric, correctness, complexity, quality, edge cases and actionable improvements.
+Reports last for the visit. Evaluation neither executes nor saves code and does
+not award solved status. Saved history, React evaluation and automatic edits wait.
 
-Architecture: `features/ai` owns provider access, bounded streaming transport,
-failure normalization, cancellation and one shared per-process AI admission limit
-(10 requests/minute/learner, one active/learner, four total across tutor and
-evaluation). Features own prompts, input/output contracts and UI state. Public
-problem context is projected once in a problem-owned server module; private tests,
-notes and authored solutions never enter inference. Structured evaluation output
-is validated on the server and client before presenting a score. All protected
-routes authenticate and validate origin/payload before inference. Runtime-only
-configuration keeps builds independent of credentials. Scale-out requires shared
-admission/spend accounting; the in-process limiter is not a distributed quota.
+Readability: green marks strong scores, amber marks partial scores and rose marks
+missing criteria. Text labels and numbers convey the same meaning. Blue Time/Space
+badges, bordered sections and grouped improvements help scanning in all themes.
 
-Acceptance checks:
+Sample mode: **Use sample feedback** previews a fixed 6/10 Majority Element report
+and its example source. While enabled, Evaluate makes no network call, execution
+or account write; it does not assess or overwrite the learner's code. Sample labels
+stay visible. Switching off restores the previous AI report, including stale-source
+status. Controls are available in development or with the server setting
+`CODE_ATLAS_EVALUATION_SAMPLES=true`; ordinary production defaults to real evaluation.
 
-- [x] Evaluate captures current source synchronously, only on explicit click/retry.
-- [x] Only Testcase/Test Result tabs exist; judge results and editor drafts survive.
-- [x] Score is derived from correctness /4, efficiency /3, quality /2, edge cases /1;
-  findings explain evidence and uncertainty without claiming executed tests.
-- [x] Editing marks the captured report stale, including edits while evaluating.
-- [x] Stop, failure, invalid output, sign-in and fresh-code retry preserve work.
-- [x] Auth, context filtering, cross-capability admission and tutor regressions pass.
-- [x] Keyboard, mobile, themes and production browser journeys are reviewed.
+Architecture: `features/ai` owns provider access, bounded transport, cancellation
+and shared per-process admission (10 requests/minute/learner, one active/learner,
+four total). Features own their prompts, contracts and UI state. The authenticated
+server projects public problem context; private tests, notes and authored solutions
+never enter inference. Server/client validation checks the rubric and rejects
+contradictory scores. Existing OpenAI configuration is reused; an optional evaluation
+model override remains available. Sample mode is a separate local path and does not
+alter the endpoint or its authentication. Distributed admission/spend storage is
+future work; the current limiter is not a cross-server or monetary quota.
 
-Implementation: extract shared AI infrastructure; add evaluation contract/prompt and
-protected endpoint; wire visit-owned state and inline result; update UI registry
-and setup documentation; run repository checks and browser review.
+Current acceptance checks:
 
-Verified 2026-11-19:
+- [x] Evaluate selects Feedback; Run/Submit select Test Result; each result survives tab changes.
+- [x] Strong, partial and zero scores have distinct colors and readable status labels.
+- [x] Sample mode supports repeated Evaluate actions with zero AI calls/account writes.
+- [x] Samples preserve source and prior live reports, and never claim to evaluate the current code.
+- [x] Sample controls are opt-in in production; live evaluation stays the default.
+- [x] Loading, Stop, errors, retry, stale source, keyboard and narrow layouts still work.
 
-- `pnpm lint`, `pnpm typecheck`, `pnpm test` (620 tests / 70 files), and forced
-  credential-free `pnpm build --force` pass. No dependencies or database changes.
-- Production Playwright: 68 public checks and 30 authenticated checks pass. Browser
-  inference uses deterministic fixtures; actual endpoint validation is also checked.
-  Port 3100 leaves the existing development server on 3000 intact. The default test
-  port remains 3000; `PLAYWRIGHT_PORT` permits an isolated verification server.
-- Live production review: four explicit evaluations in two rounds; final correct
-  Majority Element **10/10**, incorrect **0/10** with `[1,2,2]` as a valid failing
-  case. Initial review exposed unearned efficiency points and inaccurate examples;
-  the revised prompt requires tracing examples, and server/client validation rejects
-  contradictory criterion scores. No automatic inference retries were added.
-- Actual compiled Tutor rejects concurrent Evaluate work with 429. Progress/notes
-  remain unchanged, browser reports zero page errors, and light/dark/320px screenshots
-  were inspected. All 76 browser chunks exclude the real key, provider configuration
-  and evaluation prompt. Local evidence is ignored under `outputs/code-evaluation/`.
+Implementation: split report presentation into Feedback; add semantic status colors,
+feature-owned sample data and a visit-only sample toggle; pass server-controlled
+availability through the existing session; check transitions and review the browser.
+Use `CODE_ATLAS_DIST_DIR=.next-preview` for isolated review builds without replacing
+the running app's build assets.
 
-Generated reviews remain advisory and can vary; Run/Submit provide execution verdicts.
-History and distributed budget storage remain deferred. Packaged Electron was not
-verified by these browser checks. UI conventions are recorded in `ui-registry.md`;
-the shared module interface and scale-out requirements are in `docs/development.md`.
+Initial delivery evidence (PR #18, before this feedback-tab revision): 620 tests,
+68 public and 30 authenticated browser checks, lint/type checks and credential-free
+builds passed. Four live model calls led to a stricter prompt and score validation;
+final correct/incorrect solutions scored 10/10 and 0/10. Generated reviews remain
+advisory; Run/Submit provide execution verdicts. Packaged Electron was not verified.
+
+Current revision verification: lint, type checks, 623 tests / 71 files and a
+credential-free isolated production build pass. All 31 authenticated browser checks
+pass, including repeated sample evaluations with zero inference calls/account writes,
+three-tab separation, restored live reports, keyboard operation and 320px layouts.
+Manual browser review covered light, dark and dark purple; the preview is left in
+sample mode with the original workspace untouched. Evidence is ignored under
+`outputs/evaluation-feedback/`. No live inference was used for this revision.
+
+Iteration preference: use browser review for styling and focused affected tests for
+behavior changes. Reserve the full suite and production builds for broader changes
+or pre-merge validation rather than repeating them for every visual adjustment.

@@ -5,6 +5,7 @@ import { AuthSetup } from "@/components/auth-setup";
 import { javascriptPracticeCatalog } from "@/content/javascript/practice/catalog";
 import { problemStatements } from "@/content/javascript/practice/statements";
 import { ProblemExperience } from "@/features/problems/components/problem-experience";
+import { evaluationSamplesEnabled } from "@/features/problems/server/evaluation-samples";
 import { isAuthConfigured } from "@/lib/auth";
 import { learnerStorageId, requirePageLearner } from "@/lib/auth/server";
 export const metadata: Metadata = { title: "JavaScript Practice | Code Atlas" };
@@ -24,7 +25,11 @@ export default async function ProblemPage({
   if (!problem || !entry || !loadStatement) notFound();
   const { default: Statement } = await loadStatement();
   return (
-    <ProblemExperience problem={problem} learnerId={learnerStorageId(userId)}>
+    <ProblemExperience
+      problem={problem}
+      learnerId={learnerStorageId(userId)}
+      evaluationSamples={evaluationSamplesEnabled()}
+    >
       <Statement />
     </ProblemExperience>
   );

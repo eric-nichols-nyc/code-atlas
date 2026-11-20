@@ -47,11 +47,17 @@ const requests: {
 }[] = [];
 function View({
   problem = majorityElementProblem,
+  evaluationSamples = false,
 }: {
   problem?: ProblemDefinition;
+  evaluationSamples?: boolean;
 }) {
   return (
-    <ProblemSession key={problem.id} problem={problem}>
+    <ProblemSession
+      key={problem.id}
+      problem={problem}
+      evaluationSamples={evaluationSamples}
+    >
       <CodePanel />
       <ResultPanel />
     </ProblemSession>
@@ -106,7 +112,7 @@ async function finish(index: number, report: unknown = evaluationFixture) {
   });
 }
 
-it("only evaluates on explicit action, captures immediate code once, preserves judge results and uses exactly two output tabs", async () => {
+it("only evaluates on explicit action, captures immediate code once, preserves judge results and keeps feedback separate from three output tabs", async () => {
   render(
     <StrictMode>
       <View />
@@ -133,12 +139,27 @@ it("only evaluates on explicit action, captures immediate code once, preserves j
     "10/10",
   );
   expect(screen.getByText(/Code changed since this evaluation/)).toBeVisible();
+  expect(screen.getByRole("tab", { name: "Feedback" })).toHaveAttribute(
+    "aria-selected",
+    "true",
+  );
+  expect(screen.queryByTestId("execution-verdict")).toBeNull();
+  fireEvent.mouseDown(screen.getByRole("tab", { name: "Test Result" }), {
+    button: 0,
+    ctrlKey: false,
+  });
   expect(screen.getByTestId("execution-verdict")).toHaveTextContent("Accepted");
+  expect(screen.queryByTestId("evaluation-score")).toBeNull();
+  fireEvent.mouseDown(screen.getByRole("tab", { name: "Feedback" }), {
+    button: 0,
+    ctrlKey: false,
+  });
+  expect(screen.getByTestId("evaluation-score")).toHaveTextContent("10/10");
   expect(
     within(
       screen.getByRole("region", { name: "Test cases and results" }),
     ).getAllByRole("tab"),
-  ).toHaveLength(2);
+  ).toHaveLength(3);
   expect(screen.getByLabelText("Code")).toHaveValue("// newer code");
   expect(vi.mocked(fetch).mock.calls.map((call) => call[0])).toEqual([
     `/api/problems/${majorityElementProblem.id}/run`,
@@ -206,4 +227,50 @@ it("aborts and clears evaluation when leaving the problem", async () => {
   expect(requests[0]?.signal.aborted).toBe(true);
   expect(screen.queryByRole("region", { name: "AI evaluation" })).toBeNull();
   expect(screen.getByLabelText("Code")).toHaveValue(counterProblem.starterCode);
+});
+
+it("previews sample feedback repeatedly with zero requests, preserves code, and restores the previous AI report", async () => {
+  render(<View evaluationSamples />);
+  fireEvent.click(screen.getByRole("button", { name: "Evaluate" }));
+  await waitFor(() => expect(requests).toHaveLength(1));
+  await finish(0);
+  expect(screen.getByTestId("evaluation-score")).toHaveTextContent("10/10");
+  fireEvent.change(screen.getByLabelText("Code"), {
+    target: { value: "// unsaved user draft" },
+  });
+  const calls = vi.mocked(fetch).mock.calls.length;
+  fireEvent.click(screen.getByRole("button", { name: "Use sample feedback" }));
+  expect(screen.getByTestId("evaluation-score")).toHaveTextContent("6/10");
+  expect(screen.getByText("Sample feedback")).toBeVisible();
+  expect(
+    screen.getByText(/It does not assess your current code/),
+  ).toBeVisible();
+  expect(screen.getByText("2/2 · Strong")).toBeVisible();
+  expect(screen.getByText("3/4 · Improve")).toBeVisible();
+  expect(screen.getByText("0/1 · Needs attention")).toBeVisible();
+  for (let i = 0; i < 3; i++)
+    fireEvent.click(screen.getByRole("button", { name: "Evaluate" }));
+  expect(fetch).toHaveBeenCalledTimes(calls);
+  expect(screen.queryByText(/Code changed since this evaluation/)).toBeNull();
+  expect(screen.getByLabelText("Code")).toHaveValue("// unsaved user draft");
+  fireEvent.click(screen.getByRole("button", { name: "Use sample feedback" }));
+  expect(screen.getByTestId("evaluation-score")).toHaveTextContent("10/10");
+  expect(screen.getByText(/Code changed since this evaluation/)).toBeVisible();
+  expect(fetch).toHaveBeenCalledTimes(calls);
+});
+
+it("keeps Feedback empty until requested and hides sample controls when disabled", () => {
+  render(<View />);
+  fireEvent.mouseDown(screen.getByRole("tab", { name: "Feedback" }), {
+    button: 0,
+    ctrlKey: false,
+  });
+  expect(
+    screen.getByText("Select Evaluate to get feedback on your current code."),
+  ).toBeVisible();
+  expect(
+    screen.queryByRole("button", { name: "Use sample feedback" }),
+  ).toBeNull();
+  expect(screen.queryByTestId("evaluation-score")).toBeNull();
+  expect(fetch).not.toHaveBeenCalled();
 });

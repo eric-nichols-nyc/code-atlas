@@ -34,7 +34,11 @@ interface ResultSnapshot {
   source: string;
   inputs: ProblemInput[];
 }
-function useProblemState(problem: ProblemDefinition, learnerId?: string) {
+function useProblemState(
+  problem: ProblemDefinition,
+  learnerId?: string,
+  evaluationSamples = false,
+) {
   const [source, setSourceState] = useState(problem.starterCode);
   const sourceRef = useRef(source);
   const interactions = useRef(0);
@@ -70,8 +74,9 @@ function useProblemState(problem: ProblemDefinition, learnerId?: string) {
   const evaluation = useCodeEvaluation({
     problemId: problem.id,
     readCode: () => sourceRef.current,
-    onStart: () => setOutputTab("test-result"),
+    onStart: () => setOutputTab("feedback"),
     isExecuting: () => Boolean(controller.current),
+    sampleEnabled: evaluationSamples,
   });
   const setSource = (next: string) => {
     if (next !== sourceRef.current) interactions.current++;
@@ -244,13 +249,15 @@ const Context = createContext<ReturnType<typeof useProblemState> | null>(null);
 export function ProblemSession({
   problem,
   learnerId,
+  evaluationSamples = false,
   children,
 }: {
   problem: ProblemDefinition;
   learnerId?: string;
+  evaluationSamples?: boolean;
   children: ReactNode;
 }) {
-  const value = useProblemState(problem, learnerId);
+  const value = useProblemState(problem, learnerId, evaluationSamples);
   return <Context.Provider value={value}>{children}</Context.Provider>;
 }
 export function useProblemSession() {

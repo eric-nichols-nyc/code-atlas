@@ -8,10 +8,12 @@
         ".next/**",
         "!.next/cache/**",
         "!.next/dev/**",
+        ".next-preview/**",
+        "!.next-preview/cache/**",
         "dist/**",
         ".workers/**"
       ],
-      "env": ["ANALYZE", "NEON_AUTH_BASE_URL"]
+      "env": ["ANALYZE", "NEON_AUTH_BASE_URL", "CODE_ATLAS_DIST_DIR"]
     },
     "dev": {
       "dependsOn": ["^build"],
@@ -54,6 +56,8 @@
     "OPENAI_API_KEY",
     "OPENAI_TUTOR_MODEL",
     "OPENAI_EVALUATION_MODEL",
+    "CODE_ATLAS_EVALUATION_SAMPLES",
+    "CODE_ATLAS_DIST_DIR",
     "PLAYWRIGHT_PORT"
   ]
 }

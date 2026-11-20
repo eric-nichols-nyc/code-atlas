@@ -30,10 +30,12 @@ const ProblemTutor = dynamic(
 export function ProblemExperience({
   problem,
   learnerId,
+  evaluationSamples = false,
   children,
 }: {
   problem: ProblemDefinition;
   learnerId?: string;
+  evaluationSamples?: boolean;
   children: ReactNode;
 }) {
   return (
@@ -41,6 +43,7 @@ export function ProblemExperience({
       key={`${learnerId ?? "guest"}:${problem.id}`}
       problem={problem}
       learnerId={learnerId}
+      evaluationSamples={evaluationSamples}
     >
       <ProblemNotesSession problemId={problem.id} learnerId={learnerId}>
         <ProblemTutorSession>

@@ -401,8 +401,8 @@ existing production/desktop test setup; coordinate free port 3000 with a running
 ## AI capabilities
 
 Evaluate sits beside Run and Submit in published JavaScript and Algorithms practice.
-It captures the latest unsaved code on click and displays its report above existing
-judge results inside Test Result. It runs static AI review, not tests, and never saves
+It captures the latest unsaved code on click and selects Feedback for its report.
+Run and Submit keep their verdicts in Test Result. It runs static AI review, not tests, and never saves
 code, changes notes or marks a problem solved. Reports last for this learner/problem
 visit and show a stale warning after code changes. Stop and deliberate Retry preserve
 the draft; Retry captures fresh source. Reports are displayed only after completion
@@ -416,7 +416,24 @@ Validation rejects efficiency credit for nonfunctional code and full efficiency
 credit for substantially incomplete code. The total is derived from validated
 criterion scores, never a separately supplied model total.
 The prompt does not claim executed tests or require checks outside the problem's
-constraints. Scores are generated assessments, not acceptance verdicts.
+constraints. Scores are generated assessments, not acceptance verdicts. Green, amber and rose
+status colors are paired with scores and labels; blue complexity badges and bordered
+rubric sections keep the report readable in light, dark and dark purple themes.
+
+For UI testing, select Feedback → **Use sample feedback**. It loads a fixed 6/10
+example, including its own source, and makes subsequent Evaluate clicks local until
+you switch it off. The learner's draft is preserved; disabling sample mode restores
+the previous live report. Samples have explicit labels and do not award progress.
+The controls are available in development and can be enabled for a local production
+preview with `CODE_ATLAS_EVALUATION_SAMPLES=true`. They are hidden by default in
+ordinary production. This setting never bypasses authentication or changes the AI
+endpoint. No key is needed for the sample itself.
+
+To review without replacing an already running app's build assets, build and start
+with `CODE_ATLAS_DIST_DIR=.next-preview`. Keep the setting identical for both commands.
+The preview directory is ignored; the normal output remains `.next`. Pass
+`PLAYWRIGHT_PORT=3100 CODE_ATLAS_DIST_DIR=.next-preview` to production browser checks
+when port 3000 is occupied.
 
 Use the existing `OPENAI_API_KEY` and `OPENAI_TUTOR_MODEL`. Optional
 `OPENAI_EVALUATION_MODEL` selects a separate evaluation model; an empty value falls

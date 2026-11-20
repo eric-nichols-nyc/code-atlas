@@ -10,12 +10,20 @@ import {
   parseCodeEvaluation,
   parseEvaluationRequest,
 } from "../lib/code-evaluation-contract";
+import { SAMPLE_EVALUATION } from "../lib/code-evaluation-sample";
+
+const sampleSnapshot = {
+  kind: "sample" as const,
+  source: null,
+  report: SAMPLE_EVALUATION,
+};
 
 export function useCodeEvaluation(options: {
   problemId: string;
   readCode: () => string;
   onStart: () => void;
   isExecuting: () => boolean;
+  sampleEnabled: boolean;
 }) {
   const current = useRef(options);
   current.current = options;
@@ -24,8 +32,11 @@ export function useCodeEvaluation(options: {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [signIn, setSignIn] = useState(false);
+  const [sampleMode, setSampleMode] = useState(false);
+  const sampleModeRef = useRef(false);
   const [attemptSource, setAttemptSource] = useState<string | null>(null);
   const [latest, setLatest] = useState<{
+    kind: "ai";
     source: string;
     report: CodeEvaluation;
   } | null>(null);
@@ -37,9 +48,23 @@ export function useCodeEvaluation(options: {
     };
   }, []);
 
+  const setSamplePreview = (enabled: boolean) => {
+    if (
+      !current.current.sampleEnabled ||
+      active.current ||
+      current.current.isExecuting()
+    )
+      return;
+    sampleModeRef.current = enabled;
+    setSampleMode(enabled);
+    if (enabled) current.current.onStart();
+  };
+
   const evaluate = async () => {
     if (active.current || current.current.isExecuting()) return;
     current.current.onStart();
+    // A separate local path: no source validation, network call, execution or save.
+    if (current.current.sampleEnabled && sampleModeRef.current) return;
     const source = current.current.readCode();
     setAttemptSource(source);
     setError("");
@@ -84,7 +109,7 @@ export function useCodeEvaluation(options: {
       controller.signal.throwIfAborted();
       const report = parseCodeEvaluation(JSON.parse(text));
       if (mounted.current && active.current === controller)
-        setLatest({ source, report });
+        setLatest({ kind: "ai", source, report });
     } catch (reason) {
       if (mounted.current && active.current === controller) {
         setError(
@@ -108,9 +133,12 @@ export function useCodeEvaluation(options: {
   };
   return {
     busy,
-    error,
-    signIn,
-    latest,
+    error: sampleMode ? "" : error,
+    signIn: sampleMode ? false : signIn,
+    latest: sampleMode ? sampleSnapshot : latest,
+    sampleEnabled: options.sampleEnabled,
+    sampleMode,
+    setSamplePreview,
     attemptSource,
     evaluate,
     stop: () => active.current?.abort(),
