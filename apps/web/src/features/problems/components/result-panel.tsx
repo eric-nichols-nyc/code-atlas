@@ -7,20 +7,24 @@ import {
   TabsList,
   TabsTrigger,
 } from "@workspace/ui/components/tabs";
-import { inputDraft } from "../lib/input-drafts";
-import { useProblemSession } from "../state/problem-session";
+import { memo } from "react";
+import {
+  useProblemCases,
+  useProblemDefinition,
+  useProblemOutput,
+  useProblemResults,
+} from "../state/problem-context";
 import { CaseInputFields } from "./case-input-fields";
 import { CodeEvaluationResult } from "./code-evaluation";
 import { verdictLabels } from "./description-panel";
 export function ResultPanel() {
-  const s = useProblemSession();
-  const index = Math.min(Number(s.selectedCase), s.inputs.length - 1);
+  const s = {
+    ...useProblemResults(),
+    ...useProblemOutput(),
+    problem: useProblemDefinition(),
+  };
   const result = s.latest?.result;
-  const stale =
-    s.latest &&
-    (s.latest.source !== s.source ||
-      (result?.action === "run" &&
-        JSON.stringify(s.latest.inputs) !== JSON.stringify(s.parsedInputs)));
+  const stale = s.stale;
   return (
     <section className="learning-panel" aria-label="Test cases and results">
       <Tabs
@@ -45,38 +49,7 @@ export function ResultPanel() {
             </p>
           )}
           <TabsContent value="testcase">
-            <div className="mb-4 flex flex-wrap gap-2">
-              {s.inputs.map((_, i) => (
-                <Button
-                  key={s.inputIds.current[i]}
-                  variant={i === index ? "success" : "ghost"}
-                  size="sm"
-                  onClick={() => s.setSelectedCase(String(i))}
-                  aria-pressed={i === index}
-                >
-                  Case {i + 1}
-                </Button>
-              ))}
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={s.inputs.length >= 5 || Boolean(s.pending)}
-                onClick={() => {
-                  s.inputIds.current.push(crypto.randomUUID());
-                  const sample = s.problem.samples[0];
-                  if (!sample) return;
-                  s.setInputs([...s.inputs, inputDraft(sample.input)]);
-                  s.setSelectedCase(String(s.inputs.length));
-                }}
-              >
-                Add case
-              </Button>
-            </div>
-            <CaseInputFields index={index} />
-            <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
-              Run checks these visible inputs. Submit uses the complete server
-              test suite.
-            </p>
+            <TestCases pending={Boolean(s.pending)} />
           </TabsContent>
           <TabsContent value="test-result">
             <div role="status" aria-live="polite">
@@ -178,10 +151,47 @@ export function ResultPanel() {
             </div>
           </TabsContent>
           <TabsContent value="feedback">
-            <CodeEvaluationResult />
+            <Feedback />
           </TabsContent>
         </div>
       </Tabs>
     </section>
   );
 }
+
+const Feedback = memo(CodeEvaluationResult);
+
+const TestCases = memo(function TestCases({ pending }: { pending: boolean }) {
+  const s = useProblemCases();
+  const index = Math.min(Number(s.selectedCase), s.inputs.length - 1);
+  return (
+    <>
+      <div className="mb-4 flex flex-wrap gap-2">
+        {s.inputs.map((_, i) => (
+          <Button
+            key={s.inputIds[i]}
+            variant={i === index ? "success" : "ghost"}
+            size="sm"
+            onClick={() => s.setSelectedCase(String(i))}
+            aria-pressed={i === index}
+          >
+            Case {i + 1}
+          </Button>
+        ))}
+        <Button
+          variant="outline"
+          size="sm"
+          disabled={s.inputs.length >= 5 || pending}
+          onClick={s.addCase}
+        >
+          Add case
+        </Button>
+      </div>
+      <CaseInputFields index={index} />
+      <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
+        Run checks these visible inputs. Submit uses the complete server test
+        suite.
+      </p>
+    </>
+  );
+});

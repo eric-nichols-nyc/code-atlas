@@ -2,10 +2,11 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { sleepProblem } from "@workspace/problems";
 import { afterEach, expect, it, vi } from "vitest";
 import { readCodeBackup } from "../lib/code-backup";
-import { ProblemSession, useProblemSession } from "../state/problem-session";
+import { useProblemControls, useProblemEditor } from "../state/problem-context";
+import { ProblemSession } from "../state/problem-session";
 
 function Harness() {
-  const s = useProblemSession();
+  const s = { ...useProblemEditor(), ...useProblemControls() };
   return (
     <>
       <textarea

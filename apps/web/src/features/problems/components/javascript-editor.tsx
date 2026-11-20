@@ -25,7 +25,10 @@ import {
 import { tags } from "@lezer/highlight";
 import { useTheme } from "@workspace/ui/components/theme-provider";
 import { useEffect, useRef } from "react";
-import { useProblemSession } from "../state/problem-session";
+import {
+  type ProblemEditorState,
+  useProblemEditor,
+} from "../state/problem-context";
 
 const syntax = HighlightStyle.define([
   { tag: tags.keyword, color: "var(--code-keyword)" },
@@ -69,7 +72,7 @@ function appearance(dark: boolean) {
   );
 }
 export type CodeEditorSession = Pick<
-  ReturnType<typeof useProblemSession>,
+  ProblemEditorState,
   "source" | "editorState" | "editorTheme" | "editorCallbacks"
 >;
 
@@ -175,5 +178,5 @@ export function CodeEditor({
 }
 
 export default function JavaScriptEditor() {
-  return <CodeEditor session={useProblemSession()} />;
+  return <CodeEditor session={useProblemEditor()} />;
 }

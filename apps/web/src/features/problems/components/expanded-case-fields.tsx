@@ -16,11 +16,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@workspace/ui/components/select";
-import { useProblemSession } from "../state/problem-session";
+import {
+  useProblemCases,
+  useProblemDefinition,
+} from "../state/problem-context";
 
 /** The added exercises share JSON inputs, optional numeric input and supplied callbacks. */
 export function ExpandedCaseFields({ index }: { index: number }) {
-  const session = useProblemSession();
+  const session = { ...useProblemCases(), problem: useProblemDefinition() };
   const draft = session.inputs[index];
   if (!draft) return null;
   const kind = session.problem.kind;

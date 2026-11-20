@@ -10,14 +10,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@workspace/ui/components/select";
-import { useProblemSession } from "../state/problem-session";
+import {
+  useProblemCases,
+  useProblemDefinition,
+} from "../state/problem-context";
 import { AnagramCaseFields } from "./anagram-case-fields";
 import { CurryCaseFields } from "./curry-case-fields";
 import { ExpandedCaseFields } from "./expanded-case-fields";
 import { MostFrequentCharacterCaseField } from "./most-frequent-character-case-field";
 import { TwoDistinctCaseField } from "./two-distinct-case-field";
 export function CaseInputFields({ index }: { index: number }) {
-  const s = useProblemSession();
+  const s = { ...useProblemCases(), problem: useProblemDefinition() };
   const draft = s.inputs[index];
   if (!draft) return null;
   const kind = s.problem.kind;

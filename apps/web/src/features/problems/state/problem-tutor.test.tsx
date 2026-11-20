@@ -12,7 +12,8 @@ import {
 } from "@workspace/problems";
 import { StrictMode } from "react";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import { ProblemSession, useProblemSession } from "./problem-session";
+import { useProblemControls, useProblemEditor } from "./problem-context";
+import { ProblemSession } from "./problem-session";
 import { ProblemTutorSession, useProblemTutor } from "./problem-tutor";
 
 const requests: {
@@ -25,7 +26,7 @@ const requests: {
   controller: ReadableStreamDefaultController<Uint8Array>;
 }[] = [];
 function Harness() {
-  const session = useProblemSession();
+  const session = { ...useProblemEditor(), ...useProblemControls() };
   const tutor = useProblemTutor();
   return (
     <>

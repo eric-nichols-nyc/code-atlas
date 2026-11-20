@@ -1,9 +1,9 @@
 "use client";
 
-import { useProblemSession } from "../state/problem-session";
+import { useProblemDefinition } from "../state/problem-context";
 
 export function SolutionPanel() {
-  const { problem } = useProblemSession();
+  const problem = useProblemDefinition();
   return (
     <section
       className="p-5 [overflow-wrap:anywhere]"

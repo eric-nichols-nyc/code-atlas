@@ -11,10 +11,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@workspace/ui/components/select";
-import { useProblemSession } from "../state/problem-session";
+import {
+  useProblemCases,
+  useProblemDefinition,
+} from "../state/problem-context";
 
 export function CurryCaseFields({ index }: { index: number }) {
-  const s = useProblemSession();
+  const s = { ...useProblemCases(), problem: useProblemDefinition() };
   const draft = s.inputs[index];
   if (!draft) return null;
   const callback = curryFunctions.find((item) => item.id === draft.callback);

@@ -6,11 +6,12 @@ import {
   algorithmTopics,
 } from "@/content/algorithms/practice/catalog";
 import { PracticeCatalog } from "@/features/catalog/components/javascript-practice";
-import { useProblemSession } from "../state/problem-session";
+import { useProblemEditor } from "../state/problem-context";
+
 import { ProblemExperience } from "./problem-experience";
 
 function TestEditor() {
-  const session = useProblemSession();
+  const session = useProblemEditor();
   return (
     <textarea
       aria-label="JavaScript solution"
