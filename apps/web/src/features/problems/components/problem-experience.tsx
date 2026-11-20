@@ -16,6 +16,7 @@ import { CodePanel } from "./code-panel";
 import { DescriptionPanel } from "./description-panel";
 import { ProblemNotes } from "./problem-notes";
 import { ResultPanel } from "./result-panel";
+import { SolutionPanel } from "./solution-panel";
 
 const ProblemTutor = dynamic(
   () => import("./problem-tutor").then((module) => module.ProblemTutor),
@@ -81,11 +82,15 @@ function ProblemWorkspace({
               aria-label="Problem workspace"
             >
               <TabsTrigger value="problem">Problem</TabsTrigger>
+              <TabsTrigger value="solution">Solution</TabsTrigger>
               <TabsTrigger value="notes">Notes</TabsTrigger>
             </TabsList>
           </div>
           <TabsContent value="problem" className="min-h-0 overflow-y-auto">
             <DescriptionPanel>{children}</DescriptionPanel>
+          </TabsContent>
+          <TabsContent value="solution" className="min-h-0 overflow-y-auto">
+            <SolutionPanel />
           </TabsContent>
           <TabsContent value="notes" className="min-h-0 overflow-y-auto p-3">
             <ProblemNotes />

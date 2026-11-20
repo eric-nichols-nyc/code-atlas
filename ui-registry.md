@@ -218,16 +218,16 @@ Last updated: 2026-11-09. Implemented in `apps/web/src/features/learning/`, `fea
 | Subject catalog          | Flat rows; fixed ordinal/action slots; title and concise topic tag on one line |
 | Unavailable lesson       | Coming soon text and clock icon; no dead navigation or paywall-style lock      |
 
-The coding workspace puts Problem and Notes tabs on the left, editable JavaScript above Testcase/Test Result/Feedback in the center, and the optional AI tutor on the right. The visualization and multiple-choice checkpoint are removed. All three splitters resize; closing the tools panel releases its column. Mobile uses a reading flow and drawers. Preserve source, editor selection/undo, cases and results above responsive branches.
+The coding workspace puts Problem, Solution, and Notes tabs on the left, editable JavaScript above Testcase/Test Result/Feedback in the center, and the optional AI tutor on the right. The visualization and multiple-choice checkpoint are removed. All three splitters resize; closing the tools panel releases its column. Mobile uses a reading flow and drawers. Preserve source, editor selection/undo, cases and results above responsive branches.
 
 Shared learning panels use `learning-panel` (`bg-card`, `border`, `rounded-md`, no shadow),42px headers and16–20px inner padding. Problem headings use24/32px; prose14/23px. CodeMirror uses Menlo13/24px, semantic light/dark syntax roles and local assets. Default Tab exits the editor; Mod-Enter runs. Lazy editor loading reserves its space. Show Saved to account only after a successful database write/read; ordinary typing is Unsaved edits and latest verdicts remain session results.
 
-The Problem tab shows the continuous problem description and is selected by default. Notes is the second tab. Hints and Solution use shared Accordion rows; Testcase/Test Result retain shared line Tabs. Cases use shared Buttons and labeled numeric Input. Verdicts are server results with text labels, bounded diagnostics and explicit stale-code warnings. Hidden cases never expose private values/logs. Tutor uses the question-triggered chat described below; Notes uses the private note editor described below. Counter (Closures), Filter Elements from Array (Arrays), Debounce and Sleep (Async) are published practice problems. Learn has a module catalog and read-only Two Pointers preview; guided lessons remain future work.
+The Problem tab shows the continuous problem description and is selected by default. Solution is the second tab, with authored code and an explanation; Notes is third. Hints use shared Accordion rows in Problem; Testcase/Test Result retain shared line Tabs. Cases use shared Buttons and labeled numeric Input. Verdicts are server results with text labels, bounded diagnostics and explicit stale-code warnings. Hidden cases never expose private values/logs. Tutor uses the question-triggered chat described below; Notes uses the private note editor described below. Counter (Closures), Filter Elements from Array (Arrays), Debounce and Sleep (Async) are published practice problems. Learn has a module catalog and read-only Two Pointers preview; guided lessons remain future work.
 
 Practice color accents updated 2026-11-20, using the
 [AlgoMaster solution workspace](https://algomaster.io/practice/dsa/contains-duplicate-ii/solution?list=am-300)
 as a reference. Shared `TabsList variant="line" tone="accent"` makes selected
-Problem/Notes and output tabs use green text and an underline. Selected cases
+Problem/Solution/Notes and output tabs use green text and an underline. Selected cases
 and Run use the `success` Button variant; Evaluate uses `warning`, and Submit
 uses `info`. Run/Submit include decorative Play/Send icons alongside their
 labels. Problem inline code uses `interactive` text over an 8% green tint;
@@ -376,21 +376,23 @@ the mobile drawer restores focus to the icon that opened it.
 ## Problem help and editor controls
 
 Files: `packages/ui/src/components/accordion.tsx`,
-`apps/web/src/features/problems/components/description-panel.tsx`, `code-panel.tsx`,
-and `state/problem-session.tsx`. Last updated: 2026-11-09.
+`apps/web/src/features/problems/components/description-panel.tsx`, `solution-panel.tsx`,
+`code-panel.tsx`, and `state/problem-session.tsx`. Last updated: 2026-11-20.
 
 | Property             | Pattern                                                                                          |
 | -------------------- | ------------------------------------------------------------------------------------------------ |
 | Description          | Existing panel and 20px padding; title, prose, examples and constraints stay visible             |
-| Help rows            | Shared Accordion with multiple independently open rows; Hint 1, Hint 2, then Solution            |
+| Help rows            | Shared Accordion with multiple independently open Hint rows in Problem                           |
 | Accordion appearance | Shared border, 16px vertical trigger padding, text-sm font-medium, native focus ring and chevron |
 | Motion               | Default accordion reveal; reduced-motion disables reveal and chevron transitions                 |
 | Code header actions  | Shared ghost icon Buttons for Share and Reset code, followed by the shared theme switcher        |
 | Availability         | Share is visibly disabled and named Share code (coming soon)                                     |
 | Execution actions    | Evaluate, Run and Submit stay beneath the editor; no Reset layout action                         |
 
-Keep help expansion in the problem session above adaptive branches. Solution reveals
-the authored code and explanation below the hints in the Problem tab. Keep the
+Keep hint expansion and the selected tab above adaptive branches. Solution is its
+own scrollable tab between Problem and Notes, with 20px padding, an 18px semibold
+heading, a bordered rounded-md code block, and 14px muted explanation text. Code
+overflow stays inside the block; no additional reveal control is needed. Keep the
 latest real result in Test Result. Reset code is
 only enabled for an edited source and restores starter code. Icons have accessible
 names; tooltips identify the reset/share actions.
@@ -500,10 +502,10 @@ show an accepted/saved state without the server response.
 
 Files: `features/problems/components/problem-notes.tsx`, `problem-notes-editor.tsx`,
 `state/problem-notes.tsx`, and `problem-experience.tsx`.
-Last updated: 2026-11-19.
+Last updated: 2026-11-20.
 
-Use shared line Tabs in the 42px problem pane header, with Problem first and Notes
-second. The notes body uses 12px padding, FieldGroup/Field/FieldTitle,
+Use shared line Tabs in the 42px problem pane header, ordered Problem, Solution,
+then Notes. The notes body uses 12px padding, FieldGroup/Field/FieldTitle,
 a bordered rounded-md editor, and shared small Buttons. Load BlockNote on demand.
 Use its slash menu and selection toolbar for block insertion and rich-text
 formatting. Use the workspace card colors for the editor and the current theme
