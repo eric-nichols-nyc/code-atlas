@@ -1,0 +1,11 @@
+Write `findMostFrequentChar(str)`. Return the character that occurs most often in `str`. Return `""` for an empty string.
+
+Count characters exactly as they appear. Uppercase and lowercase letters are different, and spaces, punctuation, digits, and emoji count too. Iterate by Unicode code point, as JavaScript `for...of` does; do not trim, lowercase, or normalize the string.
+
+**Tie rule:** If multiple characters have the same highest final frequency, return the one that reaches that count first in a left-to-right scan. In `"abba"`, both letters occur twice, but `b` reaches two occurrences before `a`, so return `"b"`. Update the winner only when a new count is **strictly greater** than the current maximum.
+
+For `"javascript"`, return `"a"`: it appears twice and every other character appears once. For `""`, return `""`.
+
+Use a frequency table and track the best character as you scan. Aim for O(n) time and O(k) extra space, where k is the number of distinct characters. Other correct approaches are accepted.
+
+Inputs have at most 1000 JavaScript UTF-16 code units (`str.length`). Enter `str` in the testcase panel without surrounding quotes; leave it blank for empty input. Return the character as a primitive string, rather than its count, a boxed String, an object, or a Promise.

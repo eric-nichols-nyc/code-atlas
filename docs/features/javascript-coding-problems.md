@@ -20,8 +20,10 @@ from Array, Debounce, and Sleep.
   hover states. Mobile keeps Dashboard/topic visible above the section links.
   Current Learn availability is described in the linked learning brief.
 - Problem routes use Back to Practice and an AI tutor toggle in place of the global
-  header. A continuous description contains examples, constraints, independent hint
-  accordions, and Solution last. No visualization or Submissions view is included.
+  header. The left pane has Problem, Solution, and Notes tabs. Problem opens first
+  with the description, examples, constraints, and independent hint accordions.
+  Solution shows the authored code and explanation without another reveal control.
+  No visualization or Submissions view is included.
 - The shared editor supports Reset code, theme, a disabled Share icon, Run, Submit,
   editable cases, and expected/actual results. Desktop panes resize horizontally and
   vertically; mobile uses a reading layout and tools drawer. Source, inputs, help,
@@ -148,6 +150,28 @@ the existing development server on 3000. Existing theme/auth smoke journeys now
 use the configured base URL instead of a hardcoded port. The signed-in browser
 review used the separate dedicated test identity and made no progress edits.
 Packaged Electron remains outside this browser-only change's verification.
+
+## Separate Solution tab — 2026-11-20
+
+Move the authored solution from the last Problem accordion to its own left-pane
+tab between Problem and Notes, for JavaScript and Algorithms. Keep the existing
+green active-tab indicator, scrollable pane, and shared responsive workspace.
+Hints stay in Problem. Reading a solution does not replace or execute learner code.
+
+- [x] Show only the authored code and explanation in Solution; remove the old
+  Solution accordion from Problem.
+- [x] Preserve code, inputs, expanded hints, results, and unsaved notes when
+  switching tabs, changing themes, or resizing.
+- [x] Verify keyboard tab navigation and 320px containment in the browser, and
+  run lint, typecheck, focused workspace/notes tests, and a production build.
+
+**Verification:** Root lint, typecheck, production build, and 34 focused
+workspace/notes/evaluation tests passed. Direct signed-in browser review covered
+Most Frequent Character and Sleep, arrow-key navigation, Light/Dark themes, and
+320px containment. Code, open hints and an unsaved note survived tab switches
+and responsive changes. Result retention is covered by the mocked workspace
+test. The local production app was rebuilt and restarted; packaged Electron and
+authenticated end-to-end automation were not rerun for this change.
 
 ## References
 

@@ -61,7 +61,7 @@ export function DescriptionPanel({ children }: { children: ReactNode }) {
             <li key={constraint}>{constraint}</li>
           ))}
         </ul>
-        <h2 className="mt-7 mb-2 text-sm font-semibold">Hints and solution</h2>
+        <h2 className="mt-7 mb-2 text-sm font-semibold">Hints</h2>
         <Accordion
           type="multiple"
           value={s.helpSections}
@@ -75,17 +75,6 @@ export function DescriptionPanel({ children }: { children: ReactNode }) {
               </AccordionContent>
             </AccordionItem>
           ))}
-          <AccordionItem value="solution">
-            <AccordionTrigger>Solution</AccordionTrigger>
-            <AccordionContent>
-              <pre className="overflow-x-auto rounded-md border bg-background p-3 font-mono text-xs leading-6">
-                <code>{s.problem.solution}</code>
-              </pre>
-              <p className="mt-4 leading-relaxed text-muted-foreground">
-                {s.problem.solutionExplanation}
-              </p>
-            </AccordionContent>
-          </AccordionItem>
         </Accordion>
       </div>
     </section>

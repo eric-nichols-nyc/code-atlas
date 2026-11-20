@@ -134,11 +134,15 @@ export function PracticeCatalog({
                     data-icon="inline-start"
                     className="text-category-async"
                   />
-                ) : item.id === "closures" ? (
+                ) : item.id === "closures" || item.id === "hash-maps" ? (
                   <BracesIcon
                     aria-hidden="true"
                     data-icon="inline-start"
-                    className="text-category-closures"
+                    className={
+                      item.id === "hash-maps"
+                        ? "text-category-arrays"
+                        : "text-category-closures"
+                    }
                   />
                 ) : item.id === "arrays" ? (
                   <LayersIcon

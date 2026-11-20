@@ -91,11 +91,19 @@ export interface AnagramInput {
   s: string;
   t: string;
 }
+export interface TwoDistinctInput {
+  s: string;
+}
+export interface MostFrequentCharacterInput {
+  str: string;
+}
 export interface MajorityElementInput {
   nums: number[];
 }
 export type ProblemInput =
+  | MostFrequentCharacterInput
   | AnagramInput
+  | TwoDistinctInput
   | MajorityElementInput
   | number
   | CounterInput
@@ -111,6 +119,7 @@ export type ProblemInput =
   | CompositionInput
   | MemoizeInput;
 export type ProblemOutput =
+  | string
   | boolean
   | number
   | number[]
@@ -161,7 +170,9 @@ export interface ProblemDefinition {
     | "closures"
     | "arrays"
     | "generators"
-    | "two-pointers";
+    | "two-pointers"
+    | "sliding-window"
+    | "hash-maps";
   kind:
     | "delay"
     | "counter"
@@ -177,7 +188,9 @@ export interface ProblemDefinition {
     | "function-composition"
     | "memoize"
     | "majority-element"
-    | "valid-anagram";
+    | "valid-anagram"
+    | "longest-substring-two-distinct"
+    | "most-frequent-character";
   inputError: string;
   title: string;
   summary: string;

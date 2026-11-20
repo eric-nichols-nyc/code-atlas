@@ -6,14 +6,15 @@ select Save, reload, and see the confirmed account note restored.
 
 ## Scope and decisions
 
-- Place Notes second in the problem pane tab list, after the default Problem tab.
+- Place Notes after Problem and Solution in the problem pane tab list. Problem
+  opens by default; Solution contains the authored code and explanation.
   Use BlockNote with a slash menu for headings, quotes, lists, checklists, and code
   blocks. Rich-text formatting and links remain available. Load the editor on demand.
 - Explicit Save persists a validated versioned document through authenticated Next.js
   GET/PUT `/api/problems/{problemId}/notes` and a separate Prisma user/problem model.
   Ownership comes only from the verified Neon identity. Notes never enter public
   content, progress payloads, judging, or tutor context.
-- Drafts survive switching between Problem and Notes, resizing, and theme changes in the current session.
+- Drafts survive switching between Problem, Solution, and Notes, resizing, and theme changes in the current session.
   Unsaved changes end on navigation/reload; confirmed saves follow the account.
   Concurrent sessions use last successful database write wins.
 - Failed initial reads block editing until retry. Failed saves preserve edits. Late

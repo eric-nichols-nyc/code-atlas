@@ -14,11 +14,15 @@ import { useProblemSession } from "../state/problem-session";
 import { AnagramCaseFields } from "./anagram-case-fields";
 import { CurryCaseFields } from "./curry-case-fields";
 import { ExpandedCaseFields } from "./expanded-case-fields";
+import { MostFrequentCharacterCaseField } from "./most-frequent-character-case-field";
+import { TwoDistinctCaseField } from "./two-distinct-case-field";
 export function CaseInputFields({ index }: { index: number }) {
   const s = useProblemSession();
   const draft = s.inputs[index];
   if (!draft) return null;
   const kind = s.problem.kind;
+  if (kind === "most-frequent-character")
+    return <MostFrequentCharacterCaseField index={index} />;
   if (
     [
       "map-array",
@@ -31,6 +35,8 @@ export function CaseInputFields({ index }: { index: number }) {
   )
     return <ExpandedCaseFields index={index} />;
   if (kind === "valid-anagram") return <AnagramCaseFields index={index} />;
+  if (kind === "longest-substring-two-distinct")
+    return <TwoDistinctCaseField index={index} />;
   if (kind === "curry") return <CurryCaseFields index={index} />;
   const predicate = filterPredicates.find(
     (item) => item.id === draft.predicate,

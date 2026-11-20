@@ -20,7 +20,7 @@ The coding workspace brings the problem, editor, and test cases together in resi
 <details>
 <summary>View the practice catalog and landing page</summary>
 
-Browse fourteen JavaScript challenges and the first Algorithms challenge by topic, search, or difficulty, with account-backed flags and solved status.
+Browse JavaScript and Algorithms challenges by topic, search, or difficulty, with account-backed flags and solved status.
 
 ![JavaScript practice catalog with categories, difficulty filtering, search, and progress indicators](docs/images/practice-catalog.jpg)
 
@@ -33,7 +33,7 @@ The public landing page includes a Counter example that works without an account
 ## How It Works
 
 Start by choosing a JavaScript or Algorithms challenge, from closures and debouncing
-to comparing strings with two pointers.
+to comparing strings with two pointers and finding substrings with a sliding window.
 
 Once you open a challenge, you'll see the problem description on one side and a code
 editor on the other. Write your solution, experiment with different approaches, and
@@ -83,23 +83,25 @@ feedback, and improve.**
 
 ### Available challenges
 
-| Challenge                            | Difficulty | Concept                                |
-| ------------------------------------ | ---------- | -------------------------------------- |
-| Valid Anagram                        | Easy       | Two pointers and sorted strings        |
-| Counter                              | Easy       | Closures                               |
-| Curry                                | Medium     | Closures and partial application       |
-| Function Composition                 | Easy       | Higher-order functions and closures    |
-| Memoize                              | Medium     | Closures and cached results            |
-| Filter Elements from Array           | Easy       | Arrays and callbacks                   |
-| Map Array                            | Easy       | Arrays and transformation callbacks    |
-| Reduce Array                         | Easy       | Arrays and accumulator callbacks       |
-| Chunk Array                          | Easy       | Array grouping and non-mutating copies |
-| Majority Element                     | Easy       | Arrays and Boyer–Moore voting          |
-| Flatten Nested Array                 | Medium     | Arrays and recursive traversal         |
-| Debounce                             | Medium     | Timers and async behavior              |
-| Delay the Resolution of Each Promise | Medium     | Promises and fulfillment timing        |
-| Fibonacci Generator                  | Easy       | Generators and iterator state          |
-| Sleep                                | Easy       | Promises and asynchronous execution    |
+| Challenge                                              | Difficulty | Concept                                |
+| ------------------------------------------------------ | ---------- | -------------------------------------- |
+| Valid Anagram                                          | Easy       | Two pointers and sorted strings        |
+| Most Frequent Character                                | Easy       | Hash maps and character frequencies    |
+| Longest Substring with At Most Two Distinct Characters | Medium     | Sliding window and character counts    |
+| Counter                                                | Easy       | Closures                               |
+| Curry                                                  | Medium     | Closures and partial application       |
+| Function Composition                                   | Easy       | Higher-order functions and closures    |
+| Memoize                                                | Medium     | Closures and cached results            |
+| Filter Elements from Array                             | Easy       | Arrays and callbacks                   |
+| Map Array                                              | Easy       | Arrays and transformation callbacks    |
+| Reduce Array                                           | Easy       | Arrays and accumulator callbacks       |
+| Chunk Array                                            | Easy       | Array grouping and non-mutating copies |
+| Majority Element                                       | Easy       | Arrays and Boyer–Moore voting          |
+| Flatten Nested Array                                   | Medium     | Arrays and recursive traversal         |
+| Debounce                                               | Medium     | Timers and async behavior              |
+| Delay the Resolution of Each Promise                   | Medium     | Promises and fulfillment timing        |
+| Fibonacci Generator                                    | Easy       | Generators and iterator state          |
+| Sleep                                                  | Easy       | Promises and asynchronous execution    |
 
 Each challenge includes a description, examples, constraints, starter code, hints,
 a solution, and server-controlled evaluation.

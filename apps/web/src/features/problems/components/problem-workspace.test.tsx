@@ -12,6 +12,7 @@ import {
   type ExecutionResult,
   flattenNestedArrayProblem,
   functionCompositionProblem,
+  longestSubstringTwoDistinctProblem,
   majorityElementProblem,
   mapArrayProblem,
   memoizeProblem,
@@ -71,6 +72,34 @@ function Workspace({
   );
 }
 afterEach(() => vi.unstubAllGlobals());
+it("edits one case-sensitive substring field, rejects empty input and sends the current source", async () => {
+  const fetch = vi.fn(async (_url: string, _init?: RequestInit) =>
+    Response.json(accepted),
+  );
+  vi.stubGlobal("fetch", fetch);
+  render(<Workspace problem={longestSubstringTwoDistinctProblem} />);
+  expect(screen.getByText("Sliding Window")).toBeVisible();
+  expect(screen.queryByLabelText("t =")).toBeNull();
+  const field = screen.getByRole("textbox", { name: "s =" });
+  fireEvent.change(field, { target: { value: "" } });
+  expect(field).toHaveAttribute("aria-invalid", "true");
+  fireEvent.click(screen.getByRole("button", { name: "Run" }));
+  expect(fetch).not.toHaveBeenCalled();
+  fireEvent.change(field, { target: { value: "aAaAb" } });
+  fireEvent.change(
+    screen.getByRole("textbox", { name: "JavaScript solution" }),
+    { target: { value: longestSubstringTwoDistinctProblem.solution } },
+  );
+  fireEvent.click(screen.getByRole("button", { name: "Run" }));
+  await screen.findByText("Accepted", { selector: "h2" });
+  expect(fetch.mock.calls[0]?.[0]).toBe(
+    `/api/problems/${longestSubstringTwoDistinctProblem.id}/run`,
+  );
+  expect(JSON.parse(fetch.mock.calls[0]?.[1]?.body as string)).toMatchObject({
+    code: longestSubstringTwoDistinctProblem.solution,
+    inputs: [{ s: "aAaAb" }, { s: "ccaabbb" }, { s: "a" }],
+  });
+});
 it("runs Majority Element with edited nums, rejects invalid cases and renders zero", async () => {
   const fetch = vi.fn(async (_url: string, _init?: RequestInit) =>
     Response.json({
@@ -256,6 +285,15 @@ describe("real coding workspace", () => {
     const sent = JSON.parse(fetch.mock.calls[0]?.[1]?.body as string);
     expect(sent.code).toBe(sleepProblem.solution);
     expect(sent.inputs).toEqual([150, 200]);
+    fireEvent.mouseDown(screen.getByRole("tab", { name: "Solution" }), {
+      button: 0,
+    });
+    expect(screen.getByTestId("execution-verdict")).toHaveTextContent(
+      "Accepted",
+    );
+    fireEvent.mouseDown(screen.getByRole("tab", { name: "Problem" }), {
+      button: 0,
+    });
     fireEvent.change(
       screen.getByRole("textbox", { name: "JavaScript solution" }),
       { target: { value: "async function sleep(){}" } },
@@ -290,26 +328,51 @@ describe("real coding workspace", () => {
       screen.getByRole("textbox", { name: "JavaScript solution" }),
     ).toHaveValue(sleepProblem.solution);
   });
-  it("opens hints and solution independently without changing the editor", () => {
+  it("shows the solution in its own tab and preserves hints, code and inputs across tabs", () => {
     render(<Workspace />);
     const editor = screen.getByRole("textbox", { name: "JavaScript solution" });
     const hint = screen.getByRole("button", { name: "Hint 1" });
-    const solution = screen.getByRole("button", { name: "Solution" });
+    const solution = screen.getByRole("tab", { name: "Solution" });
     expect(hint).toHaveAttribute("aria-expanded", "false");
-    expect(solution).toHaveAttribute("aria-expanded", "false");
+    expect(screen.queryByRole("button", { name: "Solution" })).toBeNull();
+    expect(
+      screen.queryByRole("region", { name: "Problem solution" }),
+    ).toBeNull();
     fireEvent.change(editor, { target: { value: "// My work" } });
+    fireEvent.change(screen.getByLabelText("millis ="), {
+      target: { value: "150" },
+    });
     fireEvent.click(hint);
     expect(screen.getByText(/A Promise can stay pending/)).toBeVisible();
-    fireEvent.click(solution);
-    expect(hint).toHaveAttribute("aria-expanded", "true");
-    expect(solution).toHaveAttribute("aria-expanded", "true");
+    fireEvent.mouseDown(solution, { button: 0 });
+    expect(solution).toHaveAttribute("aria-selected", "true");
+    const panel = screen.getByRole("tabpanel", { name: "Solution" });
+    const solutionCode = within(panel).getByText(/function sleep/, {
+      selector: "code",
+    });
+    expect(solutionCode).toBeVisible();
+    expect(solutionCode.textContent).toBe(sleepProblem.solution);
     expect(
-      screen.getByText(/function sleep/, { selector: "code" }),
+      within(panel).getByText(sleepProblem.solutionExplanation),
     ).toBeVisible();
+    expect(
+      screen.queryByRole("region", { name: "Problem description" }),
+    ).toBeNull();
     expect(editor).toHaveValue("// My work");
-    fireEvent.click(hint);
-    expect(hint).toHaveAttribute("aria-expanded", "false");
-    expect(solution).toHaveAttribute("aria-expanded", "true");
+    expect(screen.getByLabelText("millis =")).toHaveValue(150);
+    fireEvent.mouseDown(screen.getByRole("tab", { name: "Notes" }), {
+      button: 0,
+    });
+    fireEvent.mouseDown(screen.getByRole("tab", { name: "Problem" }), {
+      button: 0,
+    });
+    expect(screen.getByRole("button", { name: "Hint 1" })).toHaveAttribute(
+      "aria-expanded",
+      "true",
+    );
+    expect(screen.getByText(/A Promise can stay pending/)).toBeVisible();
+    expect(editor).toHaveValue("// My work");
+    expect(screen.getByLabelText("millis =")).toHaveValue(150);
   });
   it("resets edited code from the header icon", () => {
     render(<Workspace />);
@@ -325,14 +388,19 @@ describe("real coding workspace", () => {
       screen.getByRole("textbox", { name: "JavaScript solution" }),
     ).toHaveValue(sleepProblem.starterCode);
   });
-  it("places Notes beside Problem and restores focus after closing the AI tutor", async () => {
+  it("places Solution and Notes beside Problem and restores focus after closing the AI tutor", async () => {
     render(<Workspace />);
     const editor = screen.getByRole("textbox", { name: "JavaScript solution" });
     fireEvent.change(editor, { target: { value: "// My work" } });
     const tabs = screen.getByRole("tablist", { name: "Problem workspace" });
     const problem = within(tabs).getByRole("tab", { name: "Problem" });
+    const solution = within(tabs).getByRole("tab", { name: "Solution" });
     const notes = within(tabs).getByRole("tab", { name: "Notes" });
-    expect(within(tabs).getAllByRole("tab")).toEqual([problem, notes]);
+    expect(within(tabs).getAllByRole("tab")).toEqual([
+      problem,
+      solution,
+      notes,
+    ]);
     expect(problem).toHaveAttribute("aria-selected", "true");
     fireEvent.mouseDown(notes, { button: 0 });
     expect(screen.getByRole("tabpanel", { name: "Notes" })).toBeVisible();

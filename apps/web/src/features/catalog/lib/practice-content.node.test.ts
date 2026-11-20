@@ -1,14 +1,38 @@
-import { validAnagramProblem } from "@workspace/problems";
+import {
+  longestSubstringTwoDistinctProblem,
+  validAnagramProblem,
+} from "@workspace/problems";
 import { expect, it } from "vitest";
 import { algorithmsPracticeCatalog } from "@/content/algorithms/practice/catalog";
 import { validatePracticeContent } from "./practice-content";
 
 const subject = {
   id: "algorithms",
-  catalog: algorithmsPracticeCatalog,
+  catalog: algorithmsPracticeCatalog.filter(
+    (p) => p.id === validAnagramProblem.id,
+  ),
   statementSlugs: ["valid-anagram"],
 };
 const read = async () => "A complete authored problem statement.";
+it("validates both Algorithms contracts and statements", async () => {
+  expect(
+    await validatePracticeContent(
+      [
+        {
+          ...subject,
+          catalog: algorithmsPracticeCatalog.filter(
+            (p) =>
+              p.id === validAnagramProblem.id ||
+              p.id === longestSubstringTwoDistinctProblem.id,
+          ),
+          statementSlugs: ["valid-anagram", "longest-substring-two-distinct"],
+        },
+      ],
+      [validAnagramProblem, longestSubstringTwoDistinctProblem],
+      read,
+    ),
+  ).toEqual([]);
+});
 it("accepts the registered Algorithms definition with false sample expectations", async () => {
   expect(
     await validatePracticeContent([subject], [validAnagramProblem], read),
