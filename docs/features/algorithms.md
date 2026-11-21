@@ -1,5 +1,38 @@
 # Algorithms
 
+## Move Zeroes and Max Consecutive Ones
+
+Add two Easy JavaScript exercises from Code Drill to Algorithms Practice. Reuse the
+existing workspace, editable JSON testcase input, verified account progress, and
+isolated Run/Submit flow. Publish original prose, hints, and worked solutions.
+
+- **Move Zeroes** (Two Pointers) takes 1–10,000 signed 32-bit integers. For
+  `[0,1,0,3,12]`, the original array must become `[1,3,12,0,0]`. Accept returning
+  that same array (as in Code Drill) or returning nothing. The judge can verify
+  mutation and ordering. Constant extra space is a learning objective.
+- **Max Consecutive Ones** (Sliding Window) takes 1–100,000 numeric bits.
+  `[1,1,0,1,1,1]` returns `3`. The guest must return an integer number.
+- Both use the existing disposable QuickJS worker and its 16 MiB heap, 256 KiB
+  stack, and 100 ms guest entry / 250 ms cumulative budgets. Move Zeroes exports
+  only a bounded integer snapshot. Private cases use the existing redaction path.
+  Allow up to five maximum-size cases through the authenticated Run endpoint for
+  these two exercises while keeping its existing source limit.
+- Verify catalog navigation, edited and invalid input, accepted Run and Submit,
+  rejected shortcuts, maximum inputs, private-case redaction, and browser layout.
+  Other languages and guided lessons are outside this slice.
+
+References: [Move Zeroes](https://code-drill-app.vercel.app/problems/move-zeroes-dev-1778782578258)
+and [Max Consecutive Ones](https://code-drill-app.vercel.app/problems/max-consecutive-ones-1779063679639).
+
+**Verification.** Lint, typecheck, all 715 Vitest tests, and a credential-free
+production build passed. The content check registered 19 practice problems.
+Both signed-in Playwright journeys passed with a dedicated development learner
+and the live judge. They covered topic navigation, invalid and edited testcases,
+Run output, private Submit, and a 320 px layout. Direct browser review confirmed
+both links in the Algorithms Practice preview.
+
+### Original Algorithms rollout
+
 **Outcome:** Enter Algorithms from Dashboard, read the copied Two Pointers lesson,
 then solve Valid Anagram, Most Frequent Character, or Longest Substring with At Most
 Two Distinct Characters with real Run/Submit and the existing account tools.

@@ -188,6 +188,8 @@ export interface ProblemDefinition {
     | "function-composition"
     | "memoize"
     | "majority-element"
+    | "move-zeroes"
+    | "max-consecutive-ones"
     | "valid-anagram"
     | "longest-substring-two-distinct"
     | "most-frequent-character";

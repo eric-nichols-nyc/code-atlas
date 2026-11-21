@@ -2,6 +2,8 @@ import {
   type ExecutionResult,
   fibonacciGeneratorProblem,
   longestSubstringTwoDistinctProblem,
+  maxConsecutiveOnesProblem,
+  moveZeroesProblem,
 } from "@workspace/problems";
 import { beforeEach, expect, it, vi } from "vitest";
 import type { ProgressService } from "@/features/catalog/server/progress-service";
@@ -116,6 +118,8 @@ it("bounds source and JSON and validates all current problem inputs before sched
     ["javascript.counter", [{ n: 0, calls: 1001 }]],
     ["javascript.debounce", [{ t: -1, calls: [] }]],
     ["javascript.fibonacci-generator", [{ count: 51 }]],
+    ["algorithms.move-zeroes", [{ nums: [2147483648] }]],
+    ["algorithms.max-consecutive-ones", [{ nums: [1, 2] }]],
     [
       "javascript.filter-elements-from-array",
       [{ arr: [1], predicate: "unknown" }],
@@ -131,6 +135,27 @@ it("bounds source and JSON and validates all current problem inputs before sched
     ).toBe(400);
   expect(execute).not.toHaveBeenCalled();
 });
+
+it.each([
+  { problem: moveZeroesProblem, length: 10_000, value: -2147483648 },
+  { problem: maxConsecutiveOnesProblem, length: 100_000, value: 1 },
+])(
+  "accepts five maximum-size $problem.title inputs within the request budget",
+  async ({ problem, length, value }) => {
+    const inputs = Array.from({ length: 5 }, () => ({
+      nums: Array.from({ length }, () => value),
+    }));
+    const post = make();
+    const body = { code: problem.solution, inputs };
+    expect((await post(req(body), context("run", problem.id))).status).toBe(
+      200,
+    );
+    expect(execute.mock.calls[0]?.[0].inputs?.length).toBe(5);
+    expect((await post(req(body), context("submit", problem.id))).status).toBe(
+      413,
+    );
+  },
+);
 
 it("uses the verified owner, strips Submit cases and only saves the server verdict", async () => {
   const post = make();

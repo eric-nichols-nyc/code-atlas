@@ -53,6 +53,10 @@ it("lists only Algorithms problems and uses the supplied Two Pointers category",
     "href",
     "/algorithms/practice/valid-anagram",
   );
+  expect(screen.getByRole("link", { name: "Move Zeroes" })).toHaveAttribute(
+    "href",
+    "/algorithms/practice/move-zeroes",
+  );
   expect(screen.queryByRole("link", { name: "Sleep" })).toBeNull();
   fireEvent.change(screen.getByRole("searchbox"), {
     target: { value: "unknown" },
@@ -63,7 +67,7 @@ it("lists only Algorithms problems and uses the supplied Two Pointers category",
     "aria-selected",
     "true",
   );
-  expect(screen.getByRole("status")).toHaveTextContent("1 problem");
+  expect(screen.getByRole("status")).toHaveTextContent("2 problems");
 });
 it("discovers the new Medium problem in Sliding Window and search", () => {
   render(
@@ -88,6 +92,9 @@ it("discovers the new Medium problem in Sliding Window and search", () => {
     "href",
     "/algorithms/practice/longest-substring-two-distinct",
   );
+  expect(
+    screen.getByRole("link", { name: "Max Consecutive Ones" }),
+  ).toHaveAttribute("href", "/algorithms/practice/max-consecutive-ones");
   expect(screen.queryByRole("link", { name: "Valid Anagram" })).toBeNull();
   fireEvent.change(screen.getByRole("searchbox"), {
     target: { value: "distinct" },

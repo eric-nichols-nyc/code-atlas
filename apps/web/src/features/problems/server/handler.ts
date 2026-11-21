@@ -2,7 +2,10 @@ import "server-only";
 import {
   type ExecutionResult,
   findProblem,
+  MAX_CONSECUTIVE_ONES_LENGTH,
+  MAX_MOVE_ZEROES_LENGTH,
   MAX_SOURCE_BYTES,
+  type ProblemDefinition,
   type ProblemInput,
   validRunInputs,
 } from "@workspace/problems";
@@ -18,6 +21,18 @@ import {
 } from "./service";
 
 type Context = { params: Promise<{ problemId: string; action: string }> };
+
+function runBodyLimit(kind: ProblemDefinition["kind"]) {
+  if (kind === "longest-substring-two-distinct") return 544 * 1024;
+  // Five compact JSON arrays, plus source with worst-case JSON escaping and metadata.
+  const sourceAndEnvelopeBytes = 6 * MAX_SOURCE_BYTES + 1024;
+  if (kind === "move-zeroes")
+    return 5 * MAX_MOVE_ZEROES_LENGTH * 12 + sourceAndEnvelopeBytes;
+  if (kind === "max-consecutive-ones")
+    return 5 * MAX_CONSECUTIVE_ONES_LENGTH * 2 + sourceAndEnvelopeBytes;
+  return 64 * 1024;
+}
+
 export function createExecutionHandler(
   services: {
     execute?: typeof executeProblem;
@@ -40,12 +55,10 @@ export function createExecutionHandler(
       return json({ error: "Problem or action unavailable." }, 404);
     let value: unknown;
     try {
-      // Five maximum-length ASCII strings plus the existing 32 KiB source cap.
-      const limit =
-        action === "run" && problem.kind === "longest-substring-two-distinct"
-          ? 544 * 1024
-          : 64 * 1024;
-      value = await readJson(request, limit);
+      value = await readJson(
+        request,
+        action === "run" ? runBodyLimit(problem.kind) : 64 * 1024,
+      );
     } catch (error) {
       if (error instanceof Response) return error;
       throw error;

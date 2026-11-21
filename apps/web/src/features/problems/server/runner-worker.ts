@@ -8,6 +8,11 @@ import type {
   Verdict,
 } from "@workspace/problems";
 import { getQuickJS, type QuickJSHandle } from "quickjs-emscripten";
+import {
+  consecutiveOnesHarness,
+  judgeAlgorithmArray,
+  moveZeroesHarness,
+} from "./adapters/algorithm-arrays.js";
 import { consoleHarness } from "./console-harness.js";
 
 const curryAdapterPath = import.meta.url.endsWith(".ts")
@@ -106,6 +111,8 @@ const {
   `./adapters/most-frequent-character.${adapterExtension}`
 );
 const additionalHarnesses: Record<string, string> = {
+  "algorithms.move-zeroes": moveZeroesHarness,
+  "algorithms.max-consecutive-ones": consecutiveOnesHarness,
   "algorithms.most-frequent-character": mostFrequentCharacterHarness,
   "algorithms.longest-substring-two-distinct": twoDistinctHarness,
   "javascript.majority-element": majorityElementHarness,
@@ -466,6 +473,24 @@ async function runCase(test: Work["cases"][number]): Promise<CaseResult> {
       errorText,
       exceeded: () => interrupted || cpu > 250,
     };
+    if (
+      work.problemId === "algorithms.move-zeroes" ||
+      work.problemId === "algorithms.max-consecutive-ones"
+    ) {
+      if (
+        typeof test.input === "number" ||
+        !("nums" in test.input) ||
+        !additionalCheck
+      )
+        return result("runtime-error", "Invalid array input.");
+      const outcome = judgeAlgorithmArray(
+        work.problemId,
+        test.input.nums,
+        guest,
+        additionalCheck,
+      );
+      return result(outcome.verdict, outcome.message, undefined, outcome);
+    }
     if (work.problemId === "algorithms.longest-substring-two-distinct") {
       if (
         typeof test.input === "number" ||

@@ -1,6 +1,8 @@
 import {
   longestSubstringTwoDistinctProblem,
+  maxConsecutiveOnesProblem,
   mostFrequentCharacterProblem,
+  moveZeroesProblem,
   validAnagramProblem,
 } from "@workspace/problems";
 import type { PracticeEntry } from "@/features/catalog/lib/practice-catalog";
@@ -14,6 +16,8 @@ export const algorithmsPracticeCatalog: PracticeEntry[] = [
   validAnagramProblem,
   longestSubstringTwoDistinctProblem,
   mostFrequentCharacterProblem,
+  moveZeroesProblem,
+  maxConsecutiveOnesProblem,
 ].map((problem, index) => ({
   id: problem.id,
   slug: problem.slug,

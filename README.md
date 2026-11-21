@@ -86,6 +86,8 @@ feedback, and improve.**
 | Challenge                                              | Difficulty | Concept                                |
 | ------------------------------------------------------ | ---------- | -------------------------------------- |
 | Valid Anagram                                          | Easy       | Two pointers and sorted strings        |
+| Move Zeroes                                            | Easy       | In-place two-pointer updates           |
+| Max Consecutive Ones                                   | Easy       | Single-pass streak tracking            |
 | Most Frequent Character                                | Easy       | Hash maps and character frequencies    |
 | Longest Substring with At Most Two Distinct Characters | Medium     | Sliding window and character counts    |
 | Counter                                                | Easy       | Closures                               |
