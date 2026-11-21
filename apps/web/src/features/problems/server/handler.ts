@@ -1,5 +1,6 @@
 import "server-only";
 import {
+  catalogAlgorithmRunBodyLimit,
   type ExecutionResult,
   findProblem,
   MAX_CONSECUTIVE_ONES_LENGTH,
@@ -22,7 +23,9 @@ import {
 
 type Context = { params: Promise<{ problemId: string; action: string }> };
 
-function runBodyLimit(kind: ProblemDefinition["kind"]) {
+function runBodyLimit({ kind, parameters }: ProblemDefinition) {
+  if (kind === "catalog-algorithm" && parameters)
+    return catalogAlgorithmRunBodyLimit(parameters);
   if (kind === "longest-substring-two-distinct") return 544 * 1024;
   // Five compact JSON arrays, plus source with worst-case JSON escaping and metadata.
   const sourceAndEnvelopeBytes = 6 * MAX_SOURCE_BYTES + 1024;
@@ -57,7 +60,7 @@ export function createExecutionHandler(
     try {
       value = await readJson(
         request,
-        action === "run" ? runBodyLimit(problem.kind) : 64 * 1024,
+        action === "run" ? runBodyLimit(problem) : 64 * 1024,
       );
     } catch (error) {
       if (error instanceof Response) return error;

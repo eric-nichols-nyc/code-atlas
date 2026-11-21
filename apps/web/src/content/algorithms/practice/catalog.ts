@@ -1,4 +1,5 @@
 import {
+  catalogAlgorithmProblems,
   longestSubstringTwoDistinctProblem,
   maxConsecutiveOnesProblem,
   mostFrequentCharacterProblem,
@@ -11,6 +12,7 @@ export const algorithmTopics: typeof topics = [
   { id: "two-pointers", label: "Two Pointers", variant: "blue" },
   { id: "sliding-window", label: "Sliding Window", variant: "amber" },
   { id: "hash-maps", label: "Hash Maps", variant: "blue" },
+  { id: "arrays", label: "Arrays", variant: "blue" },
 ];
 export const algorithmsPracticeCatalog: PracticeEntry[] = [
   validAnagramProblem,
@@ -18,6 +20,7 @@ export const algorithmsPracticeCatalog: PracticeEntry[] = [
   mostFrequentCharacterProblem,
   moveZeroesProblem,
   maxConsecutiveOnesProblem,
+  ...catalogAlgorithmProblems,
 ].map((problem, index) => ({
   id: problem.id,
   slug: problem.slug,

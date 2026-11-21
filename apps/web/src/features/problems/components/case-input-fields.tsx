@@ -15,6 +15,7 @@ import {
   useProblemDefinition,
 } from "../state/problem-context";
 import { AnagramCaseFields } from "./anagram-case-fields";
+import { CatalogAlgorithmCaseFields } from "./catalog-algorithm-case-fields";
 import { CurryCaseFields } from "./curry-case-fields";
 import { ExpandedCaseFields } from "./expanded-case-fields";
 import { MostFrequentCharacterCaseField } from "./most-frequent-character-case-field";
@@ -24,6 +25,8 @@ export function CaseInputFields({ index }: { index: number }) {
   const draft = s.inputs[index];
   if (!draft) return null;
   const kind = s.problem.kind;
+  if (kind === "catalog-algorithm")
+    return <CatalogAlgorithmCaseFields index={index} />;
   if (kind === "most-frequent-character")
     return <MostFrequentCharacterCaseField index={index} />;
   if (

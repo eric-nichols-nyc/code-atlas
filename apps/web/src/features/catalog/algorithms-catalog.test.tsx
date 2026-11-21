@@ -67,7 +67,7 @@ it("lists only Algorithms problems and uses the supplied Two Pointers category",
     "aria-selected",
     "true",
   );
-  expect(screen.getByRole("status")).toHaveTextContent("2 problems");
+  expect(screen.getByRole("status")).toHaveTextContent("6 problems");
 });
 it("discovers the new Medium problem in Sliding Window and search", () => {
   render(
@@ -97,7 +97,7 @@ it("discovers the new Medium problem in Sliding Window and search", () => {
   ).toHaveAttribute("href", "/algorithms/practice/max-consecutive-ones");
   expect(screen.queryByRole("link", { name: "Valid Anagram" })).toBeNull();
   fireEvent.change(screen.getByRole("searchbox"), {
-    target: { value: "distinct" },
+    target: { value: "two distinct" },
   });
   expect(screen.getByRole("status")).toHaveTextContent("1 problem");
 });

@@ -13,6 +13,11 @@ import {
   judgeAlgorithmArray,
   moveZeroesHarness,
 } from "./adapters/algorithm-arrays.js";
+import {
+  catalogAlgorithmHarness,
+  judgeCatalogAlgorithm,
+} from "./adapters/catalog-algorithm.js";
+import type { CatalogAlgorithmTarget } from "./catalog-algorithms/types.js";
 import { consoleHarness } from "./console-harness.js";
 
 const curryAdapterPath = import.meta.url.endsWith(".ts")
@@ -134,6 +139,7 @@ interface Work {
     input: ProblemInput;
     hidden: boolean;
     independent?: boolean;
+    catalogTarget?: CatalogAlgorithmTarget;
   }[];
 }
 const work = workerData as Work;
@@ -433,7 +439,9 @@ async function runCase(test: Work["cases"][number]): Promise<CaseResult> {
       }
       generatorCheck = harness.value;
     }
-    const additionalSource = additionalHarnesses[work.problemId];
+    const additionalSource = test.catalogTarget
+      ? catalogAlgorithmHarness
+      : additionalHarnesses[work.problemId];
     if (additionalSource) {
       const harness = enter(() => ctx.evalCode(additionalSource, "judge.js"));
       if (harness.error) {
@@ -473,6 +481,21 @@ async function runCase(test: Work["cases"][number]): Promise<CaseResult> {
       errorText,
       exceeded: () => interrupted || cpu > 250,
     };
+    if (test.catalogTarget) {
+      if (
+        typeof test.input === "number" ||
+        !("args" in test.input) ||
+        !additionalCheck
+      )
+        return result("runtime-error", "Invalid problem input.");
+      const outcome = judgeCatalogAlgorithm(
+        test.input,
+        test.catalogTarget,
+        guest,
+        additionalCheck,
+      );
+      return result(outcome.verdict, outcome.message, undefined, outcome);
+    }
     if (
       work.problemId === "algorithms.move-zeroes" ||
       work.problemId === "algorithms.max-consecutive-ones"

@@ -1,6 +1,11 @@
 "use client";
 
-import type { CaseResult, ProblemInput } from "@workspace/problems";
+import {
+  type AlgorithmParameter,
+  type CaseResult,
+  type ProblemInput,
+  problemInputFields,
+} from "@workspace/problems";
 import { CheckIcon, XIcon } from "@workspace/ui/components/icons";
 import {
   Tabs,
@@ -128,7 +133,11 @@ export function TestResultPanel() {
               value={String(index)}
               className="min-h-0 overflow-auto p-4"
             >
-              <CaseDetails item={item} timing={problem.kind === "delay"} />
+              <CaseDetails
+                item={item}
+                timing={problem.kind === "delay"}
+                parameters={problem.parameters}
+              />
             </TabsContent>
           ))}
         </Tabs>
@@ -137,7 +146,15 @@ export function TestResultPanel() {
   );
 }
 
-function CaseDetails({ item, timing }: { item: CaseResult; timing: boolean }) {
+function CaseDetails({
+  item,
+  timing,
+  parameters,
+}: {
+  item: CaseResult;
+  timing: boolean;
+  parameters?: AlgorithmParameter[];
+}) {
   // Private values and console output never belong in the public detail view.
   if (item.hidden)
     return (
@@ -163,7 +180,7 @@ function CaseDetails({ item, timing }: { item: CaseResult; timing: boolean }) {
             {item.input === undefined ? (
               <ValueBox>—</ValueBox>
             ) : (
-              <InputValues input={item.input} />
+              <InputValues input={item.input} parameters={parameters} />
             )}
           </dd>
         </div>
@@ -202,9 +219,14 @@ function CaseDetails({ item, timing }: { item: CaseResult; timing: boolean }) {
   );
 }
 
-function InputValues({ input }: { input: ProblemInput }) {
-  const fields: [string, unknown][] =
-    typeof input === "number" ? [["millis", input]] : Object.entries(input);
+function InputValues({
+  input,
+  parameters,
+}: {
+  input: ProblemInput;
+  parameters?: AlgorithmParameter[];
+}) {
+  const fields = problemInputFields(input, parameters);
   return (
     <div className="flex flex-col gap-3">
       {fields.map(([name, value]) => (

@@ -1,4 +1,5 @@
 import {
+  algorithmArgumentDraft,
   type ProblemDefinition,
   type ProblemInput,
   validProblemInput,
@@ -12,10 +13,18 @@ export interface InputDraft {
   s?: string;
   t?: string;
   str?: string;
+  args?: string[];
 }
 export function inputDraft(input: ProblemInput): InputDraft {
   const base = { value: "", calls: "", json: "", predicate: "greaterThan10" };
   if (typeof input === "number") return { ...base, value: String(input) };
+  if ("args" in input)
+    return {
+      ...base,
+      args: input.args.map((arg) =>
+        typeof arg === "string" ? arg : JSON.stringify(arg),
+      ),
+    };
   if ("str" in input) return { ...base, str: input.str };
   if ("s" in input)
     return { ...base, s: input.s, ...("t" in input ? { t: input.t } : {}) };
@@ -71,6 +80,16 @@ export function parseInputDraft(
   draft: InputDraft,
 ): ProblemInput | undefined {
   try {
+    if (problem.kind === "catalog-algorithm") {
+      if (!draft.args || !problem.parameters) return undefined;
+      const input = {
+        args: draft.args.map((raw, index) => {
+          const parameter = problem.parameters?.[index];
+          return parameter ? algorithmArgumentDraft(parameter, raw) : undefined;
+        }),
+      };
+      return validProblemInput(problem, input) ? input : undefined;
+    }
     if (problem.kind === "most-frequent-character") {
       const input = { str: draft.str };
       return validProblemInput(problem, input) ? input : undefined;

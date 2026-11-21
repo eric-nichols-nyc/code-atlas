@@ -1,3 +1,5 @@
+import { validCatalogAlgorithmInput } from "./catalog-algorithms.js";
+import { catalogAlgorithmProblems } from "./problems/catalog-algorithms/index.js";
 import { chunkArrayProblem } from "./problems/chunk-array.js";
 import { counterProblem } from "./problems/counter.js";
 import { curryFunctions, curryProblem } from "./problems/curry.js";
@@ -37,6 +39,7 @@ import {
 import { sleepProblem } from "./problems/sleep.js";
 import { validAnagramProblem } from "./problems/valid-anagram.js";
 import {
+  type AlgorithmParameter,
   type ExecutionResult,
   type NestedArray,
   type ProblemDefinition,
@@ -45,8 +48,14 @@ import {
   verdicts,
 } from "./types.js";
 
+export {
+  algorithmArgumentDraft,
+  catalogAlgorithmRunBodyLimit,
+  validAlgorithmArgument,
+} from "./catalog-algorithms.js";
 export * from "./types.js";
 export {
+  catalogAlgorithmProblems,
   chunkArrayProblem,
   compositionFunctions,
   counterProblem,
@@ -97,6 +106,7 @@ export const publicProblems = [
   flattenNestedArrayProblem,
   fibonacciGeneratorProblem,
   delayEachPromiseProblem,
+  ...catalogAlgorithmProblems,
 ];
 export function findProblem(slugOrId: string) {
   return publicProblems.find((p) => p.slug === slugOrId || p.id === slugOrId);
@@ -147,6 +157,8 @@ export function validProblemInput(
   if (problem.kind === "delay") return validMillis(value);
   if (!value || typeof value !== "object" || Array.isArray(value)) return false;
   const input = value as Record<string, unknown>;
+  if (problem.kind === "catalog-algorithm")
+    return validCatalogAlgorithmInput(problem, input);
   if (problem.kind === "most-frequent-character")
     return (
       Object.keys(input).length === 1 &&
@@ -324,8 +336,27 @@ export function validRunInputs(
       value.every((input) => validProblemInput(problem, input)))
   );
 }
-export function formatProblemInput(input: ProblemInput) {
+export function problemInputFields(
+  input: ProblemInput,
+  parameters?: AlgorithmParameter[],
+): [string, unknown][] {
+  if (typeof input === "number") return [["millis", input]];
+  if ("args" in input)
+    return input.args.map((value, index) => [
+      parameters?.[index]?.name ?? `Argument ${index + 1}`,
+      value,
+    ]);
+  return Object.entries(input);
+}
+export function formatProblemInput(
+  input: ProblemInput,
+  parameters?: AlgorithmParameter[],
+) {
   if (typeof input === "number") return `millis = ${input}`;
+  if ("args" in input)
+    return problemInputFields(input, parameters)
+      .map(([name, value]) => `${name} = ${JSON.stringify(value)}`)
+      .join(", ");
   if ("str" in input) return `str = ${JSON.stringify(input.str)}`;
   if ("s" in input)
     return `s = ${JSON.stringify(input.s)}${"t" in input ? `, t = ${JSON.stringify(input.t)}` : ""}`;

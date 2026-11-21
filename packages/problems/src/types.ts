@@ -100,7 +100,33 @@ export interface MostFrequentCharacterInput {
 export interface MajorityElementInput {
   nums: number[];
 }
+export type AlgorithmArgument =
+  | number
+  | string
+  | number[]
+  | number[][]
+  | string[];
+export type AlgorithmOutput = AlgorithmArgument | boolean | string[][];
+export interface CatalogAlgorithmInput {
+  args: AlgorithmArgument[];
+}
+type AlgorithmAlphabet = "lowercase" | "ascii" | "letters" | "alphanumeric";
+type IntegerBounds = { min: number; max: number };
+type LengthBounds = { minLength: number; maxLength: number };
+export type AlgorithmParameter = { name: string } & (
+  | ({ type: "integer"; maxLengthOfArgument?: number } & IntegerBounds)
+  | ({ type: "string"; alphabet?: AlgorithmAlphabet } & LengthBounds)
+  | ({ type: "integers"; sorted?: true } & IntegerBounds & LengthBounds)
+  | ({ type: "matrix"; square?: true } & IntegerBounds & LengthBounds)
+  | ({
+      type: "strings";
+      minWordLength: number;
+      maxWordLength: number;
+      alphabet?: AlgorithmAlphabet;
+    } & LengthBounds)
+);
 export type ProblemInput =
+  | CatalogAlgorithmInput
   | MostFrequentCharacterInput
   | AnagramInput
   | TwoDistinctInput
@@ -119,11 +145,7 @@ export type ProblemInput =
   | CompositionInput
   | MemoizeInput;
 export type ProblemOutput =
-  | string
-  | boolean
-  | number
-  | number[]
-  | number[][]
+  | AlgorithmOutput
   | MemoizeOutput
   | DebounceCall[]
   | TimedValue[];
@@ -192,7 +214,9 @@ export interface ProblemDefinition {
     | "max-consecutive-ones"
     | "valid-anagram"
     | "longest-substring-two-distinct"
-    | "most-frequent-character";
+    | "most-frequent-character"
+    | "catalog-algorithm";
+  parameters?: AlgorithmParameter[];
   inputError: string;
   title: string;
   summary: string;
@@ -209,4 +233,17 @@ export interface ProblemDefinition {
   hints: string[];
   solution: string;
   solutionExplanation: string;
+}
+
+export interface CatalogAlgorithmDefinition
+  extends Omit<ProblemDefinition, "samples" | "parameters"> {
+  kind: "catalog-algorithm";
+  subjectId: "algorithms";
+  parameters: AlgorithmParameter[];
+  samples: {
+    id: string;
+    input: CatalogAlgorithmInput;
+    expected: AlgorithmOutput;
+    explanation: string;
+  }[];
 }

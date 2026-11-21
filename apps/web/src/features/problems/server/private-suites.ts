@@ -4,8 +4,14 @@ import type {
   ProblemDefinition,
   ProblemInput,
 } from "@workspace/problems";
+
+type DedicatedJudgeProblemKind = Exclude<
+  ProblemDefinition["kind"],
+  "catalog-algorithm"
+>;
+
 // These inputs are server-only. Public content contains examples, never full suites.
-export const privateSuites: Record<ProblemDefinition["kind"], ProblemInput[]> =
+export const privateSuites: Record<DedicatedJudgeProblemKind, ProblemInput[]> =
   {
     "move-zeroes": [
       { nums: [1, 0, 2, 0, 3] },

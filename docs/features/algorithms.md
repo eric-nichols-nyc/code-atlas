@@ -190,3 +190,32 @@ build passed with `CODE_ATLAS_DIST_DIR=.next-preview/all-changes`, preserving th
 running app's build. Content validation passed for all 17 practice problems.
 The signed-in journey results above remain their original evidence; authenticated
 browser automation and packaged Electron were not rerun for this combined check.
+
+### Published Code Drill exercises
+
+Add the 14 missing exercises from Code Drill's published JavaScript catalog to
+Algorithms Practice. Two Pointers, Sliding Window, Hash Maps and Arrays cover
+the new string, sequence, array and matrix challenges. Keep both longest-unique
+substring exercises with their original difficulty and function signatures.
+Use the existing JavaScript workspace, editor, progress and feedback flow with
+Code Atlas statements, examples, hints and solutions.
+
+Learners can find each exercise, edit the named arguments, Run up to five
+examples or custom cases, and Submit against an additional private suite.
+Validate argument bounds and choose the comparison appropriate to each
+exercise, including unordered groups and required in-place mutation. Keep
+learner code in the isolated worker and omit hidden values and output from
+results. Verify catalog discovery, content, input editing, judging and
+redaction through focused checks and a browser review.
+
+Count Pairs With Sum counts all distinct index pairs. For three equal values
+that add to the target in pairs, the expected answer is 3. This follows the
+Code Drill statement and JavaScript solution and corrects two inconsistent
+expected results in its testcase data.
+
+**Verification.** Lint, typecheck, 772 Vitest tests, and the production build
+passed. Content validation found 33 practice problems across JavaScript and
+Algorithms. The signed-in Chromium checks covered discovery of all 14 additions,
+the Arrays filter, custom inputs, invalid input feedback, equivalent anagram
+groupings, required mutation, hidden Submit results, and a 320 px workspace.
+Direct browser review confirmed 19 exercises and the Rotate Image workspace.
