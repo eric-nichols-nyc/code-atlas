@@ -221,6 +221,11 @@ progress after fully quitting and reopening Electron against the production serv
 See [verification instructions](docs/development.md#verification)
 and the [full command list](docs/development.md#commands).
 
+Use `pnpm analyze` for interactive Turbopack bundle inspection, or
+`pnpm analyze --output --snapshot baseline` to save a report without starting a
+server. See [bundle analysis](docs/development.md#bundle-analysis) for route filters,
+snapshots and graph exports. Analysis is separate from the normal build and CI.
+
 ## What's next
 
 Individual Learn lessons, additional JavaScript and Algorithms challenges, saved tutor history,

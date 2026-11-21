@@ -104,7 +104,7 @@ Root `package.json` is the source of truth for scripts.
 | `pnpm test:e2e:desktop:auth`                  | Authenticated Electron Run/Submit, full quit and account restore                  |
 | `pnpm --filter @workspace/web content:check`  | Validate the current practice catalog and public definitions                      |
 | `pnpm --filter @workspace/web worker:build`   | Compile the isolated worker/adapters to ignored `.workers/`                       |
-| `pnpm analyze`                                | Webpack bundle-analysis build for the web app                                     |
+| `pnpm analyze`                                | Interactive Turbopack bundle analyzer for the web app on localhost:4000           |
 | `pnpm db:generate`                            | Generate Prisma Client without connecting to a database                           |
 | `pnpm db:migrate --name <name>`               | Create/apply a development migration once models and credentials exist            |
 | `pnpm db:deploy` / `pnpm db:studio`           | Apply committed migrations / open Prisma Studio                                   |
@@ -307,8 +307,66 @@ pnpm dlx shadcn@latest add <component> --cwd packages/ui
 ```
 
 Use `@workspace/ui/lib/utils` for `cn` imports. Read and maintain [ui-registry.md](../ui-registry.md)
-when changing reusable patterns. Normal builds use Turbopack; `pnpm analyze` uses Webpack and writes
-ignored reports under `apps/web/.next/analyze/`. Review bundle impact for substantial client additions.
+when changing reusable patterns. Normal builds and `pnpm analyze` both use
+Turbopack. Review bundle impact for substantial client additions.
+
+### Bundle analysis
+
+`pnpm analyze` compiles the existing Node worker and serves Next.js's native
+Turbopack analyzer at `http://localhost:4000`. It generates a production bundle
+graph and serves an interactive report; it does not create a runnable application
+build. Use `pnpm analyze --port 4001` when the default port is occupied.
+
+For a saved report without a server, run `pnpm analyze --output --snapshot baseline`.
+Analysis data, snapshots and the viewer are written to ignored
+`apps/web/.next/diagnostics/analyze/`. `CODE_ATLAS_DIST_DIR` selects a different
+output directory, such as `.next-preview/bundle-audit`, when keeping analysis
+separate from a running app. Normal builds and CI do not generate these reports.
+
+Export a saved graph without rebuilding or starting a server:
+
+```sh
+pnpm --filter @workspace/web exec next analyze export --snapshot baseline
+```
+
+The export is JSON Lines. With a custom output directory, also pass
+`--dist-dir .next-preview/bundle-audit`; export reads saved files without loading
+Next.js configuration or environment files. `--route` restricts route records;
+the export still includes the full module graph.
+
+Start with `/`, `/dashboard`, and the JavaScript/Algorithms practice routes.
+Compare client and server code, trace why a dependency is included, and distinguish
+initial route chunks from dynamic imports. CodeMirror, the BlockNote/Mantine notes
+editor, Markdown, and shared UI imports are useful inspection targets. Graph sizes
+are evidence about bundled code; use browser network/performance recordings to
+establish actual transfer cost and responsiveness.
+
+**Turbopack baseline — 2026-11-20:** The first native snapshot contains 33 routes.
+On both practice problem routes, BlockNote contributes about 3.64 MB of raw
+generated JavaScript across the analyzer's async outputs; this includes related
+lazy code and is not an initial page download budget. The graph records the notes
+editor, JavaScript editor and tutor as async groups. Landing and Dashboard have
+no BlockNote, CodeMirror or `react-markdown` JavaScript contributions. Shared auth
+code remains in their bootstrap/render-dependent groups and is a useful next
+inspection target. The four inspected routes have no client JavaScript parts
+attributed to the private judge server folder, database package, Prisma or OpenAI
+SDK.
+
+The native JSON Lines export and a small summary are local ignored artifacts at
+`outputs/bundle-analysis/{turbopack-baseline.jsonl,summary.json}`. The snapshot/viewer
+is under `apps/web/.next-preview/bundle-audit/diagnostics/analyze/`. Historical
+Webpack reports in older feature briefs retain their original context and sizes.
+
+**Validation:** Root lint, typecheck, the credential-free production build and
+all 687 tests passed after removing the Webpack analyzer dependency and its 16
+unused transitive tooling packages. Native headless capture and JSON Lines export
+passed. Browser inspection verified the practice-route treemap, Table view and
+initial-load filter; filtering initial code for BlockNote produced no matching
+rows. Screenshots are in ignored `outputs/bundle-analysis/`.
+
+The pinned Next.js analyzer's overview logged React error #467 in the browser;
+direct practice-route views rendered without page errors. Saved snapshots and
+exports worked. No framework upgrade is included in this tooling change.
 
 ## Verification
 

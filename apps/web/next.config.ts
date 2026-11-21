@@ -1,5 +1,4 @@
 import { fileURLToPath } from "node:url";
-import bundleAnalyzer from "@next/bundle-analyzer";
 import createMDX from "@next/mdx";
 import type { NextConfig } from "next";
 
@@ -51,7 +50,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default bundleAnalyzer({
-  enabled: process.env.ANALYZE === "true",
-  openAnalyzer: false,
-})(createMDX()(nextConfig));
+export default createMDX()(nextConfig);
