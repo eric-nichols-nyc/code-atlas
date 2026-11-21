@@ -56,29 +56,27 @@ export const validPalindromeProblem: CatalogAlgorithmDefinition = {
     "Compare letters in the same case.",
   ],
   solutionExplanation:
-    "Move two pointers inward. Skip characters outside the checked alphabet and compare each remaining pair case-insensitively. Each pointer passes each position at most once, so the solution uses O(n) time and O(1) extra space.",
+    "Use a fixed ASCII lookup table to fold letters to a single case, keep digits, and mark ignored characters with zero. Move two pointers inward, skipping zeros and comparing each remaining pair. Each pointer passes each position at most once, so the solution uses O(n) time and O(1) extra space.",
   solution: `function isPalindrome(s) {
+  const folded = new Uint8Array(128);
+  for (let digit = 48; digit <= 57; digit++) folded[digit] = digit;
+  for (let letter = 65; letter <= 90; letter++) {
+    folded[letter] = letter;
+    folded[letter + 32] = letter;
+  }
+
   let left = 0;
   let right = s.length - 1;
   while (left < right) {
-    const first = s.charCodeAt(left);
-    const last = s.charCodeAt(right);
-    // In ASCII, setting bit 5 folds uppercase letters to lowercase.
-    const firstLower = first | 32;
-    const lastLower = last | 32;
-    const firstIsDigit = first >= 48 && first <= 57;
-    const firstIsLetter = firstLower >= 97 && firstLower <= 122;
-    const lastIsDigit = last >= 48 && last <= 57;
-    const lastIsLetter = lastLower >= 97 && lastLower <= 122;
-    if (!firstIsDigit && !firstIsLetter) {
-      left++;
-    } else if (!lastIsDigit && !lastIsLetter) {
-      right--;
-    } else {
-      if (firstLower !== lastLower) return false;
-      left++;
-      right--;
-    }
+    let first = folded[s.charCodeAt(left)];
+    while (first === 0 && left < right) first = folded[s.charCodeAt(++left)];
+
+    let last = folded[s.charCodeAt(right)];
+    while (last === 0 && left < right) last = folded[s.charCodeAt(--right)];
+
+    if (first !== last) return false;
+    left++;
+    right--;
   }
   return true;
 }`,

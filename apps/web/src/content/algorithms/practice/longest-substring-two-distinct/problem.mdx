@@ -6,6 +6,6 @@ For `"eceba"`, the longest valid substring is `"ece"`, so return `3`. For `"ccaa
 
 The input contains **1–100000 English letters**, uppercase or lowercase. Comparisons are case-sensitive: `"aA"` contains two distinct characters, while `"aAb"` contains three. Do not trim, normalize, or change case.
 
-Try a **Sliding Window** approach. Expand the right boundary and keep counts of letters inside the window. When a third distinct letter enters, advance the left boundary until the window is valid again. Track the largest valid window length. Aim for O(n) time and O(1) extra space.
+Try a **Sliding Window** approach. Track the length of the current window and the length of its trailing run of one letter. When a third distinct letter enters, begin the next window with that run and the new letter. Track the largest valid window length. Aim for O(n) time and O(1) extra space.
 
 Edit `s` in the testcase panel as a plain string without surrounding quotes. Empty strings, spaces, digits, and punctuation are outside this problem's constraints. Return an integer length rather than the substring itself, a numeric string, or a Promise.

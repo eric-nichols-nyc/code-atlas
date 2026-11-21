@@ -48,36 +48,35 @@ export const longestSubstringTwoDistinctProblem = {
   ],
   hints: [
     "Keep a sliding window from left to right that contains at most two distinct letters.",
-    "Track how many times each letter occurs inside the current window.",
-    "When a third distinct letter enters, shrink from the left until a count reaches zero and can be removed.",
-    "After restoring a valid window, compare right - left + 1 with the best length so far.",
+    "Remember the last letter, the other letter in the window, and the length of the trailing run of the last letter.",
+    "When a third distinct letter enters, the new window contains only the trailing run and the new letter.",
+    "Compare the length of each valid window with the best length so far.",
   ],
   solution: `function lengthOfLongestSubstringTwoDistinct(s) {
-  const counts = new Map();
-  let left = 0;
   let longest = 0;
+  let windowLength = 0;
+  let tailLength = 0;
+  let last = -1;
+  let other = -1;
 
-  for (let right = 0; right < s.length; right++) {
-    const char = s[right];
-    counts.set(char, (counts.get(char) ?? 0) + 1);
-
-    while (counts.size > 2) {
-      const outgoing = s[left];
-      const remaining = counts.get(outgoing) - 1;
-      if (remaining === 0) counts.delete(outgoing);
-      else counts.set(outgoing, remaining);
-      left++;
+  for (let index = 0; index < s.length; index++) {
+    const letter = s.charCodeAt(index);
+    if (letter === last) {
+      tailLength++;
+      windowLength++;
+    } else {
+      windowLength = (letter === other ? windowLength : tailLength) + 1;
+      other = last;
+      last = letter;
+      tailLength = 1;
     }
-
-    longest = Math.max(longest, right - left + 1);
+    if (windowLength > longest) longest = windowLength;
   }
 
   return longest;
 }`,
   solutionExplanation:
-    "Expand the right boundary and count the new letter. If there are three distinct letters, " +
-    "advance the left boundary while removing outgoing letters until only two remain. " +
-    "The resulting window is valid, so record its length. Each boundary advances at most n times: " +
-    "O(n) time and O(1) auxiliary space, since the map holds at most three distinct letters during an update. " +
-    "Compare letters exactly; uppercase and lowercase forms are different characters.",
+    "Track the longest valid window ending at the current index and the length of its trailing run of one letter. " +
+    "A letter already in the window extends it. A third letter starts a new window with the trailing run, which is the longest suffix containing only the most recent letter. " +
+    "One pass takes O(n) time and uses O(1) extra space. Character codes preserve the distinction between uppercase and lowercase.",
 } satisfies ProblemDefinition;

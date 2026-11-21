@@ -128,12 +128,21 @@ describe("isolated two-distinct substring judging", () => {
     "function lengthOfLongestSubstringTwoDistinct(s){return s.length}",
     "function lengthOfLongestSubstringTwoDistinct(s){return Math.min(2,s.length)}",
     // Case normalization changes the meaning of distinct characters.
-    problem.solution.replace(
-      "const counts = new Map();",
-      "s = s.toLowerCase(); const counts = new Map();",
-    ),
+    `${problem.solution}
+      const solve = lengthOfLongestSubstringTwoDistinct;
+      lengthOfLongestSubstringTwoDistinct = (s) => solve(s.toLowerCase());`,
     // Removing a letter too early loses counts for duplicates still in the window.
-    problem.solution.replace("counts.get(outgoing) - 1", "0"),
+    `function lengthOfLongestSubstringTwoDistinct(s) {
+      const letters = new Set();
+      let left = 0;
+      let best = 0;
+      for (let right = 0; right < s.length; right++) {
+        letters.add(s[right]);
+        while (letters.size > 2) letters.delete(s[left++]);
+        best = Math.max(best, right - left + 1);
+      }
+      return best;
+    }`,
   ])("rejects incomplete solutions: %s", async (code) => {
     expect(
       (await executeProblem({ ...job, code, action: "submit" })).verdict,
