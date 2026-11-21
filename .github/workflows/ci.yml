@@ -46,7 +46,8 @@ jobs:
         run: pnpm typecheck
 
       - name: Automated tests (Vitest)
-        run: pnpm test
+        # Judge tests enforce short execution deadlines inside isolated workers.
+        run: pnpm test --maxWorkers=2
 
       - name: Production build
         run: pnpm build
