@@ -8,6 +8,7 @@ import type {
   Verdict,
 } from "@workspace/problems";
 import { getQuickJS, type QuickJSHandle } from "quickjs-emscripten";
+import { consoleHarness } from "./console-harness.js";
 
 const curryAdapterPath = import.meta.url.endsWith(".ts")
   ? "./adapters/curry.ts"
@@ -347,6 +348,13 @@ async function runCase(test: Work["cases"][number]): Promise<CaseResult> {
   ctx.setProp(ctx.global, "console", consoleObject);
   consoleObject.dispose();
   try {
+    const consoleSetup = enter(() => ctx.evalCode(consoleHarness));
+    try {
+      if (consoleSetup.error)
+        return result("runtime-error", "The console could not initialize.");
+    } finally {
+      consoleSetup.dispose();
+    }
     if (virtual) {
       const date = ctx.getProp(ctx.global, "Date");
       const now = ctx.newFunction("now", () => ctx.newNumber(virtualNow));

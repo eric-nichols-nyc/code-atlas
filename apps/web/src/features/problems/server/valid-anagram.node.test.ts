@@ -43,6 +43,89 @@ describe("Valid Anagram contract", () => {
 });
 
 describe("isolated Valid Anagram judging", () => {
+  it("captures the sorted array passed to console.log", async () => {
+    const result = await executeProblem({
+      ...job,
+      code: `function isAnagram(s, t) {
+        const sort1 = s.split("").sort();
+        console.log("sort1=", sort1);
+        return true;
+      }`,
+      action: "run",
+      inputs: [{ s: "anagram", t: "nagaram" }],
+    });
+    expect(result.verdict).toBe("accepted");
+    expect(result.cases[0]?.logs).toEqual([
+      'sort1= ["a","a","a","g","m","n","r"]',
+    ]);
+  });
+  it("captures nested values, cycles and accessor markers without executing getters", async () => {
+    const result = await executeProblem({
+      ...job,
+      code: `function isAnagram() {
+        const value = { items: [0, false, null, { text: "hello" }] };
+        value.self = value;
+        Object.defineProperty(value, "secret", {
+          enumerable: true,
+          get() { throw new Error("getter must not run"); }
+        });
+        value.toJSON = () => { throw new Error("toJSON must not run"); };
+        console.warn("value=", value);
+        console.error([], {}, null, 12n);
+        return true;
+      }`,
+      action: "run",
+      inputs: [{ s: "ab", t: "ba" }],
+    });
+    expect(result.verdict).toBe("accepted");
+    expect(result.cases[0]?.logs).toEqual([
+      'value= {"items":[0,false,null,{"text":"hello"}],"self":[Circular],"secret":[Getter],"toJSON":[Function]}',
+      "[] {} null 12n",
+    ]);
+  });
+  it("keeps console inspection bounded and independent of learner-modified intrinsics", async () => {
+    const result = await executeProblem({
+      ...job,
+      code: `function isAnagram() {
+        const value = Array(1000).fill("a");
+        JSON.stringify = Object.keys = Object.getOwnPropertyDescriptor = () => { throw new Error("replaced"); };
+        console.log(value);
+        for (let i = 0; i < 100; i++) console.log({ value });
+        return true;
+      }`,
+      action: "run",
+      inputs: [{ s: "ab", t: "ba" }],
+    });
+    expect(result.verdict).toBe("accepted");
+    expect(result.cases[0]?.logs[0]).toBe(
+      `[${Array(25).fill('"a"').join(",")},…]`,
+    );
+    expect(result.cases[0]?.logs.length).toBeLessThanOrEqual(41);
+    expect(result.cases[0]?.logs.every((line) => line.length <= 1024)).toBe(
+      true,
+    );
+  });
+  it("interrupts hostile console proxies and recovers for the next execution", async () => {
+    const result = await executeProblem({
+      ...job,
+      code: `function isAnagram() {
+        console.log(new Proxy({}, { ownKeys() { while (true) {} } }));
+        while (true) {}
+      }`,
+      action: "run",
+      inputs: [{ s: "ab", t: "ba" }],
+    });
+    expect(result.verdict).toBe("time-limit-exceeded");
+    expect(
+      (
+        await executeProblem({
+          ...job,
+          action: "run",
+          inputs: [{ s: "ab", t: "ba" }],
+        })
+      ).verdict,
+    ).toBe("accepted");
+  });
   it("evaluates current edited cases including false and empty values", async () => {
     const result = await executeProblem({
       ...job,
@@ -112,7 +195,7 @@ describe("isolated Valid Anagram judging", () => {
     const failed = await executeProblem({
       ...job,
       action: "submit",
-      code: "function isAnagram(s){console.log(s);throw new Error('secret:'+s)}",
+      code: "function isAnagram(s){console.log([s],{input:s});throw new Error('secret:'+s)}",
     });
     for (const item of failed.cases.filter((item) => item.hidden)) {
       expect(item.message).toBe("Hidden case failed.");
