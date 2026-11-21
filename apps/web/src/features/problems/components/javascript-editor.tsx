@@ -123,7 +123,7 @@ export function CodeEditor({
             ...completionKeymap,
           ]),
           theme.current.of(
-            appearance(document.documentElement.matches(".dark, .dark-purple")),
+            appearance(document.documentElement.matches(".dark, .brown")),
           ),
           EditorView.contentAttributes.of({
             "aria-label": typescript

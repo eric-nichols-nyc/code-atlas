@@ -11,6 +11,8 @@ export function ThemeProvider(
       attribute="class"
       defaultTheme="dark"
       themes={["light", "dark", "dark-purple"]}
+      // Preserve saved Dark purple preferences while replacing their palette.
+      value={{ light: "light", dark: "dark", "dark-purple": "brown" }}
       enableSystem
       enableColorScheme={false}
       disableTransitionOnChange

@@ -33,6 +33,7 @@ export function useProblemExecution({
   const [pending, setPending] = useState<ExecutionAction | null>(null);
   const [error, setError] = useState("");
   const [latest, setLatest] = useState<ResultSnapshot | null>(null);
+  const [selectedResultCase, setSelectedResultCase] = useState("0");
   const controller = useRef<AbortController | null>(null);
   const isActive = useCallback(() => Boolean(controller.current), []);
 
@@ -88,6 +89,7 @@ export function useProblemExecution({
             "The runner returned an invalid result. Please retry.",
           );
         setLatest({ result, source, inputs: validInputs });
+        setSelectedResultCase("0");
         return { status: "completed", source, result };
       } catch (reason) {
         if (request.signal.aborted) return null;
@@ -109,8 +111,18 @@ export function useProblemExecution({
 
   const resetResult = useCallback(() => {
     setLatest(null);
+    setSelectedResultCase("0");
     setError("");
   }, []);
 
-  return { pending, error, latest, isActive, execute, resetResult };
+  return {
+    pending,
+    error,
+    latest,
+    selectedResultCase,
+    setSelectedResultCase,
+    isActive,
+    execute,
+    resetResult,
+  };
 }

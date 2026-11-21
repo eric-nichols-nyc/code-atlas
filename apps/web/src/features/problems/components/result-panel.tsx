@@ -1,6 +1,10 @@
 "use client";
-import { formatProblemInput } from "@workspace/problems";
 import { Button } from "@workspace/ui/components/button";
+import {
+  SparklesIcon,
+  SquareCheckIcon,
+  TerminalIcon,
+} from "@workspace/ui/components/icons";
 import {
   Tabs,
   TabsContent,
@@ -10,147 +14,70 @@ import {
 import { memo } from "react";
 import {
   useProblemCases,
-  useProblemDefinition,
   useProblemOutput,
   useProblemResults,
 } from "../state/problem-context";
 import { CaseInputFields } from "./case-input-fields";
 import { CodeEvaluationResult } from "./code-evaluation";
-import { verdictLabels } from "./description-panel";
+import { TestResultPanel } from "./test-result-panel";
+
+const outputTabClassName = "gap-1 px-1.5 text-xs sm:gap-1.5 sm:px-2 sm:text-sm";
+
 export function ResultPanel() {
   const s = {
     ...useProblemResults(),
     ...useProblemOutput(),
-    problem: useProblemDefinition(),
   };
-  const result = s.latest?.result;
-  const stale = s.stale;
   return (
     <section className="learning-panel" aria-label="Test cases and results">
       <Tabs
         value={s.outputTab}
         onValueChange={s.setOutputTab}
-        className="min-h-0 flex-1 gap-0"
+        className="min-h-0 min-w-0 flex-1 gap-0"
       >
-        <div className="learning-panel-header">
-          <TabsList variant="line" tone="accent">
-            <TabsTrigger value="testcase">Testcase</TabsTrigger>
-            <TabsTrigger value="test-result">Test Result</TabsTrigger>
-            <TabsTrigger value="feedback">Feedback</TabsTrigger>
+        <div className="learning-panel-header overflow-x-auto">
+          <TabsList
+            variant="line"
+            tone="accent"
+            aria-label="Execution output"
+            className="shrink-0"
+          >
+            <TabsTrigger value="testcase" className={outputTabClassName}>
+              <SquareCheckIcon
+                aria-hidden="true"
+                className="size-3 sm:size-4"
+              />
+              Testcase
+            </TabsTrigger>
+            <TabsTrigger value="test-result" className={outputTabClassName}>
+              <TerminalIcon aria-hidden="true" className="size-3 sm:size-4" />
+              Test Result
+            </TabsTrigger>
+            <TabsTrigger value="feedback" className={outputTabClassName}>
+              <SparklesIcon aria-hidden="true" className="size-3 sm:size-4" />
+              Feedback
+            </TabsTrigger>
           </TabsList>
         </div>
-        <div className="min-h-0 flex-1 overflow-auto p-4">
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
           {s.error && s.outputTab !== "feedback" && (
             <p
               role="alert"
-              className="mb-4 text-sm leading-relaxed text-destructive"
+              className="shrink-0 px-4 pt-4 text-sm leading-relaxed text-destructive"
             >
               {s.error}
             </p>
           )}
-          <TabsContent value="testcase">
+          <TabsContent value="testcase" className="min-h-0 overflow-auto p-4">
             <TestCases pending={Boolean(s.pending)} />
           </TabsContent>
-          <TabsContent value="test-result">
-            <div role="status" aria-live="polite">
-              {s.pending ? (
-                <p className="py-4 text-sm text-muted-foreground">
-                  {s.pending === "submit"
-                    ? "Judging the complete test suite…"
-                    : "Running your test cases…"}
-                </p>
-              ) : result ? (
-                <>
-                  <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-                    <h2
-                      className="text-base font-semibold"
-                      data-testid="execution-verdict"
-                    >
-                      {verdictLabels[result.verdict]}
-                    </h2>
-                    <span className="text-xs text-muted-foreground">
-                      {result.passed}/{result.total} tests passed ·{" "}
-                      {result.action === "submit" ? "Submit" : "Run"}
-                    </span>
-                  </div>
-                  {stale && (
-                    <p className="mb-4 rounded-md border p-3 text-sm text-muted-foreground">
-                      Code or inputs changed. These results belong to the
-                      earlier version; run again to check your changes.
-                    </p>
-                  )}
-                  <ol className="flex flex-col gap-3">
-                    {result.cases.map((c, i) => (
-                      <li
-                        key={c.id}
-                        className="rounded-md border bg-background p-3 text-sm"
-                      >
-                        <p className="mb-2 font-medium">
-                          {c.hidden ? "Hidden case" : `Case ${i + 1}`} ·{" "}
-                          {c.passed ? "Passed" : verdictLabels[c.verdict]}
-                        </p>
-                        {!c.hidden && (
-                          <dl className="mb-2 grid grid-cols-2 gap-2 font-mono text-xs">
-                            <dt>Input</dt>
-                            <dd className="min-w-0 [overflow-wrap:anywhere]">
-                              {c.input === undefined
-                                ? "—"
-                                : formatProblemInput(c.input)}
-                            </dd>
-                            {s.problem.kind === "delay" ? (
-                              <>
-                                <dt>Observed delay</dt>
-                                <dd>
-                                  {c.elapsedMs === undefined
-                                    ? "—"
-                                    : `${c.elapsedMs} ms`}
-                                </dd>
-                              </>
-                            ) : (
-                              <>
-                                <dt>Expected</dt>
-                                <dd className="max-h-32 overflow-auto [overflow-wrap:anywhere]">
-                                  {c.expected !== undefined
-                                    ? JSON.stringify(c.expected)
-                                    : "—"}
-                                </dd>
-                                <dt>Output</dt>
-                                <dd className="max-h-32 overflow-auto [overflow-wrap:anywhere]">
-                                  {c.actual !== undefined
-                                    ? JSON.stringify(c.actual)
-                                    : "—"}
-                                </dd>
-                              </>
-                            )}
-                          </dl>
-                        )}
-                        <p className="text-sm leading-relaxed text-muted-foreground">
-                          {c.message}
-                        </p>
-                        {c.logs.length > 0 && (
-                          <div className="mt-3">
-                            <p className="mb-1 text-xs font-medium">
-                              Console output
-                            </p>
-                            <pre className="max-h-40 overflow-auto whitespace-pre-wrap font-mono text-xs [overflow-wrap:anywhere]">
-                              {c.logs.join("\n")}
-                            </pre>
-                          </div>
-                        )}
-                      </li>
-                    ))}
-                  </ol>
-                </>
-              ) : (
-                !s.error && (
-                  <p className="py-5 text-sm text-muted-foreground">
-                    Run your code to see test results.
-                  </p>
-                )
-              )}
-            </div>
+          <TabsContent
+            value="test-result"
+            className="flex min-h-0 flex-col overflow-hidden data-[state=inactive]:hidden"
+          >
+            <TestResultPanel />
           </TabsContent>
-          <TabsContent value="feedback">
+          <TabsContent value="feedback" className="min-h-0 overflow-auto p-4">
             <Feedback />
           </TabsContent>
         </div>

@@ -55,7 +55,7 @@ test("Algorithms discovery, copied lesson, filters, themes and pointer controls"
   await visual.getByRole("button", { name: "Next", exact: true }).click();
   await expect(visual.getByText("Step 2 of 7", { exact: true })).toBeVisible();
   await page.emulateMedia({ reducedMotion: "reduce" });
-  for (const theme of ["Light", "Dark", "Dark purple", "System"]) {
+  for (const theme of ["Light", "Dark", "Brown", "System"]) {
     await page
       .getByRole("button", { name: "Change theme", exact: true })
       .click();
@@ -289,7 +289,7 @@ test("Algorithms workspace preserves drafts through themes, tools and narrow lay
   const themePage = await context.newPage();
   await themePage.goto("/algorithms/learn");
   try {
-    for (const theme of ["Light", "Dark", "Dark purple", "System"]) {
+    for (const theme of ["Light", "Dark", "Brown", "System"]) {
       await themePage
         .getByRole("button", { name: "Change theme", exact: true })
         .click();

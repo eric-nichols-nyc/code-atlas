@@ -333,7 +333,7 @@ test("Two Pointers array visualization moves, scrubs and survives themes and res
   await slider.press("ArrowRight");
   for (const width of [1280, 390, 320]) {
     await page.setViewportSize({ width, height: 900 });
-    for (const theme of ["Light", "Dark", "Dark purple", "System"]) {
+    for (const theme of ["Light", "Dark", "Brown", "System"]) {
       await page
         .getByRole("button", { name: "Change theme", exact: true })
         .click();
@@ -496,7 +496,7 @@ test("guided walkthrough preserves its step through themes and responsive layout
   const count = walkthrough.getByText("Step 4 of 6", { exact: true });
   for (const width of [1280, 390, 320]) {
     await page.setViewportSize({ width, height: 900 });
-    for (const theme of ["Light", "Dark", "Dark purple", "System"]) {
+    for (const theme of ["Light", "Dark", "Brown", "System"]) {
       await page
         .getByRole("button", { name: "Change theme", exact: true })
         .click();
@@ -565,7 +565,7 @@ test("learning preview direct access, themes, responsive state and unavailable m
   await page.goto("/javascript/learn");
   const search = page.getByRole("searchbox", { name: "Search modules" });
   await search.fill("two");
-  for (const theme of ["Light", "Dark", "Dark purple", "System"]) {
+  for (const theme of ["Light", "Dark", "Brown", "System"]) {
     await page
       .getByRole("button", { name: "Change theme", exact: true })
       .click();

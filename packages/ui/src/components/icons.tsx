@@ -5,6 +5,7 @@ export {
   BoldIcon,
   BookOpenIcon,
   BracesIcon,
+  CheckIcon,
   CircleCheckIcon,
   CircleIcon,
   CodeXmlIcon,
@@ -27,7 +28,10 @@ export {
   SendIcon,
   Share2Icon,
   SparklesIcon,
+  SquareCheckIcon,
   StarIcon,
+  TerminalIcon,
   TimerIcon,
   WorkflowIcon,
+  XIcon,
 } from "lucide-react";
