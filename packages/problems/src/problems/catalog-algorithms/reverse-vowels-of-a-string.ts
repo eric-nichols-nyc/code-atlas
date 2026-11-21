@@ -59,12 +59,15 @@ export const reverseVowelsOfAStringProblem: CatalogAlgorithmDefinition = {
     "Skip nonvowels and swap each pair of vowels from the outside in. Each pointer scans at most n positions. The running time is O(n) and JavaScript strings are immutable, so the working array takes O(n) extra space.",
   solution: `function reverseVowels(s) {
   const chars = s.split("");
-  const vowels = "aeiouAEIOU";
+  const vowels = {
+    a: true, e: true, i: true, o: true, u: true,
+    A: true, E: true, I: true, O: true, U: true,
+  };
   let left = 0;
   let right = chars.length - 1;
   while (left < right) {
-    while (left < right && !vowels.includes(chars[left])) left++;
-    while (left < right && !vowels.includes(chars[right])) right--;
+    while (left < right && !vowels[chars[left]]) left++;
+    while (left < right && !vowels[chars[right]]) right--;
     if (left < right) {
       const vowel = chars[left];
       chars[left++] = chars[right];

@@ -208,6 +208,10 @@ learner code in the isolated worker and omit hidden values and output from
 results. Verify catalog discovery, content, input editing, judging and
 redaction through focused checks and a browser review.
 
+The judge measures the 100 ms guest entry and 250 ms cumulative budgets in
+worker-thread CPU time. The service watchdog caps the full request at 10 seconds
+of elapsed time.
+
 Count Pairs With Sum counts all distinct index pairs. For three equal values
 that add to the target in pairs, the expected answer is 3. This follows the
 Code Drill statement and JavaScript solution and corrects two inconsistent
