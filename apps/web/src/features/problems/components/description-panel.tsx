@@ -44,7 +44,8 @@ export function DescriptionPanel({ children }: { children: ReactNode }) {
               <h2 className="mb-2 text-sm font-semibold">Example {i + 1}</h2>
               <div className="rounded-md border-l-2 border-interactive/50 bg-interactive/5 p-3 text-sm leading-relaxed">
                 <p className="font-mono [overflow-wrap:anywhere]">
-                  Input: {formatProblemInput(example.input)}
+                  Input:{" "}
+                  {formatProblemInput(example.input, s.problem.parameters)}
                 </p>
                 <p className="font-mono">
                   {typeof example.input === "number"

@@ -92,6 +92,20 @@ feedback, and improve.**
 | Max Consecutive Ones                                   | Easy       | Single-pass streak tracking            |
 | Most Frequent Character                                | Easy       | Hash maps and character frequencies    |
 | Longest Substring with At Most Two Distinct Characters | Medium     | Sliding window and character counts    |
+| Valid Palindrome                                       | Easy       | Two pointers and character filtering   |
+| Longest Unique Substring                               | Easy       | Sliding window and a set               |
+| Find the Difference of Two Arrays                      | Easy       | Set membership                         |
+| Merge Strings Alternately                              | Easy       | Two pointers and string traversal      |
+| Longest Consecutive Sequence                           | Medium     | Set membership and sequence starts     |
+| Sort Array by Increasing Frequency                     | Easy       | Frequency counts and sorting           |
+| Group Anagrams                                         | Medium     | Hash maps and grouping keys            |
+| Remove Duplicates from Sorted Array                    | Easy       | In-place two-pointer compaction        |
+| Count Pairs With Sum                                   | Easy       | Complement frequencies                 |
+| Maximum Sum Subarray of Size K                         | Easy       | Fixed-size sliding window              |
+| Reverse Vowels of a String                             | Easy       | Two pointers and vowel matching        |
+| Rotate Image                                           | Medium     | In-place matrix transformation         |
+| Spiral Matrix                                          | Medium     | Matrix traversal and shrinking bounds  |
+| Longest Substring Without Repeating Characters         | Medium     | Sliding window and last-seen indices   |
 | Counter                                                | Easy       | Closures                               |
 | Curry                                                  | Medium     | Closures and partial application       |
 | Function Composition                                   | Easy       | Higher-order functions and closures    |

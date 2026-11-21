@@ -1,4 +1,5 @@
 import { performance } from "node:perf_hooks";
+import { threadCpuUsage } from "node:process";
 import { parentPort, workerData } from "node:worker_threads";
 import type {
   CaseResult,
@@ -13,6 +14,11 @@ import {
   judgeAlgorithmArray,
   moveZeroesHarness,
 } from "./adapters/algorithm-arrays.js";
+import {
+  catalogAlgorithmHarness,
+  judgeCatalogAlgorithm,
+} from "./adapters/catalog-algorithm.js";
+import type { CatalogAlgorithmTarget } from "./catalog-algorithms/types.js";
 import { consoleHarness } from "./console-harness.js";
 
 const curryAdapterPath = import.meta.url.endsWith(".ts")
@@ -134,15 +140,23 @@ interface Work {
     input: ProblemInput;
     hidden: boolean;
     independent?: boolean;
+    catalogTarget?: CatalogAlgorithmTarget;
   }[];
 }
 const work = workerData as Work;
 const QuickJS = await getQuickJS();
+
+function threadCpuMilliseconds(start: ReturnType<typeof threadCpuUsage>) {
+  const { user, system } = threadCpuUsage(start);
+  return (user + system) / 1000;
+}
+
 async function runCase(test: Work["cases"][number]): Promise<CaseResult> {
   const rt = QuickJS.newRuntime();
   rt.setMemoryLimit(16 * 1024 * 1024);
   rt.setMaxStackSize(256 * 1024);
-  let deadline = Infinity;
+  const entryCpuBudgetMs = test.catalogTarget?.entryCpuBudgetMs ?? 100;
+  let entryStart: ReturnType<typeof threadCpuUsage> | undefined;
   let cpu = 0;
   let interrupted = false;
   let closed = false;
@@ -154,7 +168,8 @@ async function runCase(test: Work["cases"][number]): Promise<CaseResult> {
     work.problemId === "javascript.delay-the-resolution-of-each-promise";
   let virtualNow = 0;
   rt.setInterruptHandler(() => {
-    if (performance.now() > deadline || cpu > 250) {
+    const entryCpu = entryStart ? threadCpuMilliseconds(entryStart) : 0;
+    if (entryCpu > entryCpuBudgetMs || cpu + entryCpu > 250) {
       interrupted = true;
       return true;
     }
@@ -182,13 +197,13 @@ async function runCase(test: Work["cases"][number]): Promise<CaseResult> {
   let additionalCheck: QuickJSHandle | undefined;
   let promise: QuickJSHandle | undefined;
   const enter = <T>(call: () => T): T => {
-    const start = performance.now();
-    deadline = start + 100;
+    const start = threadCpuUsage();
+    entryStart = start;
     try {
       return call();
     } finally {
-      cpu += performance.now() - start;
-      deadline = Infinity;
+      cpu += threadCpuMilliseconds(start);
+      entryStart = undefined;
     }
   };
   const errorText = (error: QuickJSHandle) => {
@@ -433,7 +448,9 @@ async function runCase(test: Work["cases"][number]): Promise<CaseResult> {
       }
       generatorCheck = harness.value;
     }
-    const additionalSource = additionalHarnesses[work.problemId];
+    const additionalSource = test.catalogTarget
+      ? catalogAlgorithmHarness
+      : additionalHarnesses[work.problemId];
     if (additionalSource) {
       const harness = enter(() => ctx.evalCode(additionalSource, "judge.js"));
       if (harness.error) {
@@ -473,6 +490,21 @@ async function runCase(test: Work["cases"][number]): Promise<CaseResult> {
       errorText,
       exceeded: () => interrupted || cpu > 250,
     };
+    if (test.catalogTarget) {
+      if (
+        typeof test.input === "number" ||
+        !("args" in test.input) ||
+        !additionalCheck
+      )
+        return result("runtime-error", "Invalid problem input.");
+      const outcome = judgeCatalogAlgorithm(
+        test.input,
+        test.catalogTarget,
+        guest,
+        additionalCheck,
+      );
+      return result(outcome.verdict, outcome.message, undefined, outcome);
+    }
     if (
       work.problemId === "algorithms.move-zeroes" ||
       work.problemId === "algorithms.max-consecutive-ones"

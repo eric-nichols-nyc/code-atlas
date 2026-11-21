@@ -16,7 +16,7 @@ describe("Majority Element inputs", () => {
     expect(findProblem("majority-element")).toBe(problem);
     for (const input of [
       ...problem.samples.map((sample) => sample.input),
-      ...privateSuites[problem.kind],
+      ...privateSuites["majority-element"],
     ]) {
       expect(validProblemInput(problem, input)).toBe(true);
       expect(parseInputDraft(problem, inputDraft(input))).toEqual(input);

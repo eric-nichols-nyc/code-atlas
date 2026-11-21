@@ -20,6 +20,7 @@ export interface ExecutionJob {
   signal?: AbortSignal;
 }
 
+import { catalogAlgorithmJudges } from "./catalog-algorithms";
 import { privateSuites } from "./private-suites";
 
 let active = 0;
@@ -60,11 +61,21 @@ export async function executeProblem(
         ? (job.inputs ?? problem.samples.map((x) => x.input))
         : problem.samples.map((x) => x.input)
     ).map((input, i) => ({ id: `case-${i + 1}`, input, hidden: false }));
+    const catalogJudge =
+      problem.kind === "catalog-algorithm"
+        ? catalogAlgorithmJudges[problem.id]
+        : undefined;
+    if (problem.kind === "catalog-algorithm" && !catalogJudge)
+      throw new ExecutionUnavailable("The problem judge is unavailable.");
+    const privateInputs =
+      problem.kind === "catalog-algorithm"
+        ? (catalogJudge?.inputs ?? [])
+        : privateSuites[problem.kind];
     const tests =
       job.action === "submit"
         ? [
             ...visible,
-            ...privateSuites[problem.kind].map((input, i) => ({
+            ...privateInputs.map((input, i) => ({
               id: `hidden-${i + 1}`,
               input,
               hidden: true,
@@ -87,7 +98,20 @@ export async function executeProblem(
             entryFunction: problem.entryFunction,
             code: job.code,
             action: job.action,
-            cases: tests,
+            cases: catalogJudge
+              ? tests.map((test) => {
+                  if (typeof test.input === "number" || !("args" in test.input))
+                    throw new ExecutionUnavailable("Invalid problem input.");
+                  return {
+                    ...test,
+                    catalogTarget: {
+                      expected: catalogJudge.expected(test.input.args),
+                      mode: catalogJudge.mode,
+                      entryCpuBudgetMs: catalogJudge.entryCpuBudgetMs,
+                    },
+                  };
+                })
+              : tests,
           },
           env: {},
           execArgv: [],

@@ -18,8 +18,7 @@ export function judgeTwoDistinct(
   guest: GuestAccess,
   harness: QuickJSHandle,
 ): CaseOutcome {
-  // Independent oracle: track last positions and evict the least recent letter,
-  // rather than reproducing the authored frequency-count solution.
+  // Track last positions and evict the least recent letter for the oracle.
   const lastSeen = new Map<string, number>();
   let left = 0;
   let expected = 0;

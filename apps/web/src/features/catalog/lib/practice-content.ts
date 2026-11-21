@@ -66,6 +66,13 @@ export async function validatePracticeContent(
     const validExpected = (expected: unknown) => {
       if (problem.kind === "most-frequent-character")
         return typeof expected === "string" && [...expected].length <= 1;
+      if (problem.kind === "catalog-algorithm")
+        return (
+          typeof expected === "boolean" ||
+          typeof expected === "string" ||
+          Number.isSafeInteger(expected) ||
+          Array.isArray(expected)
+        );
       if (problem.kind === "delay") return true;
       if (problem.kind === "valid-anagram")
         return typeof expected === "boolean";
