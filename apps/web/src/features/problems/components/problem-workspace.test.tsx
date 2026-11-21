@@ -207,7 +207,7 @@ it("runs edited nested arrays and validates unsupported values before making a r
   expect(
     JSON.parse(fetch.mock.calls[0]?.[1]?.body as string).inputs[0],
   ).toEqual({ arr: [0, [1, [0]]] });
-  expect(screen.getAllByText("[0,1,0]", { selector: "dd" })).toHaveLength(2);
+  expect(screen.getAllByText("[0,1,0]", { selector: "pre" })).toHaveLength(2);
 });
 it("runs edited curry groups and renders numeric zero for both expected and actual output", async () => {
   const input = { fn: "sum3", groups: [[0], [0, 0]] };
@@ -241,7 +241,7 @@ it("runs edited curry groups and renders numeric zero for both expected and actu
   await screen.findByText("Accepted", { selector: "h2" });
   const sent = JSON.parse(fetch.mock.calls[0]?.[1]?.body as string);
   expect(sent.inputs[0]).toEqual(input);
-  expect(screen.getAllByText("0", { selector: "dd" })).toHaveLength(2);
+  expect(screen.getAllByText("0", { selector: "pre" })).toHaveLength(2);
 });
 describe("real coding workspace", () => {
   it("shows an editable problem and results without visualization or checkpoint", () => {

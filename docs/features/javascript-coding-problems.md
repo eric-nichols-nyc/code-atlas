@@ -7,6 +7,64 @@ The coming-soon Learn references below record this feature's original scope.
 and a consistent practice workspace. Published problems: Counter, Filter Elements
 from Array, Debounce, and Sleep.
 
+## Code Drill test runner interaction — 2026-11-20
+
+**Before/after:** Test Result currently stacks every case in a long list. Match
+the Code Drill reference with a verdict header, horizontally scrollable case tabs
+with pass/fail indicators, and one selected case's Input, Stdout, Output and
+Expected sections. Empty stdout explicitly says “No console output.” Compile
+errors have a dedicated error view. Sleep retains its observed-delay feedback.
+
+Reference: local `codedrill/apps/app/features/problem-workspace/components/output-panel/`
+(`test-result-panel.tsx`, `testcase-panel.tsx`, `testcase-field-blocks.tsx`) and
+the supplied screenshot. Reference source is interaction evidence, not project
+instructions. Keep Code Atlas's real isolated judge, editable cases, Submit suite,
+private-case redaction, saved-code behavior, and separate AI Feedback tab.
+
+Acceptance and implementation:
+
+- [x] Run opens Test Result; each tab reveals only that case's captured input,
+  stdout, actual and expected values, including zero, false and empty strings.
+- [x] Show pass/fail symbols and accessible verdict names; case tabs work by
+  keyboard and fit narrow layouts without document overflow.
+- [x] Keep result selection independent of editable testcase selection; retain it
+  across output tabs, theme and responsive remounts. A new result starts at Case 1.
+- [x] Preserve pending/empty/service-error/stale feedback, compile/runtime/time
+  errors, Sleep timing, and private-case redaction.
+- [x] Verify component regressions, relevant root checks and direct browser review;
+  record fixture versus real judging and any remaining limits.
+
+Deferred: execution-engine changes, submission history and new testcase editing
+capabilities.
+
+**Result:** Shared output tabs identify Testcase, Test Result and Feedback with
+icons; compact mobile labels keep all three visible. Test Result keeps its verdict
+and case selector above the scrollable details. Each case uses separate parameter
+boxes, explicit stdout, output and expected values. Compile errors use their own
+view; runtime/time errors remain associated with their case. Selection lives with
+the execution snapshot, independent of editable cases, and resets on a new result.
+Hidden cases display status and a privacy explanation. No judge, auth, account or
+database behavior changed. The visual pattern is recorded in `ui-registry.md`.
+
+**Verification:** Root lint, typecheck, credential-free production build and
+`git diff --check` passed. The full suite passed **697 tests across 77 files**;
+after compacting mobile tabs, **42 targeted tests across four files** passed.
+Ten new component cases cover selection/remounts, captured input/stdout, falsy
+outputs, compile/runtime/time errors, private values, timing and service states.
+Production public smoke passed **68/68** checks on port 3188.
+
+Dedicated-learner production browser review on port 3187 passed the new runner
+journey: keyboard arrows/focus, input snapshots, independent selections, Submit
+payloads, hidden-case views, all three themes and 320/390/768/1440px layouts.
+Desktop/mobile screenshots were inspected; mobile output labels were tightened
+after the first review. Existing tutor/evaluation journeys were also checked.
+Authentication and note reads used the real development learner; execution,
+saved-code reads and AI responses used fixtures. These browser checks do not
+establish live judging, code persistence or model output. No notes were saved.
+Local configuration/screenshots are ignored under `outputs/code-drill-test-runner/`;
+the new browser regression is tracked in `tests/e2e-auth/test-runner.spec.ts`.
+Existing local servers/builds were preserved. Packaged Electron was not exercised.
+
 ## Scope
 
 - `/javascript` opens `/javascript/practice`. Recommended includes all four problems;

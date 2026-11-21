@@ -89,7 +89,7 @@ test("React discovery, Hooks filters and lifecycle walkthrough remain read-only"
     "dependency list",
   );
   await page.emulateMedia({ reducedMotion: "reduce" });
-  for (const theme of ["Light", "Dark", "Dark purple", "System"]) {
+  for (const theme of ["Light", "Dark", "Brown", "System"]) {
     await page
       .getByRole("button", { name: "Change theme", exact: true })
       .click();

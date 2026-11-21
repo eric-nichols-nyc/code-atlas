@@ -119,7 +119,7 @@ test("submits a working counter fix, preserves undo and themes, and resets only 
   const frame = page
     .frames()
     .find((frame) => frame.url().includes("sandpack.codesandbox.io"));
-  for (const theme of ["Light", "Dark purple", "Dark"]) {
+  for (const theme of ["Light", "Brown", "Dark"]) {
     await page.getByRole("button", { name: "Change theme" }).click();
     await page.getByRole("menuitemradio", { name: theme, exact: true }).click();
     await page.keyboard.press("Escape");

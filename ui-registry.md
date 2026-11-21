@@ -26,12 +26,23 @@ Primary text is `#f9f9f9`; supporting text is `#a3a3a3`. Keep these values in
 the shared theme and consume semantic classes throughout the app. Light theme
 keeps its existing palette. Difficulty and category accents retain their roles.
 
-Dark purple is an optional palette added on 2026-11-14: page/header `#110d1a`,
-panels `#181221`, overlays `#1e162b`, muted surfaces `#20172d`, secondary
-surfaces `#291e37`, hover/selection `#322442`, and borders `#30223f`.
-Primary actions use lavender `#c4a7f5` with deep plum labels; foreground
-`#f4eefb` and supporting text `#b8aacb` keep copy readable. The root
-`.dark-purple` class inherits dark semantic status/category colors and syntax roles.
+Brown replaces the optional Dark purple palette on 2026-11-20. Its colors
+match the live Code Drill dark theme and its shared stylesheet, including the app's
+white-copy overrides. Use the `.brown` root class with warm charcoal backgrounds
+and cards `oklch(0.2679 0.0036 106.6427)`, cream muted text
+`oklch(0.7713 0.0169 99.0657)`, white main copy, terracotta primary/focus accents
+`oklch(0.6724 0.1308 38.7559)`, and warm borders
+`oklch(0.3618 0.0101 106.8928)`. Popovers, secondary, muted, accent and input tokens
+also come directly from Code Drill. Keep semantic status/category colors and dark
+editor syntax. The shared provider maps the stored `dark-purple` preference to the
+`brown` class; the menu labels it Brown. Existing saved preferences therefore pick
+up the new palette immediately, without discarding workspace state.
+
+Verification: the 17 shared palette values match Code Drill's live computed colors.
+Signed-in dashboard/workspace review confirmed Brown selection, reload persistence,
+readable editor/input surfaces, and working Light/Dark choices. Root lint, typecheck,
+credential-free build, 28 relevant workspace tests and `git diff --check` passed.
+Screenshots are ignored under `outputs/code-drill-test-runner/brown-*.jpg`.
 
 ## Buttons
 
@@ -445,6 +456,34 @@ outputs use explicit undefined checks so a valid zero is displayed as `0`.
 Flatten Nested Array reuses the labeled JSON `arr` Input without a callback selector
 or numeric field. Its help text states the 20-level and 1000-node limits, and
 invalid nesting/value types use the existing inline Run validation feedback.
+
+### Test result case details
+
+Files: `features/problems/components/result-panel.tsx`, `test-result-panel.tsx`.
+Last updated: 2026-11-20. Captured with the imprint workflow from the Code Drill
+interaction update.
+
+| Property       | Pattern                                                                                           |
+| -------------- | ------------------------------------------------------------------------------------------------- |
+| Container      | Existing `learning-panel`, semantic `bg-card` and `border`                                        |
+| Verdict        | `text-sm font-semibold`, `text-interactive` for accepted, `text-destructive` for failure          |
+| Case tabs      | Shared Tabs with transparent list, `gap-1`, `px-2.5 text-xs`, active `bg-muted`, no active shadow |
+| Case status    | Decorative Check/X in semantic green/destructive; accessible name includes verdict                |
+| Value boxes    | `rounded-md border bg-muted/40 px-3 py-2.5`, `font-mono text-sm leading-relaxed`                  |
+| Field labels   | `text-xs font-medium text-muted-foreground`; parameter labels also `font-mono`                    |
+| Stdout label   | `rounded bg-primary/15 px-1.5 py-0.5 text-xs font-medium text-primary`                            |
+| Detail spacing | `p-4`, `gap-5` between sections; `gap-2` between label and value                                  |
+| Focus / hover  | Inherit shared Tabs keyboard focus ring and hover text                                            |
+
+Keep the output tabs, verdict and case selector above the scrollable detail body.
+Output tabs include decorative icons; use 12px labels/icons and compact spacing
+on mobile, restoring the existing 14px labels and 16px icons on wider screens.
+Contain long case rows in their own horizontal scroller and long values in their
+boxes. Show one captured case at a time in Input, Stdout, Output, Expected order;
+Sleep uses Observed delay. Empty stdout is explicit, errors have a labeled value
+box, and private cases show only status and a privacy explanation. Preserve result
+selection in session state across layout remounts; new executions begin at Case 1.
+Testcase editing and AI Feedback remain independent.
 
 ## Account progress and saved code
 

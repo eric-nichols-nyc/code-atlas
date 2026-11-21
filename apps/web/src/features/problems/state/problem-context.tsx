@@ -45,7 +45,14 @@ export interface ProblemSessionValues {
     resetCode: () => void;
     evaluation: Pick<Evaluation, "busy" | "sampleMode" | "evaluate">;
   };
-  results: Pick<Execution, "pending" | "error" | "latest"> & { stale: boolean };
+  results: Pick<
+    Execution,
+    | "pending"
+    | "error"
+    | "latest"
+    | "selectedResultCase"
+    | "setSelectedResultCase"
+  > & { stale: boolean };
   evaluation: Evaluation & {
     pending: ExecutionAction | null;
     stale: boolean;
@@ -218,9 +225,18 @@ export function ProblemSessionContexts({
       pending: execution.pending,
       error: execution.error,
       latest: execution.latest,
+      selectedResultCase: execution.selectedResultCase,
+      setSelectedResultCase: execution.setSelectedResultCase,
       stale: resultStale,
     }),
-    [execution.pending, execution.error, execution.latest, resultStale],
+    [
+      execution.pending,
+      execution.error,
+      execution.latest,
+      execution.selectedResultCase,
+      execution.setSelectedResultCase,
+      resultStale,
+    ],
   );
   const evaluationStale =
     evaluation.latest?.kind === "ai" &&

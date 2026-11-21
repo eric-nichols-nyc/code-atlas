@@ -53,7 +53,7 @@ export function ThemeSwitcher() {
             <MoonIcon aria-hidden="true" /> Dark
           </DropdownMenuRadioItem>
           <DropdownMenuRadioItem value="dark-purple">
-            <PaletteIcon aria-hidden="true" /> Dark purple
+            <PaletteIcon aria-hidden="true" /> Brown
           </DropdownMenuRadioItem>
           <DropdownMenuRadioItem value="system">
             <MonitorIcon aria-hidden="true" /> System
