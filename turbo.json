@@ -13,7 +13,7 @@
         "dist/**",
         ".workers/**"
       ],
-      "env": ["ANALYZE", "NEON_AUTH_BASE_URL", "CODE_ATLAS_DIST_DIR"]
+      "env": ["NEON_AUTH_BASE_URL", "CODE_ATLAS_DIST_DIR"]
     },
     "dev": {
       "dependsOn": ["^build"],
