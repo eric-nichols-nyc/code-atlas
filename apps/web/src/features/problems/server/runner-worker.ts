@@ -155,6 +155,7 @@ async function runCase(test: Work["cases"][number]): Promise<CaseResult> {
   const rt = QuickJS.newRuntime();
   rt.setMemoryLimit(16 * 1024 * 1024);
   rt.setMaxStackSize(256 * 1024);
+  const entryCpuBudgetMs = test.catalogTarget?.entryCpuBudgetMs ?? 100;
   let entryStart: ReturnType<typeof threadCpuUsage> | undefined;
   let cpu = 0;
   let interrupted = false;
@@ -168,7 +169,7 @@ async function runCase(test: Work["cases"][number]): Promise<CaseResult> {
   let virtualNow = 0;
   rt.setInterruptHandler(() => {
     const entryCpu = entryStart ? threadCpuMilliseconds(entryStart) : 0;
-    if (entryCpu > 100 || cpu + entryCpu > 250) {
+    if (entryCpu > entryCpuBudgetMs || cpu + entryCpu > 250) {
       interrupted = true;
       return true;
     }

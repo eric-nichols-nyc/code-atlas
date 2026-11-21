@@ -107,6 +107,7 @@ export async function executeProblem(
                     catalogTarget: {
                       expected: catalogJudge.expected(test.input.args),
                       mode: catalogJudge.mode,
+                      entryCpuBudgetMs: catalogJudge.entryCpuBudgetMs,
                     },
                   };
                 })

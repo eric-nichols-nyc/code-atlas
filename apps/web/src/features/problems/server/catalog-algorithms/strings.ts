@@ -60,6 +60,7 @@ export const stringCases = {
     },
   },
   "algorithms.reverse-vowels-of-a-string": {
+    entryCpuBudgetMs: 200,
     inputs: [
       { args: ["I"] },
       { args: ["e a! O."] },

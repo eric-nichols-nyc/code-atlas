@@ -14,9 +14,11 @@ export interface CatalogAlgorithmJudge {
   inputs: CatalogAlgorithmInput[];
   expected: (args: AlgorithmArgument[]) => AlgorithmOutput;
   mode?: CatalogAlgorithmMode;
+  entryCpuBudgetMs?: number;
 }
 
 export interface CatalogAlgorithmTarget {
   expected: AlgorithmOutput;
   mode?: CatalogAlgorithmMode;
+  entryCpuBudgetMs?: number;
 }

@@ -155,6 +155,12 @@ it.each([
     "function isPalindrome() { while (true) {} }",
     "time-limit-exceeded",
   ],
+  [
+    "reverse-vowels-of-a-string",
+    { args: ["ae"] },
+    "function reverseVowels() { while (true) {} }",
+    "time-limit-exceeded",
+  ],
 ] satisfies [string, CatalogAlgorithmInput, string, string][])(
   "judges edited %s cases with the published result contract",
   async (problemId, input, code, verdict) => {
