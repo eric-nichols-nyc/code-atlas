@@ -7,6 +7,26 @@ The coming-soon Learn references below record this feature's original scope.
 and a consistent practice workspace. Published problems: Counter, Filter Elements
 from Array, Debounce, and Sleep.
 
+## Practice list sorting
+
+The JavaScript and Algorithms practice lists previously offered only curated
+ordering. The Sort by menu now orders visible problems and stays selected while
+browsing categories, searching, or clearing filters. Sort choices are local to
+the catalog visit.
+
+- [x] Offer Default order, Easy to hard, Hard to easy, Category A–Z, and
+  Category Z–A. Preserve the curated order within ties and use the category
+  labels shown in each subject.
+- [x] Keep search, difficulty and category filters working together with sorting.
+- [x] Verify keyboard use, both subject catalogs, and the layout at 320px.
+
+**Verification.** Lint, typecheck, the credential-free production build, and all
+725 Vitest tests passed. A test fixture exercised all three difficulty levels.
+All 68 public Playwright smoke checks passed. A signed-in Chromium review with
+the dedicated development learner checked ordering, filter combinations, default
+reset, keyboard focus and dismissal, and layout in JavaScript at 1280px and
+Algorithms at 320px. The browser review used the published Easy and Medium problems.
+
 ## Code Drill test runner interaction — 2026-11-20
 
 **Before/after:** Test Result currently stacks every case in a long list. Match
