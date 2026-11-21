@@ -75,6 +75,7 @@ export async function validatePracticeContent(
           "reduce-array",
           "function-composition",
           "majority-element",
+          "max-consecutive-ones",
           "longest-substring-two-distinct",
         ].includes(problem.kind)
       )

@@ -34,6 +34,8 @@ export function CaseInputFields({ index }: { index: number }) {
       "function-composition",
       "memoize",
       "majority-element",
+      "move-zeroes",
+      "max-consecutive-ones",
     ].includes(kind)
   )
     return <ExpandedCaseFields index={index} />;

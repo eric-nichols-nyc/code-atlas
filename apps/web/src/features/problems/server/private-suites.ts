@@ -7,6 +7,32 @@ import type {
 // These inputs are server-only. Public content contains examples, never full suites.
 export const privateSuites: Record<ProblemDefinition["kind"], ProblemInput[]> =
   {
+    "move-zeroes": [
+      { nums: [1, 0, 2, 0, 3] },
+      { nums: [4, 2, 4, 0, 0, 3, 0, 5, 1, 0] },
+      { nums: [0, 0, 0, 0] },
+      { nums: [5, -4, 2, 2] },
+      { nums: [0, -2147483648, 2147483647, 0, -1, 0] },
+      { nums: [7] },
+      {
+        nums: Array.from({ length: 10_000 }, (_, index) =>
+          index % 3 === 0 ? 0 : index - 5000,
+        ),
+      },
+    ],
+    "max-consecutive-ones": [
+      { nums: [1] },
+      { nums: [0] },
+      { nums: [1, 1, 1, 1] },
+      { nums: [1, 1, 1, 0, 1, 0] },
+      { nums: [0, 1, 0, 1, 0, 1, 0] },
+      { nums: Array(100_000).fill(1) },
+      {
+        nums: Array.from({ length: 100_000 }, (_, index) =>
+          index % 5 === 0 ? 0 : 1,
+        ),
+      },
+    ],
     "most-frequent-character": [
       { str: "z" },
       { str: "xyz" },

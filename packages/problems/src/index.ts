@@ -20,8 +20,16 @@ import {
 import { longestSubstringTwoDistinctProblem } from "./problems/longest-substring-two-distinct.js";
 import { majorityElementProblem } from "./problems/majority-element.js";
 import { mapArrayProblem, mapTransforms } from "./problems/map-array.js";
+import {
+  MAX_CONSECUTIVE_ONES_LENGTH,
+  maxConsecutiveOnesProblem,
+} from "./problems/max-consecutive-ones.js";
 import { memoizeFunctions, memoizeProblem } from "./problems/memoize.js";
 import { mostFrequentCharacterProblem } from "./problems/most-frequent-character.js";
+import {
+  MAX_MOVE_ZEROES_LENGTH,
+  moveZeroesProblem,
+} from "./problems/move-zeroes.js";
 import {
   reduceArrayProblem,
   reduceFunctions,
@@ -52,20 +60,26 @@ export {
   flattenNestedArrayProblem,
   functionCompositionProblem,
   longestSubstringTwoDistinctProblem,
+  MAX_CONSECUTIVE_ONES_LENGTH,
   MAX_FLATTEN_DEPTH,
   MAX_FLATTEN_NODES,
+  MAX_MOVE_ZEROES_LENGTH,
   majorityElementProblem,
   mapArrayProblem,
   mapTransforms,
+  maxConsecutiveOnesProblem,
   memoizeFunctions,
   memoizeProblem,
   mostFrequentCharacterProblem,
+  moveZeroesProblem,
   reduceArrayProblem,
   reduceFunctions,
   sleepProblem,
   validAnagramProblem,
 };
 export const publicProblems = [
+  moveZeroesProblem,
+  maxConsecutiveOnesProblem,
   mostFrequentCharacterProblem,
   validAnagramProblem,
   longestSubstringTwoDistinctProblem,
@@ -162,6 +176,23 @@ export function validProblemInput(
     }
     return false;
   }
+  if (problem.kind === "move-zeroes")
+    return (
+      Object.keys(input).length === 1 &&
+      numericArray(
+        input.nums,
+        MAX_MOVE_ZEROES_LENGTH,
+        -2147483648,
+        2147483647,
+      ) &&
+      input.nums.length > 0
+    );
+  if (problem.kind === "max-consecutive-ones")
+    return (
+      Object.keys(input).length === 1 &&
+      numericArray(input.nums, MAX_CONSECUTIVE_ONES_LENGTH, 0, 1) &&
+      input.nums.length > 0
+    );
   if (problem.kind === "valid-anagram")
     return (
       Object.keys(input).length === 2 &&

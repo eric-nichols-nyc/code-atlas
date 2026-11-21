@@ -2,6 +2,7 @@
 
 import {
   compositionFunctions,
+  MAX_CONSECUTIVE_ONES_LENGTH,
   mapTransforms,
   memoizeFunctions,
   reduceFunctions,
@@ -36,8 +37,10 @@ export function ExpandedCaseFields({ index }: { index: number }) {
           ? memoizeFunctions
           : [];
   const selected = callbacks.find((item) => item.id === draft.callback);
+  const algorithmArray =
+    kind === "move-zeroes" || kind === "max-consecutive-ones";
   const jsonName =
-    kind === "reduce-array" || kind === "majority-element"
+    algorithmArray || kind === "reduce-array" || kind === "majority-element"
       ? "nums"
       : kind === "memoize"
         ? "calls"
@@ -53,8 +56,9 @@ export function ExpandedCaseFields({ index }: { index: number }) {
           ? "x"
           : undefined;
   const prefix = `case-${index}`;
-  const help =
-    kind === "majority-element"
+  const help = algorithmArray
+    ? session.problem.inputError
+    : kind === "majority-element"
       ? "JSON integer array: 1–1000 values from -1e9 to 1e9. One value must occur more than half the time."
       : kind === "map-array" || kind === "reduce-array"
         ? "JSON integer array: up to 1000 values from -10000 to 10000. Empty arrays are allowed."
@@ -73,11 +77,14 @@ export function ExpandedCaseFields({ index }: { index: number }) {
           id={`${prefix}-json`}
           className="font-mono"
           value={draft.json}
-          maxLength={32768}
+          maxLength={
+            algorithmArray ? MAX_CONSECUTIVE_ONES_LENGTH * 2 + 1 : 32768
+          }
           onChange={(event) =>
             session.updateInput(index, { json: event.target.value })
           }
           aria-describedby={`${prefix}-help`}
+          aria-invalid={algorithmArray && !session.parsedInputs[index]}
         />
         <p
           id={`${prefix}-help`}

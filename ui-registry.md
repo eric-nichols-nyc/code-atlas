@@ -749,6 +749,11 @@ spell checking disabled. Do not trim drafts or substitute a numeric/JSON field.
 Empty text means the empty string; result formatting quotes it and renders both
 boolean values through explicit undefined checks.
 
+Move Zeroes and Max Consecutive Ones reuse the JSON testcase input labeled
+`nums =`, with help specific to each array's length and allowed values. Keep
+invalid drafts editable and mark the input with `aria-invalid`. Move Zeroes
+shows the original input and the array after mutation in separate result boxes.
+
 Most Frequent Character uses the same Field primitives with a shared Textarea
 for `str`, preserving case, Unicode, whitespace and line breaks. Blank text is
 valid; drafts over 1000 UTF-16 code units stay visible and show invalid state.

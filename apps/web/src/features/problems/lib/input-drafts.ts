@@ -84,19 +84,24 @@ export function parseInputDraft(
       return validProblemInput(problem, input) ? input : undefined;
     }
     if (
+      problem.kind === "majority-element" ||
+      problem.kind === "move-zeroes" ||
+      problem.kind === "max-consecutive-ones"
+    ) {
+      const input: unknown = { nums: JSON.parse(draft.json) };
+      return validProblemInput(problem, input) ? input : undefined;
+    }
+    if (
       problem.kind !== "map-array" &&
       problem.kind !== "memoize" &&
       problem.kind !== "filter-array" &&
       problem.kind !== "curry" &&
       problem.kind !== "flatten-array" &&
-      problem.kind !== "majority-element" &&
       !draft.value.trim()
     )
       return undefined;
     let input: unknown;
-    if (problem.kind === "majority-element")
-      input = { nums: JSON.parse(draft.json) };
-    else if (problem.kind === "map-array")
+    if (problem.kind === "map-array")
       input = { arr: JSON.parse(draft.json), transform: draft.callback };
     else if (problem.kind === "reduce-array")
       input = {
