@@ -1,4 +1,5 @@
 import {
+  act,
   fireEvent,
   render,
   screen,
@@ -73,6 +74,36 @@ function Workspace({
   );
 }
 afterEach(() => vi.unstubAllGlobals());
+it("preserves the timer, code and case drafts while switching workspace tabs", async () => {
+  vi.useFakeTimers();
+  try {
+    render(<Workspace />);
+    await act(async () => {});
+    const editor = screen.getByRole("textbox", { name: "JavaScript solution" });
+    fireEvent.change(editor, { target: { value: "// Timer draft" } });
+    fireEvent.change(screen.getByLabelText("millis ="), {
+      target: { value: "250" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Timer" }));
+    fireEvent.click(screen.getByRole("button", { name: "Start Stopwatch" }));
+    act(() => vi.advanceTimersByTime(2000));
+    expect(screen.getByRole("timer")).toHaveTextContent("00:00:02");
+    fireEvent.mouseDown(screen.getByRole("tab", { name: "Solution" }), {
+      button: 0,
+    });
+    fireEvent.mouseDown(screen.getByRole("tab", { name: "Problem" }), {
+      button: 0,
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Show AI tutor" }));
+    fireEvent.click(screen.getByRole("button", { name: "Close" }));
+    act(() => vi.advanceTimersByTime(1000));
+    expect(screen.getByRole("timer")).toHaveTextContent("00:00:03");
+    expect(editor).toHaveValue("// Timer draft");
+    expect(screen.getByLabelText("millis =")).toHaveValue(250);
+  } finally {
+    vi.useRealTimers();
+  }
+});
 it("edits one case-sensitive substring field, rejects empty input and sends the current source", async () => {
   const fetch = vi.fn(async (_url: string, _init?: RequestInit) =>
     Response.json(accepted),
