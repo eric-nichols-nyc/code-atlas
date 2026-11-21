@@ -79,9 +79,11 @@ export type CodeEditorSession = Pick<
 export function CodeEditor({
   session: s,
   typescript = false,
+  label = typescript ? "React TypeScript source" : "JavaScript solution",
 }: {
   session: CodeEditorSession;
   typescript?: boolean;
+  label?: string;
 }) {
   const { resolvedTheme } = useTheme();
   const host = useRef<HTMLDivElement>(null);
@@ -126,9 +128,7 @@ export function CodeEditor({
             appearance(document.documentElement.matches(".dark, .brown")),
           ),
           EditorView.contentAttributes.of({
-            "aria-label": typescript
-              ? "React TypeScript source"
-              : "JavaScript solution",
+            "aria-label": label,
             spellcheck: "false",
           }),
           EditorView.updateListener.of((update) => {
@@ -148,7 +148,7 @@ export function CodeEditor({
       instance.destroy();
       view.current = null;
     };
-  }, [typescript]);
+  }, [typescript, label]);
   useEffect(() => {
     const instance = view.current;
     const theme = current.current.editorTheme;
