@@ -65,6 +65,27 @@ Local configuration/screenshots are ignored under `outputs/code-drill-test-runne
 the new browser regression is tracked in `tests/e2e-auth/test-runner.spec.ts`.
 Existing local servers/builds were preserved. Packaged Electron was not exercised.
 
+### Console array capture fix — 2026-11-20
+
+The native console bridge replaced all arrays and objects with `[object]`. A
+compiled-worker regression reproduced the reported `console.log('sort1=', sort1)`
+failure before the fix. Console methods now inspect values inside the QuickJS guest,
+using captured intrinsics and property descriptors; ordinary getters and `toJSON`
+are not invoked. Arrays/objects show their contents, with explicit circular,
+accessor, function and truncation markers. Inspection is bounded to four levels,
+25 entries per collection and 100 visited objects. Existing argument, line, total
+console, CPU, memory and private-case redaction limits remain in force.
+
+Verification: **701 tests across 77 files passed**, including four new worker
+regressions covering the exact sorted array, nested/circular/accessor values,
+modified intrinsics and hostile proxy timeouts/recovery. Existing private-case
+coverage now logs arrays/objects to check redaction. Root lint, typecheck,
+credential-free production build and `git diff --check` passed. Browser review reran the reported solution without
+editing its source: all three cases passed and Stdout displayed
+`sort1= ["a","a","a","g","m","n","r"]`. This was a live Run using the existing
+source/inputs, not a fixture. Proof is ignored at
+`outputs/code-drill-test-runner/console-array-fixed.jpg`.
+
 ## Scope
 
 - `/javascript` opens `/javascript/practice`. Recommended includes all four problems;
