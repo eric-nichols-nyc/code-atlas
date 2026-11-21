@@ -10,6 +10,7 @@ import {
 } from "@workspace/ui/components/sheet";
 import Link from "next/link";
 import { type ReactNode, useRef, useState } from "react";
+import { WorkspaceTimer } from "../../workspace-timer/components/workspace-timer";
 import { useWorkspaceLayout } from "../hooks/use-workspace-layout";
 import {
   ResizableWorkspace,
@@ -57,18 +58,21 @@ export function LearningWorkspace({
             </Link>
           </Button>
         </nav>
-        <Button
-          type="button"
-          variant={tutorOpen ? "secondary" : "outline"}
-          size="icon"
-          aria-label={tutorOpen ? "Hide AI tutor" : "Show AI tutor"}
-          title={tutorOpen ? "Hide AI tutor" : "Show AI tutor"}
-          aria-expanded={tutorOpen}
-          aria-controls="lesson-tutor"
-          onClick={(event) => toggleTutor(event.currentTarget)}
-        >
-          <SparklesIcon aria-hidden="true" />
-        </Button>
+        <div className="flex min-w-0 flex-wrap items-center gap-2">
+          <WorkspaceTimer />
+          <Button
+            type="button"
+            variant={tutorOpen ? "secondary" : "outline"}
+            size="icon"
+            aria-label={tutorOpen ? "Hide AI tutor" : "Show AI tutor"}
+            title={tutorOpen ? "Hide AI tutor" : "Show AI tutor"}
+            aria-expanded={tutorOpen}
+            aria-controls="lesson-tutor"
+            onClick={(event) => toggleTutor(event.currentTarget)}
+          >
+            <SparklesIcon aria-hidden="true" />
+          </Button>
+        </div>
       </header>
       <div
         ref={layout.host}

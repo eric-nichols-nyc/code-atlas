@@ -60,6 +60,8 @@ feedback, and improve.**
   These authored examples do not execute code or save learning progress.
 - **Focused practice:** CodeMirror JavaScript editor, resizable panels, hints and solutions,
   plus light, dark, and system themes.
+- **Practice timer:** A toolbar stopwatch and configurable countdown with pause,
+  resume, reset, and collapsed controls. Timing lasts for the current problem visit.
 - **Real evaluation:** Run editable visible cases, then Submit against a server-selected
   suite that includes private cases. Only an accepted Submit marks a problem solved.
 - **Persistent progress:** Flag problems and restore the latest code saved after Run or

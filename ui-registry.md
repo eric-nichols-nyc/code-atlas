@@ -61,6 +61,8 @@ Last updated: 2026-11-20.
 | Focus            | `focus-visible` ring using the shared ring token                                   |
 
 Use `asChild` for links. The optional `navigation` Button variant changes text color without a hover background, retaining the shared focus ring. Prefer component variants over overriding their colors or typography.
+Use `contrast` for a prominent neutral action: foreground-colored background with
+background-colored text, including the workspace timer's Start action.
 Colored variants use their matching focus ring and 90% hover background. Shared
 theme tokens pair green `#34d399` with `#052e24`, amber `#fbbf24` with `#422006`,
 and blue `#60a5fa` with `#102a4c` in every theme. Use `interactive` for green
@@ -792,3 +794,30 @@ The catalog navigation offers Practice; React Learn remains unavailable. Focused
 workspaces carry their own theme switcher and omit global navigation. Keep visible
 visit-only, preview-only and TypeScript-transpilation copy, and disclose that tutor
 questions include the current draft but no preview/console capture.
+
+## Workspace stopwatch and countdown
+
+Files: `apps/web/src/features/workspace-timer/`,
+`features/learning/components/learning-workspace.tsx`, and shared
+`Popover`, `ToggleGroup`, `Toggle`, and `Button` primitives.
+Last updated: 2026-11-20.
+
+- Place the Timer icon beside the AI tutor in the practice toolbar. The icon opens
+  a right-aligned 226px Popover with 12px viewport clearance, 12px padding, 16px
+  corner radius, shared popover colors, and reduced-motion support.
+- Use an outlined single-selection ToggleGroup with `size="card"`: two 58px mode
+  cards, 8px gap, 12px semibold labels, 20px icons, and a visible selected border.
+  Stopwatch uses the `info` accent; countdown uses `warning`.
+- Countdown uses labeled hour/minute Inputs, numeric keyboards, inline validation,
+  and a disabled Start for invalid or zero durations. Start is a full-width
+  `contrast` Button. All surfaces and focus states follow the selected theme.
+- Starting displays a bordered compact toolbar group with collapse, pause/resume,
+  an eight-character minimum Menlo/monospace `HH:MM:SS` readout, and reset. The
+  Timer icon remains available for settings. Collapsed sessions expose the same
+  controls in the popup and a Show in toolbar action.
+- Give every icon an accessible name and tooltip. Escape and outside clicks
+  dismiss the popup; dismissal and collapse return focus to the Timer icon.
+  Announce completion once through a status region and show “Time's up.”
+- Keep timing local to this component, above responsive panel branches. Tick
+  updates do not rerender the editor, statements, results, or tutor. Header actions
+  wrap on narrow screens; the popup and inline group fit a 320px viewport.
