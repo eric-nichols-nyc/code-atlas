@@ -42,7 +42,7 @@ export function HeapStackVisualizationClient({
           Theory
         </a>
       </WalkthroughPlayerHeader>
-      <div className={styles.explanation} aria-live="polite" aria-atomic="true">
+      <div className={player.explanation} aria-live="polite" aria-atomic="true">
         <span>
           Step {index + 1} of {total}
         </span>

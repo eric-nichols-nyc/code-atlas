@@ -16,6 +16,7 @@ import {
   learningTopics as javascriptTopics,
 } from "../src/content/javascript/learn/catalog";
 import { eventLoopPresets } from "../src/content/javascript/learn/event-loop/presets";
+import { generatorVisualization } from "../src/content/javascript/learn/generators/visualization";
 import { heapStackVisualization } from "../src/content/javascript/learn/heap-stack/visualization";
 import { moduleOverviews as javascriptOverviews } from "../src/content/javascript/learn/overviews";
 import {
@@ -85,6 +86,7 @@ errors.push(
     heapStackVisualization,
     "Heap & Stack visualization",
   ),
+  ...validateCodeWalkthrough(generatorVisualization, "Generator visualization"),
 );
 for (const subject of learningSubjects) {
   errors.push(

@@ -1,0 +1,136 @@
+import { GeneratorVisualization } from "@/features/learning/components/generator-visualization";
+import styles from "@/features/learning/components/walkthrough-theory.module.css";
+import { generatorVisualization } from "./visualization";
+
+<GeneratorVisualization definition={generatorVisualization} />
+
+<div className={styles.theory}>
+
+<section id="generators-theory" className={styles.section} aria-labelledby="generators-intro" tabIndex={-1}>
+<h2 id="generators-intro">What are generators and iterators?</h2>
+
+<div className={styles.intro}>
+<div>
+
+An **iterator** exposes a `next()` method. Each call reports a value and
+whether iteration has finished. A **generator** is an iterator whose progress
+is managed by a `function*` body. Each `yield` lets the caller take a value
+while the generator saves its position and local bindings for the next call.
+
+</div>
+<div>
+
+<aside className={styles.callout}>
+
+Watch the second call above. `next(5)` sends 5 into the paused `yield`
+expression and receives the next yielded value, 15.
+
+</aside>
+
+[Iterators and generators on MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Iterators_and_generators)
+
+</div>
+</div>
+
+</section>
+
+<section className={styles.section} aria-labelledby="generators-process">
+<h2 id="generators-process">How a generator runs</h2>
+
+<ol className={styles.steps}>
+  <li>
+    <strong>Create the generator.</strong> Calling a generator function gives
+    you an iterator. Its body begins when you call <code>next()</code>.
+  </li>
+  <li>
+    <strong>Yield a value.</strong> Execution pauses and the caller receives the
+    yielded value with <code>done: false</code>.
+  </li>
+  <li>
+    <strong>Resume from the pause.</strong> The next call can pass a value into
+    the suspended <code>yield</code> expression. Local bindings are still available.
+  </li>
+  <li>
+    <strong>Finish the iteration.</strong> A return or the end of the function
+    completes the generator, and subsequent calls keep reporting <code>done: true</code>.
+  </li>
+</ol>
+
+</section>
+
+<section className={styles.section} aria-labelledby="generators-mistakes">
+<h2 id="generators-mistakes">Common generator mistakes</h2>
+
+<div className={styles.mistakes}>
+<div className={styles.card}>
+
+### Passing input too early
+
+The first `next()` starts the body before any `yield` has paused. Pass initial
+data as arguments to the generator function, or wait until a `yield` can receive it.
+
+</div>
+<div className={styles.card}>
+
+### Checking whether the value is truthy
+
+Generators can yield `0`, `false`, or `undefined`. Check `done` to decide when
+iteration ends.
+
+</div>
+<div className={styles.card}>
+
+### Reusing a consumed generator
+
+A generator object advances in one direction. Call the generator function
+again to get a fresh iterator from the start.
+
+</div>
+</div>
+
+</section>
+
+<section className={styles.section} aria-labelledby="generators-interview">
+<h2 id="generators-interview">Generator and iterator interview questions</h2>
+
+<div className={styles.questions}>
+<div className={styles.card}>
+
+### What arrives at the caller after a yield?
+
+The `next()` call returns an object containing the yielded value and
+`done: false`. The caller can resume the saved execution later.
+
+</div>
+<div className={styles.card}>
+
+### What happens to a generator’s return value in for...of?
+
+`for...of` stops when the iterator reports `done: true`. To read the return
+value, inspect the result from the `next()` call that completes the generator.
+
+</div>
+<div className={styles.card}>
+
+### What makes a generator iterable?
+
+A generator implements `[Symbol.iterator]()` and returns itself. It provides
+both the method that starts iteration and the `next()` method that advances it.
+
+</div>
+</div>
+
+</section>
+
+<section className={styles.section} aria-labelledby="generators-related">
+<h2 id="generators-related">Related JavaScript concepts</h2>
+
+<ul className={styles.related}>
+  <li><a href="/javascript/learn/heap-stack">Heap &amp; Stack</a></li>
+  <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols">Iteration protocols</a></li>
+  <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Generator/next">Generator.next()</a></li>
+</ul>
+
+</section>
+
+</div>

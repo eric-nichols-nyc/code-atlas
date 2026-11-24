@@ -778,6 +778,14 @@ Display the reference count for the tracked allocation and label it Eligible for
 collection once the last reference goes away. Put one polite step explanation
 below the toolbar and keep it visible when the snapshot panels are stacked.
 
+## Generators & Iterators visualizer
+
+Place Input Script and Generator State beside Call Flow and Console Output.
+Keep the shared step explanation below the toolbar. Label each generator phase
+in text and show the paused line and saved local bindings. Order the call flow
+from the caller's invocation to the generator's action and back to the result.
+Console Output includes completed calls through the selected step.
+
 ## Route and navigation loading
 
 Files: `apps/web/src/components/route-loading.tsx`, `site-nav.tsx`, and the global,

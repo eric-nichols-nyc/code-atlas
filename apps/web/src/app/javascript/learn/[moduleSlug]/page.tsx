@@ -9,6 +9,7 @@ import { isAuthConfigured } from "@/lib/auth";
 import { requirePageLearner } from "@/lib/auth/server";
 
 export const metadata: Metadata = { title: "JavaScript Learn | Code Atlas" };
+const fullWidthModules = new Set(["event-loop", "heap-stack", "generators"]);
 
 export default async function LearningModulePage({
   params,
@@ -22,9 +23,11 @@ export default async function LearningModulePage({
   const loadOverview = moduleOverviews[moduleSlug];
   if (!module || !loadOverview) notFound();
   const { default: Overview } = await loadOverview();
-  const wide = module.slug === "event-loop" || module.slug === "heap-stack";
   return (
-    <LearningModuleOverview module={module} wide={wide}>
+    <LearningModuleOverview
+      module={module}
+      wide={fullWidthModules.has(module.slug)}
+    >
       <Overview />
     </LearningModuleOverview>
   );
