@@ -6,6 +6,7 @@ import type {
 export const learningTopics: readonly LearningTopic[] = [
   { id: "arrays", label: "Arrays", variant: "blue" },
   { id: "async", label: "Async", variant: "rose" },
+  { id: "memory", label: "Memory", variant: "amber" },
 ];
 
 export const javascriptLearningCatalog: readonly LearningModule[] = [
@@ -58,6 +59,26 @@ export const javascriptLearningCatalog: readonly LearningModule[] = [
         title: "Timers and microtasks",
         summary:
           "Follow synchronous code, two microtasks, and a timer callback in order.",
+      },
+    ],
+  },
+  {
+    id: "javascript.learn.heap-stack",
+    slug: "heap-stack",
+    title: "Heap & Stack",
+    summary:
+      "Follow nested calls and see how separate variables can change one shared object.",
+    topicId: "memory",
+    difficulty: "Medium",
+    order: 30,
+    status: "published",
+    recommended: true,
+    lessonOutlines: [
+      {
+        id: "frames-and-references",
+        title: "Call frames and shared references",
+        summary:
+          "Track a copied number and a shared object as two function calls return.",
       },
     ],
   },

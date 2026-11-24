@@ -1,0 +1,139 @@
+import { HeapStackVisualization } from "@/features/learning/components/heap-stack-visualization";
+import styles from "@/features/learning/components/walkthrough-theory.module.css";
+import { heapStackVisualization } from "./visualization";
+
+<HeapStackVisualization definition={heapStackVisualization} />
+
+<div className={styles.theory}>
+
+<section id="heap-stack-theory" className={styles.section} aria-labelledby="heap-stack-intro" tabIndex={-1}>
+<h2 id="heap-stack-intro">What are the heap and the stack?</h2>
+
+<div className={styles.intro}>
+<div>
+
+The **call stack** records active calls. Each call adds a frame with the state
+needed to run that function. Returning removes the top frame and lets its
+caller continue.
+
+The **heap** is where the engine manages objects whose lifetimes can extend
+beyond a call. Several bindings can refer to the same object, so a change
+through one name is visible through the others.
+
+</div>
+<div>
+
+<aside className={styles.callout}>
+
+This example tracks one object and the bindings that use it. The engine may
+store or optimize those values differently internally.
+
+</aside>
+
+[JavaScript execution model on MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Execution_model#stack_and_execution_contexts)
+
+</div>
+</div>
+
+</section>
+
+<section className={styles.section} aria-labelledby="heap-stack-process">
+<h2 id="heap-stack-process">How calls and references work</h2>
+
+<ol className={styles.steps}>
+  <li>
+    <strong>Push a frame.</strong> Calling a function creates a new execution
+    context. A nested call goes above its caller.
+  </li>
+  <li>
+    <strong>Create an object.</strong> In this example, <code>original</code>{" "}
+    refers to the object created by the literal.
+  </li>
+  <li>
+    <strong>Copy a value.</strong> The inner <code>count</code> gets the number 1.
+    The inner <code>item</code> gets a reference to the same object as <code>alias</code>.
+  </li>
+  <li>
+    <strong>Return to the caller.</strong> The frame pops. An object becomes
+    eligible for collection once it is unreachable from the program's roots.
+  </li>
+</ol>
+
+</section>
+
+<section className={styles.section} aria-labelledby="heap-stack-mistakes">
+<h2 id="heap-stack-mistakes">Common heap and stack mistakes</h2>
+
+<div className={styles.mistakes}>
+<div className={styles.card}>
+
+### Expecting assignment to clone an object
+
+Assigning an object to another variable gives both names the same object
+identity. Create a new object when you want independent properties.
+
+</div>
+<div className={styles.card}>
+
+### Assuming memory is freed on return
+
+A return removes a frame. A closure, another object, or a longer-lived binding
+can still keep its data reachable.
+
+</div>
+<div className={styles.card}>
+
+### Letting recursion grow without a bound
+
+Active calls consume stack space. Check that each recursive call moves toward
+a base case, and use iteration when the nesting could be deep.
+
+</div>
+</div>
+
+</section>
+
+<section className={styles.section} aria-labelledby="heap-stack-interview">
+<h2 id="heap-stack-interview">Heap and stack interview questions</h2>
+
+<div className={styles.questions}>
+<div className={styles.card}>
+
+### Why does the example print 2 5, then 1 5?
+
+The two frames have independent `count` bindings. Both frames can reach the
+same object, so the change to its `count` property is visible in either frame.
+
+</div>
+<div className={styles.card}>
+
+### When can a garbage collector reclaim an object?
+
+Once an object can no longer be reached from a root, the engine can reclaim
+its memory during a later collection.
+
+</div>
+<div className={styles.card}>
+
+### What happens when a call returns?
+
+The current frame comes off the top of the stack. The caller resumes from its
+call site, using the return value if it needs it.
+
+</div>
+</div>
+
+</section>
+
+<section className={styles.section} aria-labelledby="heap-stack-related">
+<h2 id="heap-stack-related">Related JavaScript concepts</h2>
+
+<ul className={styles.related}>
+  <li><a href="/javascript/learn/event-loop">Event Loop</a></li>
+  <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Memory_management">Memory management on MDN</a></li>
+  <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Closures">Closures on MDN</a></li>
+</ul>
+
+</section>
+
+</div>

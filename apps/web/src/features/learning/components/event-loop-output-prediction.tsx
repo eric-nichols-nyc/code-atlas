@@ -7,7 +7,7 @@ import {
 } from "@workspace/ui/components/icons";
 import { type DragEvent, useLayoutEffect, useRef, useState } from "react";
 import styles from "./event-loop-output-prediction.module.css";
-import workbench from "./event-loop-visualization.module.css";
+import player from "./walkthrough-player.module.css";
 
 type DropTarget = { log: number; edge: "before" | "after" };
 
@@ -80,7 +80,7 @@ export function EventLoopOutputPrediction({
       className={styles.exercise}
       aria-labelledby={`${id}-title`}
     >
-      <h2 id={`${id}-title`} className={workbench.panelTitle}>
+      <h2 id={`${id}-title`} className={player.panelTitle}>
         <CircleHelpIcon aria-hidden="true" />
         Output Prediction
       </h2>

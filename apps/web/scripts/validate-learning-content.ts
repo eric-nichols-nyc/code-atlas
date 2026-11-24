@@ -16,6 +16,7 @@ import {
   learningTopics as javascriptTopics,
 } from "../src/content/javascript/learn/catalog";
 import { eventLoopPresets } from "../src/content/javascript/learn/event-loop/presets";
+import { heapStackVisualization } from "../src/content/javascript/learn/heap-stack/visualization";
 import { moduleOverviews as javascriptOverviews } from "../src/content/javascript/learn/overviews";
 import {
   learningVisualizations as javascriptVisualizations,
@@ -30,7 +31,10 @@ import {
 import { moduleOverviews as reactOverviews } from "../src/content/react/learn/overviews";
 import { learningWalkthroughs as reactWalkthroughs } from "../src/content/react/learn/walkthroughs";
 import { validatePracticeContent } from "../src/features/catalog/lib/practice-content";
-import { validateWalkthroughRegistry } from "../src/features/learning/lib/code-walkthrough";
+import {
+  validateCodeWalkthrough,
+  validateWalkthroughRegistry,
+} from "../src/features/learning/lib/code-walkthrough";
 import { validateEventLoopVisualization } from "../src/features/learning/lib/event-loop-visualization";
 import { validateLearningContent } from "../src/features/learning/lib/learn-content";
 import { validateTwoPointerVisualization } from "../src/features/learning/lib/two-pointer-visualization";
@@ -75,6 +79,12 @@ const practiceSubjects = [
 ];
 const errors = eventLoopPresets.flatMap(({ definition }) =>
   validateEventLoopVisualization(definition),
+);
+errors.push(
+  ...validateCodeWalkthrough(
+    heapStackVisualization,
+    "Heap & Stack visualization",
+  ),
 );
 for (const subject of learningSubjects) {
   errors.push(

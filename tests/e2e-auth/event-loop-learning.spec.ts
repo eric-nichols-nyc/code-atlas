@@ -50,11 +50,13 @@ test("Event Loop theory follows the visualizer and preserves the current step", 
   });
   await expect(questions.getByRole("heading", { level: 3 })).toHaveCount(4);
   await expect(questions.locator("pre")).toContainText('console.log("script")');
+  const related = page.getByRole("region", {
+    name: "Related JavaScript concepts",
+  });
+  await expect(related.getByRole("link")).toHaveCount(5);
   await expect(
-    page
-      .getByRole("region", { name: "Related JavaScript concepts" })
-      .getByRole("link"),
-  ).toHaveCount(5);
+    related.getByRole("link", { name: "Heap & Stack" }),
+  ).toHaveAttribute("href", "/javascript/learn/heap-stack");
 });
 
 test("Event Loop shows a ready timer waiting for both microtasks", async ({
