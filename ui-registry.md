@@ -320,7 +320,7 @@ current code and a matching Run error accompany a question.
 Files: `apps/web/src/features/catalog/components/javascript-practice.tsx`,
 `apps/web/src/features/catalog/lib/practice-catalog.ts`, and
 `apps/web/src/content/javascript/practice/catalog.ts`.
-Last updated: 2026-11-10. Reference: TraceCode practice category sidebar and list.
+Last updated: 2026-11-20. Reference: TraceCode practice category sidebar and list.
 
 | Property        | Pattern                                                                                                                                                                          |
 | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -332,6 +332,7 @@ Last updated: 2026-11-10. Reference: TraceCode practice category sidebar and lis
 | Row spacing     | 58px minimum row height, 8px vertical cell padding; 20px desktop outer gutters, 32px flag area, aligned title/header and fixed metadata columns                                  |
 | Row labels      | Flag and problem title link, Difficulty, Topic and Solved; no description beneath the title                                                                                      |
 | Search          | Decorative Search icon inside the input, hidden accessible label, and shared Select for difficulty; empty results can clear filters                                              |
+| Sorting         | Shared small Select next to Difficulty, with a visible Sort by prompt and the active order shown after selection                                                                 |
 
 Recommended is an explicit curated view; each topic category lists its published
 problems. All published problems are recommended and appear in their own topic category. Do not duplicate problem records for
@@ -344,19 +345,22 @@ preserves the selected category. Keep table overflow contained on narrow screens
 The unfiltered difficulty option reads "Difficulty". The controls row uses
 `sm:items-center` so the 32px dropdown is vertically centered beside the 44px
 search field, including when the controls wrap below the table heading.
-The difficulty trigger/menu and search field use square corners (`rounded-none`).
+The difficulty and sort triggers/menus and search field use square corners
+(`rounded-none`). Default order restores curated ordering. Keep sorting selected
+when the category changes or filters are cleared.
 Place the live result count right-aligned above the table card, outside its
 toolbar. Keep its status semantics and update it when search/category filters change.
-At a panel width of at least 700px, keep the heading and controls
+At a panel width of at least 760px, keep the heading and controls
 on one row. Use the named `practice` container query with `flex-nowrap`; keep
-the title and 148px dropdown intact while the search field takes the
+the title and 148px/152px dropdowns intact while the search field takes the
 remaining space, up to 320px. Below that panel width, allow the toolbar to wrap
 and keep the existing stacked mobile controls. This is based on panel space,
 so the 280px category sidebar does not force an early wrap at 1186px viewports.
 
 Measured directly from the [live reference](https://tracecode.app/practice) on
 2026-11-10 using DOM bounds and computed styles, at a **1280 × 720 CSS-pixel
-viewport with device pixel ratio 1**. Code Atlas was checked at the same viewport:
+viewport with device pixel ratio 1**. Code Atlas was checked at the same viewport
+when the toolbar had only the search and difficulty controls:
 
 | Measurement                               | Reference and Code Atlas               |
 | ----------------------------------------- | -------------------------------------- |

@@ -46,7 +46,9 @@ import {
 } from "../../learning/lib/catalog";
 import {
   type PracticeEntry,
+  type PracticeSort,
   practiceCategories,
+  practiceDifficulties,
   practiceProblems,
 } from "../lib/practice-catalog";
 import { usePracticeRecords } from "../state/practice-records";
@@ -67,13 +69,17 @@ export function PracticeCatalog({
   const [category, setCategory] = useState("recommended");
   const [query, setQuery] = useState("");
   const [difficulty, setDifficulty] = useState("all");
+  const [sort, setSort] = useState<PracticeSort>("default");
   const searchId = useId();
   const difficultyId = useId();
   const categories = practiceCategories(catalog, topics);
   const selected =
     categories.find((item) => item.id === category) ?? categories[0];
   const selectedId = selected?.id ?? "recommended";
-  const rows = practiceProblems(catalog, selectedId, query, difficulty);
+  const rows = practiceProblems(catalog, selectedId, query, difficulty, {
+    sort,
+    categoryTopics: topics,
+  });
   const filtersActive = Boolean(query.trim()) || difficulty !== "all";
   const hasProblems = catalog.some((entry) => entry.status === "published");
 
@@ -180,11 +186,11 @@ export function PracticeCatalog({
             className="@container/practice min-w-0 overflow-hidden rounded-md border bg-card"
             aria-label={selected?.heading ?? "Recommended problems"}
           >
-            <div className="flex flex-wrap items-center justify-between gap-4 border-b px-4 py-5 sm:px-5 @min-[700px]/practice:flex-nowrap">
-              <h2 className="min-w-0 text-xl leading-7 font-semibold @min-[700px]/practice:shrink-0">
+            <div className="flex flex-wrap items-center justify-between gap-4 border-b px-4 py-5 sm:px-5 @min-[760px]/practice:flex-nowrap">
+              <h2 className="min-w-0 text-xl leading-7 font-semibold @min-[760px]/practice:shrink-0">
                 {selected?.heading}
               </h2>
-              <div className="flex w-full min-w-0 flex-col gap-3 sm:w-auto sm:flex-row sm:items-center @min-[700px]/practice:max-w-[480px] @min-[700px]/practice:flex-1">
+              <div className="flex w-full min-w-0 flex-col gap-3 sm:w-auto sm:flex-row sm:items-center @min-[760px]/practice:max-w-[644px] @min-[760px]/practice:flex-1">
                 <Label htmlFor={difficultyId} className="sr-only">
                   Difficulty
                 </Label>
@@ -200,7 +206,7 @@ export function PracticeCatalog({
                   <SelectContent className="rounded-none">
                     <SelectGroup>
                       <SelectItem value="all">Difficulty</SelectItem>
-                      {["Easy", "Medium", "Hard"].map((level) => (
+                      {practiceDifficulties.map((level) => (
                         <SelectItem key={level} value={level}>
                           <DifficultyBadge difficulty={level} />
                         </SelectItem>
@@ -208,7 +214,32 @@ export function PracticeCatalog({
                     </SelectGroup>
                   </SelectContent>
                 </Select>
-                <div className="relative w-full min-w-0 sm:w-80 @min-[700px]/practice:flex-1">
+                <Select
+                  value={sort}
+                  onValueChange={(value) => setSort(value as PracticeSort)}
+                >
+                  <SelectTrigger
+                    size="sm"
+                    className="w-full rounded-none sm:w-[152px] sm:shrink-0"
+                    aria-label="Sort by"
+                  >
+                    <SelectValue>
+                      {sort === "default" ? "Sort by" : undefined}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent className="rounded-none">
+                    <SelectGroup>
+                      <SelectItem value="default">Default order</SelectItem>
+                      <SelectItem value="easy-first">Easy to hard</SelectItem>
+                      <SelectItem value="hard-first">Hard to easy</SelectItem>
+                      <SelectItem value="category-asc">Category A–Z</SelectItem>
+                      <SelectItem value="category-desc">
+                        Category Z–A
+                      </SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+                <div className="relative w-full min-w-0 sm:w-80 @min-[760px]/practice:flex-1">
                   <SearchIcon
                     aria-hidden="true"
                     className="pointer-events-none absolute top-1/2 left-4 size-4 -translate-y-1/2 text-muted-foreground"

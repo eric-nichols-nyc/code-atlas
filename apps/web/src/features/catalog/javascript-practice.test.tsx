@@ -169,6 +169,32 @@ it("filters by difficulty and clears filters without leaving the selected catego
   expect(screen.getByRole("link", { name: "Counter" })).toBeVisible();
 });
 
+it("keeps the selected sort across categories and clearing search", async () => {
+  render(<JavaScriptPractice catalog={javascriptPracticeCatalog} />);
+  fireEvent.keyDown(screen.getByRole("combobox", { name: "Sort by" }), {
+    key: "Enter",
+  });
+  fireEvent.click(await screen.findByRole("option", { name: "Hard to easy" }));
+  fireEvent.mouseDown(screen.getByRole("tab", { name: "Closures" }), {
+    button: 0,
+    ctrlKey: false,
+  });
+  fireEvent.change(screen.getByRole("searchbox", { name: "Search problems" }), {
+    target: { value: "missing" },
+  });
+  fireEvent.click(screen.getByRole("button", { name: "Clear search" }));
+
+  expect(screen.getByRole("combobox", { name: "Sort by" })).toHaveTextContent(
+    "Hard to easy",
+  );
+  expect(screen.getAllByRole("link").map((link) => link.textContent)).toEqual([
+    "Curry",
+    "Memoize",
+    "Counter",
+    "Function Composition",
+  ]);
+});
+
 it("toggles account flags without navigating and isolates learners", async () => {
   let owner = "flags-owner-a";
   const flags = new Map<string, boolean>();

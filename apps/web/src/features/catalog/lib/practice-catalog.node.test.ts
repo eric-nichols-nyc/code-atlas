@@ -141,3 +141,60 @@ it("intersects difficulty with the selected category and search", () => {
   expect(practiceProblems(entries, "closures", "sleep", "Medium")).toEqual([]);
   expect(practiceProblems(entries, "recommended", "", "Hard")).toEqual([]);
 });
+
+it("sorts all three difficulty levels in either direction with stable ties", () => {
+  const entries = javascriptPracticeCatalog.map((entry) =>
+    entry.slug === "memoize" ? { ...entry, difficulty: "Hard" } : entry,
+  );
+  const closureSlugs = (sort: "easy-first" | "hard-first") =>
+    practiceProblems(entries, "closures", "", "all", { sort }).map(
+      (entry) => entry.slug,
+    );
+
+  expect(closureSlugs("easy-first")).toEqual([
+    "counter",
+    "function-composition",
+    "curry",
+    "memoize",
+  ]);
+  expect(closureSlugs("hard-first")).toEqual([
+    "memoize",
+    "curry",
+    "counter",
+    "function-composition",
+  ]);
+  expect(
+    practiceProblems(entries, "closures", "memoize", "Hard", {
+      sort: "easy-first",
+    }).map((entry) => entry.slug),
+  ).toEqual(["memoize"]);
+  expect(
+    practiceProblems(entries, "closures").map((entry) => entry.slug),
+  ).toEqual(["counter", "curry", "function-composition", "memoize"]);
+});
+
+it("sorts by the supplied category labels and keeps curated order within each category", () => {
+  const entries = javascriptPracticeCatalog.filter((entry) =>
+    ["counter", "curry", "majority-element"].includes(entry.slug),
+  );
+  const categoryTopics = [
+    { id: "closures", label: "A category", variant: "amber" },
+    { id: "arrays", label: "Z category", variant: "blue" },
+  ] as const;
+  const slugs = (sort: "category-asc" | "category-desc") =>
+    practiceProblems(entries, "recommended", "", "all", {
+      sort,
+      categoryTopics,
+    }).map((entry) => entry.slug);
+
+  expect(slugs("category-asc")).toEqual([
+    "counter",
+    "curry",
+    "majority-element",
+  ]);
+  expect(slugs("category-desc")).toEqual([
+    "majority-element",
+    "counter",
+    "curry",
+  ]);
+});
