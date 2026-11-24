@@ -9,7 +9,12 @@ import { isAuthConfigured } from "@/lib/auth";
 import { requirePageLearner } from "@/lib/auth/server";
 
 export const metadata: Metadata = { title: "JavaScript Learn | Code Atlas" };
-const fullWidthModules = new Set(["event-loop", "heap-stack", "generators"]);
+const fullWidthModules = new Set([
+  "event-loop",
+  "heap-stack",
+  "generators",
+  "closures",
+]);
 
 export default async function LearningModulePage({
   params,

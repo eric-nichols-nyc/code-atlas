@@ -52,8 +52,9 @@ solved status. You can pick up where you left off on another device.
 - **Learn** has searchable, filterable module previews. Two Pointers walks through array
   strategies in JavaScript and Algorithms. JavaScript's Event Loop visualizes how a timer
   waits for microtasks, Heap & Stack follows shared object references, and Generators &
-  Iterators shows how a function can pause and resume. React's Hooks section covers the
-  `useEffect` lifecycle with a six-step timer walkthrough.
+  Iterators shows how a function can pause and resume. Closures traces captured bindings
+  after the factory returns. React's Hooks section covers the `useEffect` lifecycle with
+  a six-step timer walkthrough.
 - **Practice** includes a CodeMirror editor, resizable panels, hints, solutions, and a
   stopwatch or countdown for the current problem visit. Light, dark, and system themes
   are available.

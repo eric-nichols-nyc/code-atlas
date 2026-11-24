@@ -1,0 +1,99 @@
+.stack,
+.output {
+  min-width: 0;
+  border-top: 1px solid var(--workbench-divider);
+}
+
+.stack {
+  --lane-color: var(--workbench-stack);
+}
+
+.output {
+  display: flex;
+  flex-direction: column;
+}
+
+.scope {
+  --lane-color: color-mix(in oklab, #9b69d9 62%, var(--foreground));
+  flex: 1 0 auto;
+}
+
+.console {
+  min-height: 120px;
+  flex: 1 0 auto;
+  border-top: 1px solid var(--workbench-divider);
+  background: var(--background);
+}
+
+.cards {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.card {
+  display: grid;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--workbench-divider);
+  border-radius: 6px;
+  background: var(--background);
+  overflow-wrap: anywhere;
+}
+
+.card[data-accessed="true"] {
+  border-color: var(--lane-color);
+  background: color-mix(in oklab, var(--lane-color) 10%, var(--background));
+}
+
+.cardHeader,
+.binding {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 8px;
+}
+
+.cardHeader h3,
+.binding {
+  margin: 0;
+  font-family: Menlo, monospace;
+  font-size: 12px;
+  line-height: 19px;
+}
+
+.cardHeader small,
+.lookup {
+  color: var(--workbench-muted);
+  font-size: 12px;
+  line-height: 19px;
+}
+
+.binding {
+  padding-top: 6px;
+  border-top: 1px solid var(--workbench-divider);
+}
+
+.binding dd {
+  margin: 0;
+}
+
+.lookup {
+  margin: 0 0 8px;
+  overflow-wrap: anywhere;
+}
+
+@container (min-width: 900px) {
+  .board {
+    --workbench-columns: minmax(0, 1.3fr) minmax(0, 0.9fr) minmax(0, 1.1fr);
+  }
+
+  .stack,
+  .output {
+    border-top: 0;
+    border-left: 1px solid var(--workbench-divider);
+  }
+}
