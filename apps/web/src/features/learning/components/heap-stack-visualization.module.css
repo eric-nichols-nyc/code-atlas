@@ -110,28 +110,6 @@
   line-height: 19px;
 }
 
-.explanation {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 5px 12px;
-  padding: 12px 14px;
-  border-bottom: 1px solid var(--workbench-divider);
-  background: var(--muted);
-  font-size: 13px;
-  line-height: 20px;
-}
-
-.explanation span {
-  color: var(--workbench-muted);
-  font-variant-numeric: tabular-nums;
-  font-weight: 650;
-}
-
-.explanation p {
-  margin: 0;
-}
-
 @container (min-width: 900px) {
   .board {
     --workbench-columns: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 1fr);

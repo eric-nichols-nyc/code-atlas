@@ -115,6 +115,28 @@
   min-height: 18px;
 }
 
+.explanation {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 5px 12px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--workbench-divider);
+  background: var(--muted);
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.explanation span {
+  color: var(--workbench-muted);
+  font-variant-numeric: tabular-nums;
+  font-weight: 650;
+}
+
+.explanation p {
+  margin: 0;
+}
+
 .board {
   display: grid;
   flex: 1 0 auto;

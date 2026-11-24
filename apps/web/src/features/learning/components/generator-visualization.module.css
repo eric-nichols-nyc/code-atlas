@@ -1,0 +1,162 @@
+.state,
+.output {
+  min-width: 0;
+  border-top: 1px solid var(--workbench-divider);
+}
+
+.state {
+  --lane-color: var(--workbench-stack);
+}
+
+.flow {
+  --lane-color: color-mix(in oklab, #9b69d9 62%, var(--foreground));
+  background: var(--card);
+}
+
+.output {
+  background: var(--background);
+}
+
+.console {
+  min-height: 120px;
+  border-top: 1px solid var(--workbench-divider);
+}
+
+.body {
+  padding: 12px;
+}
+
+.stateCard,
+.locals {
+  padding: 12px;
+  border: 1px solid var(--workbench-divider);
+  border-radius: 6px;
+  background: var(--background);
+}
+
+.stateCard p {
+  margin: 8px 0 0;
+  color: var(--workbench-muted);
+  font-size: 12px;
+}
+
+.stateHeading,
+.locals dl > div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 8px;
+}
+
+.stateHeading code {
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.phase {
+  --phase-color: var(--workbench-muted);
+  padding: 3px 7px;
+  border: 1px solid color-mix(in oklab, var(--phase-color) 44%, var(--border));
+  border-radius: 5px;
+  background: color-mix(in oklab, var(--phase-color) 13%, var(--background));
+  color: var(--phase-color);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.phase[data-phase="ready"],
+.phase[data-phase="running"] {
+  --phase-color: var(--workbench-stack);
+}
+
+.phase[data-phase="suspended"] {
+  --phase-color: color-mix(in oklab, #d99c3d 60%, var(--foreground));
+}
+
+.phase[data-phase="completed"] {
+  --phase-color: color-mix(in oklab, #28a98b 62%, var(--foreground));
+}
+
+.locals {
+  margin-top: 8px;
+}
+
+.locals h3 {
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.locals dl,
+.flowSteps,
+.logs {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.locals dl,
+.logs,
+.flowSteps code {
+  font-family: Menlo, monospace;
+  font-size: 12px;
+  line-height: 19px;
+  overflow-wrap: anywhere;
+}
+
+.locals dd {
+  margin: 0;
+}
+
+.flowSteps li {
+  display: grid;
+  gap: 3px;
+  padding: 7px 9px;
+  border: 1px solid var(--workbench-divider);
+  border-radius: 5px;
+  background: var(--workbench-row);
+}
+
+.flowSteps span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--workbench-muted);
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.flowSteps span svg {
+  width: 12px;
+  height: 12px;
+}
+
+.flowSteps p,
+.empty {
+  margin: 0;
+  font-size: 12px;
+  line-height: 19px;
+}
+
+.empty {
+  color: var(--workbench-muted);
+}
+
+@container (min-width: 900px) {
+  .board {
+    --workbench-columns: minmax(0, 1.25fr) minmax(0, 0.85fr) minmax(0, 1fr);
+  }
+
+  .state,
+  .output {
+    border-top: 0;
+    border-left: 1px solid var(--workbench-divider);
+  }
+
+  .flow {
+    min-height: 248px;
+  }
+}

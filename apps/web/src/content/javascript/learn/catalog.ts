@@ -7,6 +7,7 @@ export const learningTopics: readonly LearningTopic[] = [
   { id: "arrays", label: "Arrays", variant: "blue" },
   { id: "async", label: "Async", variant: "rose" },
   { id: "memory", label: "Memory", variant: "amber" },
+  { id: "iteration", label: "Iteration", variant: "blue" },
 ];
 
 export const javascriptLearningCatalog: readonly LearningModule[] = [
@@ -79,6 +80,26 @@ export const javascriptLearningCatalog: readonly LearningModule[] = [
         title: "Call frames and shared references",
         summary:
           "Track a copied number and a shared object as two function calls return.",
+      },
+    ],
+  },
+  {
+    id: "javascript.learn.generators",
+    slug: "generators",
+    title: "Generators & Iterators",
+    summary:
+      "Follow a generator as it yields values, resumes with input, and signals completion.",
+    topicId: "iteration",
+    difficulty: "Medium",
+    order: 40,
+    status: "published",
+    recommended: true,
+    lessonOutlines: [
+      {
+        id: "yield-and-resume",
+        title: "Yield, resume, and return",
+        summary:
+          "Track local state and iterator results across successive calls to next().",
       },
     ],
   },
