@@ -9,6 +9,7 @@
   },
   "include": [
     "src/features/problems/server/runner-worker.ts",
+    "src/features/problems/server/script-worker.ts",
     "src/features/problems/server/adapters/**/*.ts"
   ]
 }
