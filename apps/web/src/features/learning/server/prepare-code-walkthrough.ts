@@ -18,7 +18,13 @@ const highlighter = tagHighlighter([
 export function prepareCodeWalkthrough(
   definition: CodeWalkthroughDefinition,
 ): PreparedWalkthrough {
-  const source = normalizeCodeSource(definition.source);
+  return { ...definition, ...prepareCodeSource(definition.source) };
+}
+
+export function prepareCodeSource(
+  code: string,
+): Pick<PreparedWalkthrough, "source" | "codeLines"> {
+  const source = normalizeCodeSource(code);
   const spans: { from: number; to: number; role: CodeTokenRole }[] = [];
   try {
     highlightTree(
@@ -61,5 +67,5 @@ export function prepareCodeWalkthrough(
     cursor = to;
   }
   append(source.slice(cursor));
-  return { ...definition, source, codeLines };
+  return { source, codeLines };
 }

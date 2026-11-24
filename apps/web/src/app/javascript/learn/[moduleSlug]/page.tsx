@@ -23,7 +23,7 @@ export default async function LearningModulePage({
   if (!module || !loadOverview) notFound();
   const { default: Overview } = await loadOverview();
   return (
-    <LearningModuleOverview module={module}>
+    <LearningModuleOverview module={module} wide={module.slug === "event-loop"}>
       <Overview />
     </LearningModuleOverview>
   );

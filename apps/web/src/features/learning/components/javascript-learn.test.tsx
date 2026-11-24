@@ -9,7 +9,7 @@ it("lists the sample as a module with outlines, without practice account control
     "href",
     "/javascript/learn/two-pointers",
   );
-  expect(screen.getByRole("status")).toHaveTextContent("1 module");
+  expect(screen.getByRole("status")).toHaveTextContent("2 modules");
   expect(
     screen.getAllByRole("columnheader").map((cell) => cell.textContent),
   ).toEqual(["Module", "Difficulty", "Topic", "Lesson outlines"]);

@@ -500,6 +500,7 @@ for (const path of [
   "/algorithms/practice/unknown",
   "/javascript",
   "/javascript/learn",
+  "/javascript/learn/event-loop",
   "/javascript/learn/two-pointers",
   "/javascript/learn/unknown",
   "/javascript/practice",
@@ -532,6 +533,9 @@ for (const path of [
     await expect(page.getByRole("heading", { name: "Counter" })).toHaveCount(0);
     await expect(
       page.getByRole("heading", { name: "Two Pointers" }),
+    ).toHaveCount(0);
+    await expect(
+      page.getByRole("region", { name: "Event Loop Visualizer" }),
     ).toHaveCount(0);
     await expect(
       page.getByRole("button", { name: "Run", exact: true }),

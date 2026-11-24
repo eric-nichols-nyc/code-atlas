@@ -4,5 +4,6 @@ export const moduleOverviews: Record<
   string,
   () => Promise<{ default: ComponentType }>
 > = {
+  "event-loop": () => import("./event-loop/overview.mdx"),
   "two-pointers": () => import("./two-pointers/overview.mdx"),
 };

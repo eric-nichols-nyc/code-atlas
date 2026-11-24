@@ -12,39 +12,49 @@ export function StepControls({
   index,
   total,
   onChange,
+  compact = false,
 }: {
   index: number;
   total: number;
   onChange: (index: number) => void;
+  compact?: boolean;
 }) {
+  const size = compact ? "icon-sm" : "sm";
   return (
     <div className={styles.controls}>
       <Button
-        variant="outline"
-        size="sm"
+        variant={compact ? "ghost" : "outline"}
+        size={size}
+        aria-label="Previous"
+        title={compact ? "Previous" : undefined}
         disabled={index === 0}
         onClick={() => onChange(Math.max(0, index - 1))}
       >
         <ArrowLeftIcon aria-hidden="true" data-icon="inline-start" />
-        Previous
+        {!compact && "Previous"}
       </Button>
       <Button
-        size="sm"
+        variant={compact ? "ghost" : "default"}
+        size={size}
+        aria-label="Next"
+        title={compact ? "Next" : undefined}
         disabled={index === total - 1}
         onClick={() => onChange(Math.min(total - 1, index + 1))}
       >
-        Next
+        {!compact && "Next"}
         <ArrowRightIcon aria-hidden="true" data-icon="inline-end" />
       </Button>
       <Button
         className={styles.restart}
         variant="ghost"
-        size="sm"
+        size={size}
+        aria-label="Restart"
+        title={compact ? "Restart" : undefined}
         disabled={index === 0}
         onClick={() => onChange(0)}
       >
         <RotateCcwIcon aria-hidden="true" data-icon="inline-start" />
-        Restart
+        {!compact && "Restart"}
       </Button>
     </div>
   );

@@ -5,6 +5,7 @@ import type {
 
 export const learningTopics: readonly LearningTopic[] = [
   { id: "arrays", label: "Arrays", variant: "blue" },
+  { id: "async", label: "Async", variant: "rose" },
 ];
 
 export const javascriptLearningCatalog: readonly LearningModule[] = [
@@ -37,6 +38,26 @@ export const javascriptLearningCatalog: readonly LearningModule[] = [
         title: "Same-direction pointers",
         summary:
           "Move through an array with separate read and write positions, as in removing repeated values from sorted input.",
+      },
+    ],
+  },
+  {
+    id: "javascript.learn.event-loop",
+    slug: "event-loop",
+    title: "Event Loop",
+    summary:
+      "Follow a timer and two microtasks to see how the browser decides what runs next.",
+    topicId: "async",
+    difficulty: "Easy",
+    order: 20,
+    status: "published",
+    recommended: true,
+    lessonOutlines: [
+      {
+        id: "timers-and-microtasks",
+        title: "Timers and microtasks",
+        summary:
+          "Follow synchronous code, two microtasks, and a timer callback in order.",
       },
     ],
   },

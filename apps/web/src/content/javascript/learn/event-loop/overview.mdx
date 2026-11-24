@@ -1,0 +1,176 @@
+import { EventLoopVisualization } from "@/features/learning/components/event-loop-visualization";
+import { eventLoopPresets } from "./presets";
+import styles from "./theory.module.css";
+
+<EventLoopVisualization presets={eventLoopPresets} />
+
+<div className={styles.theory}>
+
+<section id="event-loop-theory" aria-labelledby="event-loop-definition" tabIndex={-1} className={styles.section}>
+<h2 id="event-loop-definition">What is the JavaScript event loop?</h2>
+
+<div className={styles.intro}>
+<div>
+
+The **event loop** is how the browser decides when to run JavaScript callbacks
+and when it can update the page. The call stack holds the JavaScript that's
+running now. Browser APIs can track pending work, such as timers, while that
+code continues. When the browser runs a callback, it gets its own call stack
+frame.
+
+Try **Easy** above to see one timer wait for two microtasks. **Complex** shows
+why a Promise reaction queued inside a timer runs before the next timer task.
+The walkthroughs show possible times for the timers to become ready. Their
+console order stays the same if a timer becomes ready later.
+
+</div>
+<div>
+
+<aside className={styles.callout}>
+
+**In an interview**, explain what is running, what has been queued, and which
+callback will run next. A short output-order example lets you show all three.
+
+</aside>
+
+[JavaScript event loop on MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Execution_model#job_queue_and_event_loop)
+
+</div>
+</div>
+
+</section>
+
+<section aria-labelledby="event-loop-steps" className={styles.section}>
+<h2 id="event-loop-steps">How the event loop works</h2>
+
+<ol className={styles.steps}>
+  <li>
+    <strong>Run the current task.</strong> Synchronous statements and the functions
+    they call run on the call stack before another task begins.
+  </li>
+  <li>
+    <strong>Queue work for later.</strong> A ready timer queues a task. A settled
+    Promise queues its registered reactions as microtasks. In the visualizer, {" "}
+    <strong>Web APIs</strong> tracks pending timers and <strong>Macrotask Queue</strong>
+    shows ready timer tasks.
+  </li>
+  <li>
+    <strong>Drain the microtasks.</strong> After a task finishes, the browser runs
+    a microtask checkpoint. Microtasks added during the checkpoint also run
+    before it ends.
+  </li>
+  <li>
+    <strong>Give the browser a chance to render.</strong> The browser can update
+    the page at a rendering opportunity. A paint isn't guaranteed between two
+    tasks. The event loop continues selecting runnable work.
+  </li>
+</ol>
+
+</section>
+
+<section aria-labelledby="event-loop-mistakes" className={styles.section}>
+<h2 id="event-loop-mistakes">Common event loop mistakes</h2>
+
+<div className={styles.mistakes}>
+<div className={styles.card}>
+
+### Expecting a zero-delay timer to run right away
+
+`setTimeout(fn, 0)` schedules `fn` for a later task. The current task finishes
+and the browser runs its microtask checkpoint first.
+
+**Use `queueMicrotask`** for brief work that must happen before another task.
+
+</div>
+<div className={styles.card}>
+
+### Letting a microtask chain run indefinitely
+
+Each microtask can queue another. If the queue keeps refilling, the browser
+can get stuck in the checkpoint and delay input or painting.
+
+**Yield to another task** between chunks of work so the browser can attend to
+other work.
+
+</div>
+<div className={styles.card}>
+
+### Keeping the main thread busy for too long
+
+A large loop or expensive calculation keeps the browser from running other
+main-thread work until it returns.
+
+**Break up long jobs** into smaller tasks or put CPU-heavy work that can run
+away from the DOM in a Web Worker.
+
+</div>
+</div>
+
+</section>
+
+<section aria-labelledby="event-loop-interview" className={styles.section}>
+<h2 id="event-loop-interview">Event loop interview questions</h2>
+
+<div className={styles.questions}>
+<div className={styles.card}>
+
+### Why does a fulfilled Promise beat a zero-delay timer here?
+
+Calling `.then()` on an already fulfilled Promise queues the reaction as a
+microtask. The script finishes, the browser runs that microtask, and the timer
+callback runs in a later task.
+
+```js
+const ready = Promise.resolve();
+setTimeout(() => console.log("timer"), 0);
+ready.then(() => console.log("promise"));
+console.log("script");
+```
+
+It logs `script` → `promise` → `timer`.
+
+</div>
+<div className={styles.card}>
+
+### Can a timer guarantee an exact start time?
+
+The delay is the earliest the timer can become eligible to run. Busy JavaScript,
+other queued work, and browser throttling can make its callback run later.
+
+</div>
+<div className={styles.card}>
+
+### When is requestAnimationFrame a good choice?
+
+Use `requestAnimationFrame` for work tied to a visual update. The browser calls
+it before an upcoming repaint, and its timestamp lets animation progress track
+elapsed time across frames.
+
+</div>
+<div className={styles.card}>
+
+### How does an async function resume after await?
+
+`await` suspends that function and lets its caller continue. Once the awaited
+Promise settles, the continuation runs as a microtask, even if the Promise was
+already settled when the function reached `await`.
+
+</div>
+</div>
+
+</section>
+
+<section aria-labelledby="event-loop-related" className={styles.section}>
+<h2 id="event-loop-related">Related JavaScript concepts</h2>
+
+<ul className={styles.related}>
+  <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises">Promises</a></li>
+  <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function">Async/await</a></li>
+  <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Closures">Closures</a></li>
+  <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Closures#closure_scope_chain">Scope chain</a></li>
+  <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Execution_model#agent_execution_model">Heap and stack</a></li>
+</ul>
+
+</section>
+
+</div>
