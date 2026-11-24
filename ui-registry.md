@@ -590,15 +590,15 @@ Save, Reset code, progress, and Run/Submit have independent effects.
 
 Files: `features/problems/components/problem-tutor.tsx`, `state/problem-tutor.tsx`,
 and shared `message`, `message-scroller`, `bubble`, and `textarea` primitives.
-Last updated: 2026-11-14.
+Last updated: 2026-11-24.
 
 Use an AI tutor heading in the 42px docked panel header and as the mobile Sheet title. State
 belongs above adaptive branches; one tutor body is mounted at a time. Use the shared
 MessageScroller for streaming follow and its jump-to-latest control. Use Message with
 You/AI tutor headers, muted user Bubble and ghost assistant Bubble. The transcript has
 12px padding and a 20px exchange gap. Composer uses FieldGroup/Field/FieldLabel with
-shared Textarea and small Buttons. Enter inserts a newline; Mod-Enter sends only while
-the composer is focused. Preserve CodeMirror's separate Mod-Enter Run behavior.
+shared Textarea and small Buttons. Enter and Mod-Enter send when the composer is focused.
+Shift+Enter inserts a newline. Preserve CodeMirror's separate Mod-Enter Run behavior.
 
 Use semantic card/background/muted/foreground/border tokens. Tutor Markdown is 14px
 with 1.65 line height; fenced code is Menlo 12px, 12px padding, shared border/muted

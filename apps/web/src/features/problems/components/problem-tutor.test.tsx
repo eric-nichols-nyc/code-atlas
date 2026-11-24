@@ -25,7 +25,7 @@ it("renders model Markdown without raw HTML, images, unsafe links or executable 
     "noopener noreferrer",
   );
 });
-it("keeps Enter for multiline input, sends on Mod-Enter and retains a failed question for explicit retry", async () => {
+it("sends on Enter, preserves multiline input and text composition, and keeps failed questions for retry", async () => {
   const fetch = vi.fn(async () =>
     Response.json(
       { error: "AI tutor is not configured. Your code and question are kept." },
@@ -42,10 +42,15 @@ it("keeps Enter for multiline input, sends on Mod-Enter and retains a failed que
   );
   const question = screen.getByRole("textbox", { name: "Your question" });
   expect(screen.getByRole("button", { name: "Send question" })).toBeDisabled();
-  fireEvent.change(question, { target: { value: "I'm stuck\non this line" } });
   fireEvent.keyDown(question, { key: "Enter" });
+  expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+  fireEvent.change(question, { target: { value: "I'm stuck\non this line" } });
+  expect(fireEvent.keyDown(question, { key: "Enter", shiftKey: true })).toBe(
+    true,
+  );
+  fireEvent.keyDown(question, { key: "Enter", isComposing: true });
   expect(fetch).not.toHaveBeenCalled();
-  fireEvent.keyDown(question, { key: "Enter", ctrlKey: true });
+  fireEvent.keyDown(question, { key: "Enter" });
   await waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
   expect(await screen.findByRole("alert")).toHaveTextContent("not configured");
   expect(screen.getByText("I'm stuck on this line")).toBeVisible();

@@ -183,7 +183,7 @@ test("authenticated tutor input validation works through the production endpoint
   expect(unknown.status()).toBe(404);
 });
 
-test("composer and CodeMirror keep their separate Mod-Enter actions", async ({
+test("Enter sends a tutor question and CodeMirror keeps its Mod-Enter action", async ({
   page,
 }) => {
   let runs = 0;
@@ -220,10 +220,14 @@ test("composer and CodeMirror keep their separate Mod-Enter actions", async ({
     .getByRole("button", { name: "Show AI tutor", exact: true })
     .click();
   await question(page).fill("Explain this code");
-  await question(page).press("Enter");
+  await question(page).press("Shift+Enter");
+  await expect(question(page)).toHaveValue("Explain this code\n");
   expect(questions).toBe(0);
-  await question(page).press("ControlOrMeta+Enter");
+  await question(page).press("Enter");
   await expect(page.getByText("Keyboard hint.")).toBeVisible();
   expect(questions).toBe(1);
+  await question(page).fill("What should I try next?");
+  await question(page).press("ControlOrMeta+Enter");
+  await expect.poll(() => questions).toBe(2);
   expect(runs).toBe(1);
 });
