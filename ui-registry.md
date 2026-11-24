@@ -730,6 +730,20 @@ references, and result synchronized with the selected snapshot. Announce one pol
 atomic explanation per step. No autoplay or motion is needed. Each instance owns
 visit-only state that survives theme/width changes and resets on remount/reload.
 
+## Full-width walkthrough player
+
+Files: `features/learning/components/walkthrough-player-header.tsx`,
+`walkthrough-player.module.css`, `use-walkthrough-playback.ts`,
+`walkthrough-theory.module.css`, `walkthrough-source.tsx`, and `step-controls.tsx`.
+
+Share the title, compact playback controls, step slider, source renderer,
+panel titles, and full-width theory sections. Each module provides its own
+panels and snapshots. Playback starts paused. Manual navigation pauses
+playback and restores the selected snapshot. Keep focus when timed playback
+reaches the final step. Theme and width changes preserve the selected step.
+The Theory link goes to the first section with room for the sticky header
+and keyboard focus. Limit paragraph line length inside the wider panels.
+
 ## Event loop visualizer
 
 Files: `features/learning/components/event-loop-visualization*.tsx`,
@@ -746,9 +760,6 @@ only during playback and keep it stationary with reduced motion. Place Easy
 and Complex in the Input Script header with pressed state and visible focus.
 Switching presets replaces source, playback, and prediction together. Retain
 local source scrolling and the stacked fallback at narrow widths.
-Playback starts paused. Manual navigation pauses playback and restores the selected
-frame, including the console. Keep focus when timed playback reaches the last
-step. Theme and width changes preserve the selected frame.
 
 Link from the header to the full-width prediction pane. Use a numbered list of
 draggable rows with a grip and an insertion line between rows. Each row
@@ -758,10 +769,14 @@ region. Check prediction reveals the final console order below the guess.
 Report matching positions in text. Reordering updates the revealed comparison,
 and Reset order applies to the prediction only.
 
-Place Event Loop theory below the viewport-height desktop visualizer. Align
-the five themed panels with the visualizer edges and limit paragraph line
-length inside them. The Theory link goes to the first section with room for
-the sticky header and keyboard focus.
+## Heap & Stack visualizer
+
+Place Input Script, Call Stack, and the Heap/Console Output column side by side
+on desktop and in reading order at narrow widths. Show the top frame first and
+label it Top. Give references a literal object ID that matches the heap card.
+Display the reference count for the tracked allocation and label it Eligible for
+collection once the last reference goes away. Put one polite step explanation
+below the toolbar and keep it visible when the snapshot panels are stacked.
 
 ## Route and navigation loading
 

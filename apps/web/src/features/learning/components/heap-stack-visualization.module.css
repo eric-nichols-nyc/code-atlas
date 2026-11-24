@@ -1,0 +1,145 @@
+.stack,
+.memory {
+  min-width: 0;
+  border-top: 1px solid var(--workbench-divider);
+}
+
+.stack {
+  --lane-color: var(--workbench-stack);
+}
+
+.memory {
+  display: flex;
+  flex-direction: column;
+}
+
+.heap {
+  --lane-color: color-mix(in oklab, #9b69d9 62%, var(--foreground));
+  flex: 1 0 auto;
+}
+
+.console {
+  min-height: 120px;
+  flex: 1 0 auto;
+  border-top: 1px solid var(--workbench-divider);
+  background: var(--background);
+}
+
+.body {
+  padding: 12px;
+}
+
+.cards,
+.logs {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.card {
+  display: grid;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid
+    color-mix(in oklab, var(--lane-color) 26%, var(--workbench-divider));
+  border-radius: 6px;
+  background: color-mix(in oklab, var(--lane-color) 8%, var(--card));
+}
+
+.cardHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 10px;
+}
+
+.cardHeader h3 {
+  margin: 0;
+  font-family: Menlo, monospace;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.cardHeader small {
+  color: var(--workbench-muted);
+  font-size: 12px;
+}
+
+.bindings {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding-top: 7px;
+  border-top: 1px solid var(--workbench-divider);
+}
+
+.bindings > div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 2px 8px;
+}
+
+.bindings dd {
+  margin: 0;
+}
+
+.bindings,
+.logs {
+  font-family: Menlo, monospace;
+  font-size: 12px;
+  line-height: 19px;
+  overflow-wrap: anywhere;
+}
+
+.reference {
+  padding: 2px 5px;
+  border: 1px solid var(--workbench-divider);
+  border-radius: 4px;
+  background: var(--workbench-row);
+}
+
+.empty {
+  margin: 0;
+  color: var(--workbench-muted);
+  font-size: 12px;
+  line-height: 19px;
+}
+
+.explanation {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 5px 12px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--workbench-divider);
+  background: var(--muted);
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.explanation span {
+  color: var(--workbench-muted);
+  font-variant-numeric: tabular-nums;
+  font-weight: 650;
+}
+
+.explanation p {
+  margin: 0;
+}
+
+@container (min-width: 900px) {
+  .board {
+    --workbench-columns: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .stack,
+  .memory {
+    border-top: 0;
+    border-left: 1px solid var(--workbench-divider);
+  }
+}
