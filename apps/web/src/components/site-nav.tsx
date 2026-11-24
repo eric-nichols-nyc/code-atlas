@@ -12,6 +12,7 @@ import {
   ArrowLeftIcon,
   BookOpenIcon,
   CodeXmlIcon,
+  FlaskConicalIcon,
   LayoutDashboardIcon,
   LoaderCircleIcon,
   WorkflowIcon,
@@ -70,6 +71,7 @@ const DashboardIcon = withNavigationStatus(LayoutDashboardIcon, "Dashboard");
 const BackIcon = withNavigationStatus(ArrowLeftIcon, "Dashboard");
 const LearnIcon = withNavigationStatus(BookOpenIcon, "Learn");
 const PracticeIcon = withNavigationStatus(CodeXmlIcon, "Practice");
+const PlaygroundIcon = withNavigationStatus(FlaskConicalIcon, "Playground");
 const subjectIdentity = {
   javascript: { label: "JavaScript", icon: JavaScriptIcon, className: "" },
   react: { label: "React", icon: ReactIcon, className: "" },
@@ -108,6 +110,14 @@ function subjectItems(
       icon: PracticeIcon,
       appearance: "text",
     });
+  if (subject === "javascript")
+    sections.push({
+      id: "playground",
+      label: "Playground",
+      href: "/javascript/playground",
+      icon: PlaygroundIcon,
+      appearance: "text",
+    });
   return sections;
 }
 const allSectionItems = [
@@ -119,7 +129,17 @@ function NavLink(props: GlobalNavLinkProps) {
   const label = [...items, ...allSectionItems].find(
     (item) => item.href === props.href,
   )?.label;
-  return <Link {...props} aria-label={props["aria-label"] ?? label} />;
+  return (
+    <Link
+      {...props}
+      aria-label={props["aria-label"] ?? label}
+      className={cn(
+        props.className,
+        props.href === "/javascript/playground" &&
+          "aria-[current=page]:bg-accent",
+      )}
+    />
+  );
 }
 
 export function SiteNav({ authConfigured }: { authConfigured: boolean }) {
@@ -184,7 +204,11 @@ export function SiteNav({ authConfigured }: { authConfigured: boolean }) {
       itemsAlign={subject ? "center" : "start"}
       mobileSections={Boolean(subject)}
       activeItemId={activeItem?.id}
-      containerClassName="max-w-none"
+      containerClassName={cn(
+        "max-w-none",
+        subject === "javascript" &&
+          "max-sm:[&_[data-slot=global-nav-links]_a]:gap-1 max-sm:[&_[data-slot=global-nav-links]_a]:px-1.5 max-[380px]:[&_[data-slot=global-nav-links]_a]:text-xs max-[380px]:[&_[data-slot=global-nav-links]_a_svg]:size-3",
+      )}
       linkComponent={NavLink}
       actions={<NavAuth configured={authConfigured} />}
       utilities={<ThemeSwitcher />}

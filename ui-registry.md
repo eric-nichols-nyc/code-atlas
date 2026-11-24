@@ -278,7 +278,7 @@ use their existing subject-local Back link. Other app routes retain the compass
 and Code Atlas brand. Keep route/topic/auth decisions outside the shared UI
 package. The page body does not duplicate section links.
 
-JavaScript owns `/javascript/practice` and `/javascript/learn`; `/javascript` opens Practice.
+JavaScript owns Practice, Learn and Playground. `/javascript` opens Practice.
 Practice lists coding problems only; problem rows open canonical
 `/javascript/practice/<problem>` links. Learn lists module previews; individual lesson design remains unspecified. Page and workspace
 breadcrumbs are removed; the Back link returns to Practice.
@@ -292,6 +292,28 @@ Dashboard resets the disclosure. Topic names remain visible alongside icons;
 color and symbols alone never identify the current subject. The theme-aware
 React mark uses darker cyan on Light; Algorithms uses violet/lavender across the
 three themes. The yellow JS tile retains its dark monogram in every theme.
+
+### JavaScript Playground
+
+`/javascript/playground` keeps the subject navigation, with Playground beside
+Practice. Keep all three JavaScript links on one row at 320px using compact
+spacing and icons. The current Playground link uses the accent fill.
+
+Use the shared bordered learning panels with muted headers. The editor occupies
+three fifths of the desktop workspace and the console takes two fifths. Both
+panels fill the remaining viewport height and scroll internally on desktop.
+Stack the editor above the console below the medium breakpoint and give the
+editor at least 320px of height. Use **script.js** and
+a primary **Run** action in the editor header. Show the execution status beside
+**Console** and an amber notice above output from an earlier snapshot. Keep
+code overflow inside its panel and use a visit-only draft notice under the
+**Playground** heading.
+
+An **AI tutor** button beside the heading toggles the existing Practice chat.
+At 1280px and wider it opens a 320px panel to the right of the console. At
+narrower widths use the shared right Sheet and restore focus to the trigger
+on close. Keep chat state above both layouts. The composer describes when
+current code and a matching Run error accompany a question.
 
 ## Practice catalog categories
 

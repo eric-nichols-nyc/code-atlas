@@ -93,6 +93,20 @@ it("offers React Learn and development Practice and hides navigation in its work
   expect(screen.queryByRole("navigation")).toBeNull();
 });
 
+it("offers Playground only in JavaScript and marks its route current", () => {
+  state.path = "/javascript/practice";
+  const view = render(<SiteNav authConfigured={false} />);
+  const link = () => screen.getByRole("link", { name: "Playground" });
+  expect(link()).toHaveAttribute("href", "/javascript/playground");
+  expect(link()).not.toHaveAttribute("aria-current");
+  state.path = "/javascript/playground";
+  view.rerender(<SiteNav authConfigured={false} />);
+  expect(link()).toHaveAttribute("aria-current", "page");
+  state.path = "/algorithms/practice";
+  view.rerender(<SiteNav authConfigured={false} />);
+  expect(screen.queryByRole("link", { name: "Playground" })).toBeNull();
+});
+
 it("keeps React Learn active and omits Practice in production, including mobile navigation", () => {
   vi.stubEnv("NODE_ENV", "production");
   state.path = "/react/learn/use-effect-lifecycle";

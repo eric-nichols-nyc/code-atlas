@@ -2,6 +2,13 @@ import { fileURLToPath } from "node:url";
 import createMDX from "@next/mdx";
 import type { NextConfig } from "next";
 
+const quickJsAssets = [
+  "./node_modules/quickjs-emscripten/**/*",
+  "../../node_modules/.pnpm/quickjs-emscripten@*/**/*",
+  "../../node_modules/.pnpm/quickjs-emscripten-core@*/**/*",
+  "../../node_modules/.pnpm/@jitl+quickjs*/**/*",
+];
+
 const nextConfig: NextConfig = {
   distDir: process.env.CODE_ATLAS_DIST_DIR ?? ".next",
   pageExtensions: ["ts", "tsx", "md", "mdx"],
@@ -13,10 +20,13 @@ const nextConfig: NextConfig = {
       "./src/content/javascript/practice/*/problem.mdx",
       "./src/content/algorithms/practice/*/problem.mdx",
       "./.workers/**/*",
-      "./node_modules/quickjs-emscripten/**/*",
-      "../../node_modules/.pnpm/quickjs-emscripten@*/**/*",
-      "../../node_modules/.pnpm/quickjs-emscripten-core@*/**/*",
-      "../../node_modules/.pnpm/@jitl+quickjs*/**/*",
+      ...quickJsAssets,
+    ],
+    "/api/javascript/playground/run": [
+      "./.workers/script-worker.js",
+      "./.workers/javascript-guest.js",
+      "./.workers/console-harness.js",
+      ...quickJsAssets,
     ],
   },
   async redirects() {

@@ -1,5 +1,4 @@
 import { performance } from "node:perf_hooks";
-import { threadCpuUsage } from "node:process";
 import { parentPort, workerData } from "node:worker_threads";
 import type {
   CaseResult,
@@ -19,7 +18,7 @@ import {
   judgeCatalogAlgorithm,
 } from "./adapters/catalog-algorithm.js";
 import type { CatalogAlgorithmTarget } from "./catalog-algorithms/types.js";
-import { consoleHarness } from "./console-harness.js";
+import { createJavaScriptGuest } from "./javascript-guest.js";
 
 const curryAdapterPath = import.meta.url.endsWith(".ts")
   ? "./adapters/curry.ts"
@@ -146,48 +145,15 @@ interface Work {
 const work = workerData as Work;
 const QuickJS = await getQuickJS();
 
-function threadCpuMilliseconds(start: ReturnType<typeof threadCpuUsage>) {
-  const { user, system } = threadCpuUsage(start);
-  return (user + system) / 1000;
-}
-
 async function runCase(test: Work["cases"][number]): Promise<CaseResult> {
-  const rt = QuickJS.newRuntime();
-  rt.setMemoryLimit(16 * 1024 * 1024);
-  rt.setMaxStackSize(256 * 1024);
-  const entryCpuBudgetMs = test.catalogTarget?.entryCpuBudgetMs ?? 100;
-  let entryStart: ReturnType<typeof threadCpuUsage> | undefined;
-  let cpu = 0;
-  let interrupted = false;
-  let closed = false;
-  let registrations = 0;
-  let jobs = 0;
-  let fatal: Verdict | null = null;
   const virtual =
     work.problemId === "javascript.debounce" ||
     work.problemId === "javascript.delay-the-resolution-of-each-promise";
-  let virtualNow = 0;
-  rt.setInterruptHandler(() => {
-    const entryCpu = entryStart ? threadCpuMilliseconds(entryStart) : 0;
-    if (entryCpu > entryCpuBudgetMs || cpu + entryCpu > 250) {
-      interrupted = true;
-      return true;
-    }
-    return false;
+  const sandbox = createJavaScriptGuest(QuickJS, {
+    entryCpuBudgetMs: test.catalogTarget?.entryCpuBudgetMs,
+    virtual,
   });
-  const ctx = rt.newContext();
-  const timers = new Map<
-    number,
-    {
-      timer?: ReturnType<typeof setTimeout>;
-      due: number;
-      callback: QuickJSHandle;
-      args: QuickJSHandle[];
-    }
-  >();
-  const logs: string[] = [];
-  let logChars = 0;
-  let truncated = false;
+  const { ctx, enter, errorText, advanceVirtual, exceeded, logs } = sandbox;
   let fn: QuickJSHandle | undefined;
   let arrayCheck: QuickJSHandle | undefined;
   let generatorCheck: QuickJSHandle | undefined;
@@ -196,32 +162,6 @@ async function runCase(test: Work["cases"][number]): Promise<CaseResult> {
   let flattenCheck: QuickJSHandle | undefined;
   let additionalCheck: QuickJSHandle | undefined;
   let promise: QuickJSHandle | undefined;
-  const enter = <T>(call: () => T): T => {
-    const start = threadCpuUsage();
-    entryStart = start;
-    try {
-      return call();
-    } finally {
-      cpu += threadCpuMilliseconds(start);
-      entryStart = undefined;
-    }
-  };
-  const errorText = (error: QuickJSHandle) => {
-    try {
-      return enter(() => {
-        const message = ctx.getProp(error, "message");
-        try {
-          return ctx.typeof(message) === "string"
-            ? ctx.getString(message).slice(0, 300)
-            : "JavaScript threw an error.";
-        } finally {
-          message.dispose();
-        }
-      });
-    } catch {
-      return "JavaScript execution failed.";
-    }
-  };
   const result = (
     verdict: Verdict,
     message: string,
@@ -237,140 +177,8 @@ async function runCase(test: Work["cases"][number]): Promise<CaseResult> {
       ? { input: test.input, elapsedMs, ...output, logs: [...logs] }
       : { logs: [] }),
   });
-  function removeTimer(id: number) {
-    const t = timers.get(id);
-    if (!t) return;
-    timers.delete(id);
-    if (t.timer) clearTimeout(t.timer);
-    t.callback.dispose();
-    for (const a of t.args) a.dispose();
-  }
-  function fireTimer(id: number) {
-    const item = timers.get(id);
-    if (!item || closed) return;
-    timers.delete(id);
-    try {
-      const result = enter(() =>
-        ctx.callFunction(item.callback, ctx.undefined, item.args),
-      );
-      if (result.error)
-        fatal = interrupted ? "time-limit-exceeded" : "runtime-error";
-      result.dispose();
-    } catch {
-      fatal = interrupted ? "time-limit-exceeded" : "runtime-error";
-    } finally {
-      item.callback.dispose();
-      item.args.forEach((arg) => {
-        arg.dispose();
-      });
-    }
-  }
-  function drainJobs() {
-    while (!fatal) {
-      const result = enter(() => rt.executePendingJobs(32));
-      try {
-        if (result.error) {
-          fatal = interrupted ? "time-limit-exceeded" : "runtime-error";
-          break;
-        }
-        jobs += result.value ?? 0;
-        if (jobs > 4096 || cpu > 250) {
-          fatal = "time-limit-exceeded";
-          break;
-        }
-        if ((result.value ?? 0) < 32) break;
-      } finally {
-        result.dispose();
-      }
-    }
-  }
-  function advanceVirtual(target: number, inclusive = true): Verdict | null {
-    drainJobs();
-    while (!fatal) {
-      const next = [...timers.entries()]
-        .filter(([, timer]) =>
-          inclusive ? timer.due <= target : timer.due < target,
-        )
-        .sort((a, b) => a[1].due - b[1].due || a[0] - b[0])[0];
-      if (!next) break;
-      virtualNow = next[1].due;
-      fireTimer(next[0]);
-      drainJobs();
-    }
-    if (Number.isFinite(target)) virtualNow = target;
-    return fatal;
-  }
-  const setTimeoutBridge = ctx.newFunction(
-    "setTimeout",
-    (callback, delay, ...args) => {
-      if (closed || ctx.typeof(callback) !== "function")
-        throw new Error("setTimeout needs a function callback.");
-      const ms = delay ? ctx.getNumber(delay) : 0;
-      if (!Number.isFinite(ms) || ms < 0 || ms > 5000)
-        throw new Error("Timer delay must be between 0 and 5000ms.");
-      if (++registrations > 128 || timers.size >= 32)
-        throw new Error("Timer limit exceeded.");
-      const id = registrations;
-      const item: {
-        callback: QuickJSHandle;
-        args: QuickJSHandle[];
-        due: number;
-        timer?: ReturnType<typeof setTimeout>;
-      } = {
-        callback: callback.dup(),
-        args: args.slice(0, 10).map((arg) => arg.dup()),
-        due: virtualNow + ms,
-      };
-      timers.set(id, item);
-      if (!virtual) item.timer = setTimeout(() => fireTimer(id), ms);
-      return ctx.newNumber(id);
-    },
-  );
-  ctx.setProp(ctx.global, "setTimeout", setTimeoutBridge);
-  setTimeoutBridge.dispose();
-  const clearTimeoutBridge = ctx.newFunction("clearTimeout", (id) => {
-    removeTimer(ctx.getNumber(id));
-    return ctx.undefined;
-  });
-  ctx.setProp(ctx.global, "clearTimeout", clearTimeoutBridge);
-  clearTimeoutBridge.dispose();
-  const consoleObject = ctx.newObject();
-  for (const level of ["log", "warn", "error"]) {
-    const method = ctx.newFunction(level, (...args) => {
-      if (logs.length >= 40 || logChars >= 8192) {
-        if (!truncated) {
-          logs.push("Console output truncated.");
-          truncated = true;
-        }
-        return ctx.undefined;
-      }
-      const text = args
-        .slice(0, 8)
-        .map((a) => {
-          const type = ctx.typeof(a);
-          return type === "string"
-            ? ctx.getString(a).slice(0, 512)
-            : type === "number"
-              ? String(ctx.getNumber(a))
-              : type === "undefined"
-                ? "undefined"
-                : type === "boolean"
-                  ? String(ctx.getNumber(a) !== 0)
-                  : "[object]";
-        })
-        .join(" ")
-        .slice(0, 1024);
-      logs.push(text);
-      logChars += text.length;
-      return ctx.undefined;
-    });
-    ctx.setProp(consoleObject, level, method);
-    method.dispose();
-  }
-  ctx.setProp(ctx.global, "console", consoleObject);
-  consoleObject.dispose();
   try {
-    const consoleSetup = enter(() => ctx.evalCode(consoleHarness));
+    const consoleSetup = sandbox.initializeConsole();
     try {
       if (consoleSetup.error)
         return result("runtime-error", "The console could not initialize.");
@@ -379,7 +187,9 @@ async function runCase(test: Work["cases"][number]): Promise<CaseResult> {
     }
     if (virtual) {
       const date = ctx.getProp(ctx.global, "Date");
-      const now = ctx.newFunction("now", () => ctx.newNumber(virtualNow));
+      const now = ctx.newFunction("now", () =>
+        ctx.newNumber(sandbox.virtualNow),
+      );
       ctx.setProp(date, "now", now);
       now.dispose();
       date.dispose();
@@ -472,8 +282,8 @@ async function runCase(test: Work["cases"][number]): Promise<CaseResult> {
       const message = errorText(compiled.error);
       compiled.dispose();
       return result(
-        interrupted ? "time-limit-exceeded" : "compile-error",
-        interrupted ? "Execution exceeded its CPU budget." : message,
+        sandbox.interrupted ? "time-limit-exceeded" : "compile-error",
+        sandbox.interrupted ? "Execution exceeded its CPU budget." : message,
       );
     }
     fn = compiled.value;
@@ -488,7 +298,7 @@ async function runCase(test: Work["cases"][number]): Promise<CaseResult> {
       isArray: arrayCheck,
       enter,
       errorText,
-      exceeded: () => interrupted || cpu > 250,
+      exceeded,
     };
     if (test.catalogTarget) {
       if (
@@ -655,7 +465,7 @@ async function runCase(test: Work["cases"][number]): Promise<CaseResult> {
         test.input,
         guest,
         {
-          now: () => virtualNow,
+          now: () => sandbox.virtualNow,
           advance: advanceVirtual,
         },
         promiseDelayCheck,
@@ -680,7 +490,7 @@ async function runCase(test: Work["cases"][number]): Promise<CaseResult> {
       )
         return result("runtime-error", "Invalid debounce input.");
       const outcome = judgeDebounce(test.input, guest, {
-        now: () => virtualNow,
+        now: () => sandbox.virtualNow,
         advance: advanceVirtual,
       });
       return result(outcome.verdict, outcome.message, undefined, outcome);
@@ -711,7 +521,7 @@ async function runCase(test: Work["cases"][number]): Promise<CaseResult> {
         const message = errorText(created.error);
         created.dispose();
         return result(
-          interrupted ? "time-limit-exceeded" : "runtime-error",
+          sandbox.interrupted ? "time-limit-exceeded" : "runtime-error",
           message,
         );
       }
@@ -734,7 +544,7 @@ async function runCase(test: Work["cases"][number]): Promise<CaseResult> {
             const message = errorText(second.error);
             second.dispose();
             return result(
-              interrupted ? "time-limit-exceeded" : "runtime-error",
+              sandbox.interrupted ? "time-limit-exceeded" : "runtime-error",
               message,
             );
           }
@@ -748,7 +558,7 @@ async function runCase(test: Work["cases"][number]): Promise<CaseResult> {
             const message = errorText(value.error);
             value.dispose();
             return result(
-              interrupted ? "time-limit-exceeded" : "runtime-error",
+              sandbox.interrupted ? "time-limit-exceeded" : "runtime-error",
               message,
               undefined,
               { expected },
@@ -780,7 +590,7 @@ async function runCase(test: Work["cases"][number]): Promise<CaseResult> {
               const message = errorText(next.error);
               next.dispose();
               return result(
-                interrupted ? "time-limit-exceeded" : "runtime-error",
+                sandbox.interrupted ? "time-limit-exceeded" : "runtime-error",
                 message,
               );
             }
@@ -794,7 +604,7 @@ async function runCase(test: Work["cases"][number]): Promise<CaseResult> {
                 "Counters must keep independent state.",
               );
           }
-          if (interrupted || cpu > 250)
+          if (exceeded())
             return result(
               "time-limit-exceeded",
               "Execution exceeded its CPU budget.",
@@ -824,19 +634,19 @@ async function runCase(test: Work["cases"][number]): Promise<CaseResult> {
       const message = errorText(called.error);
       called.dispose();
       return result(
-        interrupted ? "time-limit-exceeded" : "runtime-error",
-        interrupted ? "Execution exceeded its CPU budget." : message,
+        sandbox.interrupted ? "time-limit-exceeded" : "runtime-error",
+        sandbox.interrupted ? "Execution exceeded its CPU budget." : message,
       );
     }
     promise = called.value;
     let first = true;
     while (true) {
-      if (fatal)
+      if (sandbox.fatal)
         return result(
-          fatal,
+          sandbox.fatal,
           "A timer callback failed or exceeded its execution budget.",
         );
-      if (interrupted || cpu > 250 || jobs > 4096)
+      if (exceeded() || sandbox.jobLimitReached)
         return result(
           "time-limit-exceeded",
           "Execution exceeded its CPU or microtask budget.",
@@ -876,19 +686,18 @@ async function runCase(test: Work["cases"][number]): Promise<CaseResult> {
         const message = errorText(state.error);
         state.error.dispose();
         return result(
-          interrupted ? "time-limit-exceeded" : "runtime-error",
+          sandbox.interrupted ? "time-limit-exceeded" : "runtime-error",
           message,
         );
       }
       first = false;
-      const pending = enter(() => rt.executePendingJobs(32));
+      const pending = sandbox.executePendingJobs();
       try {
         if (pending.error)
           return result(
-            interrupted ? "time-limit-exceeded" : "runtime-error",
+            sandbox.interrupted ? "time-limit-exceeded" : "runtime-error",
             errorText(pending.error),
           );
-        jobs += pending.value ?? 0;
       } finally {
         pending.dispose();
       }
@@ -896,12 +705,10 @@ async function runCase(test: Work["cases"][number]): Promise<CaseResult> {
     }
   } catch {
     return result(
-      interrupted ? "time-limit-exceeded" : "runtime-error",
+      sandbox.interrupted ? "time-limit-exceeded" : "runtime-error",
       "Execution stopped after a resource limit or JavaScript error.",
     );
   } finally {
-    closed = true;
-    for (const id of [...timers.keys()]) removeTimer(id);
     promise?.dispose();
     arrayCheck?.dispose();
     generatorCheck?.dispose();
@@ -910,8 +717,7 @@ async function runCase(test: Work["cases"][number]): Promise<CaseResult> {
     flattenCheck?.dispose();
     additionalCheck?.dispose();
     fn?.dispose();
-    ctx.dispose();
-    rt.dispose();
+    sandbox.dispose();
   }
 }
 const results: CaseResult[] = [];
@@ -924,7 +730,7 @@ try {
     results.push(item);
     if (!item.passed) break;
   }
-  parentPort?.postMessage({ cases: results });
+  parentPort?.postMessage({ result: results });
 } catch {
   parentPort?.postMessage({ error: "Execution could not complete safely." });
 }
