@@ -2,11 +2,9 @@
 
 **Know the concept. Write the code.**
 
-Code Atlas helps developers practice JavaScript and Algorithms through hands-on coding challenges,
-real execution feedback, and progress that follows their account. JavaScript practice
-is available now, alongside a Two Pointers learning module preview with a six-step
-guided code walkthrough and an array visualization of the sample run. Individual
-lessons and additional subjects are planned.
+Practice JavaScript and Algorithms with hands-on challenges, real execution feedback, and
+account-backed progress. Run your own scripts in JavaScript Playground or follow guided
+walkthroughs in JavaScript, Algorithms, and React Learn.
 
 Built with Next.js, Electron, React, TypeScript, CodeMirror, QuickJS, Neon Auth, Neon PostgreSQL,
 Prisma, and Turborepo.
@@ -15,14 +13,15 @@ Prisma, and Turborepo.
 
 The coding workspace brings the problem, editor, and test cases together in resizable panels.
 
-![Fibonacci Generator workspace with a JavaScript editor, Run and Submit controls, and editable test cases](docs/images/coding-workspace.jpg)
+![Fibonacci Generator workspace with a JavaScript editor, editable test cases, and the AI tutor](docs/images/coding-workspace.jpg)
 
 <details>
 <summary>View the practice catalog and landing page</summary>
 
-Browse JavaScript and Algorithms challenges by topic, search, or difficulty, with account-backed flags and solved status.
+Browse JavaScript and Algorithms challenges by category, search, and difficulty. Sort by
+difficulty or category, flag problems, and track which ones you've solved.
 
-![JavaScript practice catalog with categories, difficulty filtering, search, and progress indicators](docs/images/practice-catalog.jpg)
+![JavaScript Practice with categories, difficulty filtering, sorting, search, and progress indicators](docs/images/practice-catalog.jpg)
 
 The public landing page includes a Counter example that works without an account.
 
@@ -45,43 +44,30 @@ server-side JavaScript environment against the full test suite, including privat
 cases. You'll receive a verdict and feedback to guide your next attempt. Only an
 accepted Submit marks the problem solved.
 
-Your latest executed code is saved to your account after Run or Submit, regardless
-of the verdict. Your flags and solved progress stay with your account too, so you
-can pick up where you left off, even on another device.
-
-The idea is to make learning more hands-on: **read the problem, experiment, get
-feedback, and improve.**
+Your account stores the latest code you ran or submitted, along with problem flags and
+solved status. You can pick up where you left off on another device.
 
 ## What works today
 
-- **Learning preview:** Browse JavaScript, Algorithms, or React Learn with category,
-  search, and difficulty filters. Two Pointers introduces array strategies; React's
-  Hooks section starts with useEffect lifecycle and a six-step timer explanation.
-  These authored examples do not execute code or save learning progress.
-- **Focused practice:** CodeMirror JavaScript editor, resizable panels, hints and solutions,
-  plus light, dark, and system themes.
-- **Practice timer:** A toolbar stopwatch and configurable countdown with pause,
-  resume, reset, and collapsed controls. Timing lasts for the current problem visit.
-- **Real evaluation:** Run editable visible cases, then Submit against a server-selected
-  suite that includes private cases. Only an accepted Submit marks a problem solved.
-- **Persistent progress:** Flag problems and restore the latest code saved after Run or
-  Submit, regardless of verdict. Unsaved editor changes remain in memory.
-- **Context-aware AI tutor:** Ask for hints using your current unsaved code and the problem
-  context. Requests happen only when you send a question; chat lasts for this visit.
-- **AI code evaluation:** Select Evaluate beside Run and Submit for a scored review of
-  correctness, efficiency, code quality and edge cases in a dedicated Feedback tab.
-  Reports review the captured code without executing it and last for this visit.
-- **React development pilot:** In development, explore React from Dashboard and select Practice for a
-  Stale Closure Counter exercise with a TypeScript/JSX editor, Submit-based browser
-  preview, console and the existing tutor. Drafts/chat are visit-only. The pilot is
-  unavailable in production; see [its scope and execution limits](docs/features/react-sandbox.md).
-- **Private problem notes:** Write formatted takeaways, lists, code blocks, and links in
-  Notes, then select Save to keep them with your account. Unsaved notes last only until
-  leaving or reloading the problem.
-- **Account ownership:** Neon Auth handles authentication; Prisma and Neon store each learner's
-  progress behind authenticated Next.js APIs.
-- **Isolated execution:** QuickJS WebAssembly runs in disposable Node.js Workers with
-  resource limits. Learner code has no application filesystem, Node module, or network access.
+- **Learn** has searchable, filterable module previews. Two Pointers walks through array
+  strategies with a visualization in JavaScript and Algorithms. React's Hooks section
+  covers the `useEffect` lifecycle with a six-step timer walkthrough.
+- **Practice** includes a CodeMirror editor, resizable panels, hints, solutions, and a
+  stopwatch or countdown for the current problem visit. Light, dark, and system themes
+  are available.
+- **JavaScript Playground** runs a standalone script and shows console output, errors,
+  and time limits. The draft, output, and tutor chat last for the current visit. See the
+  [Playground guide](docs/features/javascript-playground.md).
+- **AI Tutor** uses your current unsaved code and the workspace context. Press Enter to
+  send or Shift+Enter for a new line. The conversation lasts for the current visit.
+- **Evaluate** provides a scored review of correctness, efficiency, code quality, and edge
+  cases in the Feedback tab. It reviews a snapshot without executing it. Feedback lasts
+  for the current visit.
+- **Notes** stores private, formatted takeaways with your account when you select Save.
+  Unsaved notes last until you leave or reload the problem.
+- **React Practice** is a development-only pilot. The Stale Closure Counter exercise has a
+  TypeScript/JSX editor, a browser preview updated by Submit, a console, and the tutor.
+  See the [React pilot scope and execution limits](docs/features/react-sandbox.md).
 
 ### Available challenges
 
@@ -135,8 +121,9 @@ pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-Open <http://localhost:3000>. The public landing page runs without credentials.
-Signing in and using Run/Submit require Neon Auth; saving progress also requires Neon.
+Open <http://localhost:3000>. Use `localhost` for local sign-in. The public landing page and
+its Counter example run without credentials. Learn, Practice, and Playground require a
+Neon Auth session. Account saves also require a Neon database connection.
 
 ### Enable accounts and saved progress
 
@@ -161,13 +148,20 @@ pnpm db:deploy
 ```
 
 Restart the development server after environment changes. Installation and production
-builds work without database credentials. See the [development guide](docs/development.md#environment-and-authentication)
-for auth behavior, connection details, and troubleshooting.
+builds work without database credentials. See the [development guide for auth behavior,
+connection details, and troubleshooting](docs/development.md#environment-and-authentication).
+
+### Enable the AI Tutor and Evaluate
+
+Set `OPENAI_API_KEY` and `OPENAI_TUTOR_MODEL` in `apps/web/.env.local`. Evaluate uses
+the tutor model by default. Set `OPENAI_EVALUATION_MODEL` to use a separate model.
+See the [AI setup guide](docs/development.md#ai-capabilities).
 
 ## System architecture
 
-The browser and Electron client use one Next.js application serving pages and same-origin API Route Handlers. Privileged services
-stay on the server, and learner code runs in an isolated QuickJS worker.
+The browser and Electron client use one Next.js application. Protected pages and API routes
+verify Neon Auth sessions. Practice and Playground run code in disposable Node.js workers
+using QuickJS WebAssembly, with no access to the host filesystem, Node modules, or network.
 
 ```mermaid
 %%{init: {"look": "classic", "fontFamily": "Arial", "themeVariables": {"fontFamily": "Arial, sans-serif", "fontSize": "14px"}, "flowchart": {"nodeSpacing": 18, "rankSpacing": 30, "curve": "linear", "padding": 12, "wrappingWidth": 220}}}%%
@@ -177,16 +171,19 @@ flowchart LR
 
     subgraph Next["Next.js application"]
         Routes["Pages + API routes<br/>Neon Auth + input validation"]
-        Judge["Code execution<br/>Private tests + QuickJS"]
-        Progress["Account progress<br/>Flags · solved · last code"]
+        Judge["Code execution<br/>Practice and Playground"]
+        Progress["Account data<br/>Progress, code, and notes"]
+        AI["AI Tutor and Evaluate"]
 
         Routes --> Judge
         Routes --> Progress
+        Routes --> AI
     end
 
     Browser --> Routes
     Auth -.-> Routes
     Progress --> Neon[("Neon Postgres<br/>Prisma")]
+    AI --> OpenAI["OpenAI API"]
 
     style Next fill:transparent,stroke:#94a3b8,stroke-width:1px,font-family:Arial
     classDef default font-family:Arial
@@ -194,12 +191,11 @@ flowchart LR
     classDef app fill:#eff6ff,stroke:#60a5fa,color:#1e3a5f
     classDef data fill:#fffbeb,stroke:#d4a72c,color:#713f12
     class Browser,Auth client
-    class Routes,Judge,Progress app
-    class Neon data
+    class Routes,Judge,Progress,AI app
+    class Neon,OpenAI data
 ```
 
-Protected pages and APIs verify Neon Auth identity. Problem content stays in source files;
-Neon stores flags, verified solved status, and the latest executed code.
+Problem definitions and private test suites live in the repo. Neon stores account data.
 
 ## Desktop app
 
@@ -209,9 +205,9 @@ Run Code Atlas in its own desktop window:
 pnpm desktop:dev
 ```
 
-This starts the local web server when needed and opens Electron. Accounts, Run/Submit,
-and progress use the same backend as the website. Desktop has its own sign-in session;
-use email and password. Google sign-in is available in the browser version.
+This starts the local web server when needed and opens Electron. The desktop app uses the
+same backend as the website, with a separate email-and-password sign-in session. Google
+sign-in is available in the browser version.
 
 `pnpm desktop:package:local` creates an unsigned Mac app in `apps/desktop/release/`.
 Keep `pnpm dev` running when opening that local app. For other computers, package with
@@ -233,11 +229,11 @@ requests targeting `main` and pushes to `main`. Biome handles linting and format
 Vitest covers unit and integration behavior.
 
 `pnpm test:e2e` runs the production Playwright smoke suite after a credential-free
-build, with port 3000 available. Optional authenticated browser and Electron checks require a dedicated
-Neon Auth development test user. `pnpm test:e2e:desktop:auth` checks Run/Submit and saved
-progress after fully quitting and reopening Electron against the production server.
-See [verification instructions](docs/development.md#verification)
-and the [full command list](docs/development.md#commands).
+build. It uses port 3000 by default. Set `PLAYWRIGHT_PORT` to use another free port.
+Optional authenticated suites use a dedicated Neon Auth development test user. Run
+`pnpm test:e2e:auth` for browser checks or `pnpm test:e2e:desktop:auth` to check
+Run/Submit and progress after restarting Electron. See the [verification instructions](docs/development.md#verification)
+and [full command list](docs/development.md#commands).
 
 Use `pnpm analyze` for interactive Turbopack bundle inspection, or
 `pnpm analyze --output --snapshot baseline` to save a report without starting a
@@ -247,11 +243,8 @@ snapshots and graph exports. Analysis is separate from the normal build and CI.
 ## What's next
 
 Individual Learn lessons, additional JavaScript and Algorithms challenges, saved tutor history,
-note media embeds/uploads, submission history, and signed desktop distribution are planned.
-AI tutoring requires a server OpenAI key and model setting; see the [tutor setup](docs/development.md#ai-tutor). Hosted deployment is not yet configured.
-Evaluation reuses that configuration; `OPENAI_EVALUATION_MODEL` optionally selects a
-separate model. See [AI capabilities](docs/development.md#ai-capabilities) for shared
-infrastructure and the [evaluation brief](docs/features/code-evaluation.md) for scope.
+note media embeds and uploads, submission history, hosted deployment, and signed desktop
+distribution are planned.
 
 ## Documentation
 
