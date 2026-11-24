@@ -68,6 +68,7 @@ export function ProblemTutor({
 } = {}) {
   const s = useProblemTutor();
   const id = useId();
+  const canSend = !s.busy && Boolean(s.draft.trim());
   const latest = s.turns.at(-1);
   const status = s.busy
     ? latest?.status === "streaming"
@@ -175,7 +176,7 @@ export function ProblemTutor({
         className="flex shrink-0 flex-col gap-3 p-3"
         onSubmit={(event) => {
           event.preventDefault();
-          void s.send();
+          if (canSend) void s.send();
         }}
       >
         <FieldGroup className="gap-3">
@@ -184,6 +185,7 @@ export function ProblemTutor({
             <Textarea
               id={id}
               rows={3}
+              enterKeyHint="send"
               value={s.draft}
               onChange={(event) => s.setDraft(event.target.value)}
               aria-invalid={Boolean(s.error)}
@@ -193,12 +195,12 @@ export function ProblemTutor({
               onKeyDown={(event) => {
                 if (
                   event.key === "Enter" &&
-                  (event.metaKey || event.ctrlKey) &&
+                  !event.shiftKey &&
                   !event.nativeEvent.isComposing
                 ) {
                   event.preventDefault();
                   event.stopPropagation();
-                  void s.send();
+                  event.currentTarget.form?.requestSubmit();
                 }
               }}
             />
@@ -234,7 +236,7 @@ export function ProblemTutor({
               Stop reply
             </Button>
           ) : (
-            <Button type="submit" size="sm" disabled={!s.draft.trim()}>
+            <Button type="submit" size="sm" disabled={!canSend}>
               Send question
             </Button>
           )}
