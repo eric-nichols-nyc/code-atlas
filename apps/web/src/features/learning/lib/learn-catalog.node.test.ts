@@ -29,12 +29,7 @@ const entries: LearningModule[] = [
 
 describe("learning catalog", () => {
   it("counts published modules per view, without empty categories", () => {
-    expect(
-      learningCategories(entries, [
-        ...learningTopics,
-        { id: "async", label: "Async", variant: "rose" },
-      ]),
-    ).toEqual([
+    expect(learningCategories(entries, learningTopics)).toEqual([
       {
         id: "recommended",
         label: "Recommended",

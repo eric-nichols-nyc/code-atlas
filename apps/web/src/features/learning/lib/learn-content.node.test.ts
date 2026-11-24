@@ -3,6 +3,7 @@ import {
   javascriptLearningCatalog,
   learningTopics,
 } from "../../../content/javascript/learn/catalog";
+import { moduleOverviews } from "../../../content/javascript/learn/overviews";
 import { validateLearningContent } from "./learn-content";
 import type { LearningModule } from "./learn-types";
 
@@ -15,7 +16,9 @@ const validate = (
 
 describe("learning content validation", () => {
   it("accepts the authored catalog", async () => {
-    expect(await validate(javascriptLearningCatalog)).toEqual([]);
+    expect(
+      await validate(javascriptLearningCatalog, Object.keys(moduleOverviews)),
+    ).toEqual([]);
   });
   it("rejects duplicate identifiers, slugs and order", async () => {
     expect(await validate([sample, sample])).toEqual(

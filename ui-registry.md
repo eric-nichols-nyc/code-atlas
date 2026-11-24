@@ -730,6 +730,39 @@ references, and result synchronized with the selected snapshot. Announce one pol
 atomic explanation per step. No autoplay or motion is needed. Each instance owns
 visit-only state that survives theme/width changes and resets on remount/reload.
 
+## Event loop visualizer
+
+Files: `features/learning/components/event-loop-visualization*.tsx`,
+`event-loop-visualization.module.css`, `event-loop-output-prediction*`,
+`walkthrough-source.tsx`, and `step-controls.tsx`.
+
+Use the available desktop width and height. Place the title, compact playback
+controls, and step slider above three columns. Put Input Script on the left,
+Call Stack beside Web APIs and Event Loop above the two queues in the center,
+and Output Prediction above Actual Output on the right. Give each panel an icon
+and stronger header and row contrast using the shared themes. Announce the
+current step and explanation once below the Event Loop ring. Turn the ring
+only during playback and keep it stationary with reduced motion. Place Easy
+and Complex in the Input Script header with pressed state and visible focus.
+Switching presets replaces source, playback, and prediction together. Retain
+local source scrolling and the stacked fallback at narrow widths.
+Playback starts paused. Manual navigation pauses playback and restores the selected
+frame, including the console. Keep focus when timed playback reaches the last
+step. Theme and width changes preserve the selected frame.
+
+Link from the header to the full-width prediction pane. Use a numbered list of
+draggable rows with a grip and an insertion line between rows. Each row
+supports Space to pick up or drop, arrow keys to move, and Escape to cancel.
+Keep focus on the moved item and announce its new position in one polite status
+region. Check prediction reveals the final console order below the guess.
+Report matching positions in text. Reordering updates the revealed comparison,
+and Reset order applies to the prediction only.
+
+Place Event Loop theory below the viewport-height desktop visualizer. Align
+the five themed panels with the visualizer edges and limit paragraph line
+length inside them. The Theory link goes to the first section with room for
+the sticky header and keyboard focus.
+
 ## Route and navigation loading
 
 Files: `apps/web/src/components/route-loading.tsx`, `site-nav.tsx`, and the global,

@@ -15,6 +15,7 @@ import {
   javascriptLearningCatalog,
   learningTopics as javascriptTopics,
 } from "../src/content/javascript/learn/catalog";
+import { eventLoopPresets } from "../src/content/javascript/learn/event-loop/presets";
 import { moduleOverviews as javascriptOverviews } from "../src/content/javascript/learn/overviews";
 import {
   learningVisualizations as javascriptVisualizations,
@@ -30,6 +31,7 @@ import { moduleOverviews as reactOverviews } from "../src/content/react/learn/ov
 import { learningWalkthroughs as reactWalkthroughs } from "../src/content/react/learn/walkthroughs";
 import { validatePracticeContent } from "../src/features/catalog/lib/practice-content";
 import { validateWalkthroughRegistry } from "../src/features/learning/lib/code-walkthrough";
+import { validateEventLoopVisualization } from "../src/features/learning/lib/event-loop-visualization";
 import { validateLearningContent } from "../src/features/learning/lib/learn-content";
 import { validateTwoPointerVisualization } from "../src/features/learning/lib/two-pointer-visualization";
 
@@ -71,7 +73,9 @@ const practiceSubjects = [
     statementSlugs: Object.keys(algorithmsStatements),
   },
 ];
-const errors: string[] = [];
+const errors = eventLoopPresets.flatMap(({ definition }) =>
+  validateEventLoopVisualization(definition),
+);
 for (const subject of learningSubjects) {
   errors.push(
     ...(await validateLearningContent(

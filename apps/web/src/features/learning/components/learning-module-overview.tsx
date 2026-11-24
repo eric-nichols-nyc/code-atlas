@@ -14,15 +14,22 @@ export function LearningModuleOverview({
   children,
   topics = javascriptLearningTopics,
   basePath = "/javascript/learn",
+  wide = false,
 }: {
   module: LearningModule;
   children: ReactNode;
   topics?: readonly LearningTopic[];
   basePath?: string;
+  wide?: boolean;
 }) {
   const topic = topics.find((item) => item.id === module.topicId);
   return (
-    <main className="mx-auto flex w-full max-w-[1200px] min-w-0 flex-1 flex-col gap-7 px-5 py-8 md:px-8 md:py-14 lg:px-14">
+    <main
+      className={cn(
+        "mx-auto flex w-full max-w-[1200px] min-w-0 flex-1 flex-col gap-7 px-5 py-8 md:px-8 md:py-14 lg:px-14",
+        wide && "gap-3 lg:max-w-none lg:px-6 lg:py-3",
+      )}
+    >
       <div>
         <Button asChild variant="ghost" size="sm">
           <Link href={basePath}>
@@ -31,25 +38,31 @@ export function LearningModuleOverview({
           </Link>
         </Button>
       </div>
-      <header className="flex min-w-0 flex-col gap-3">
-        <div className="flex flex-wrap gap-2">
-          <Badge variant="secondary">Module preview</Badge>
-          <DifficultyBadge difficulty={module.difficulty} />
-          <Badge variant={topic?.variant}>{topic?.label}</Badge>
-        </div>
-        <h1 className="text-[28px] leading-9 font-semibold tracking-tight md:text-[40px] md:leading-[50px]">
-          {module.title}
-        </h1>
-        <p className="text-sm leading-[23px] text-muted-foreground">
-          {module.summary}
-        </p>
-        <p className="text-sm leading-[23px] text-muted-foreground">
-          Explore the pattern with a guided code example. Individual lessons and
-          interactive exercises are coming later.
-        </p>
-      </header>
+      {!wide && (
+        <header className="flex min-w-0 flex-col gap-3">
+          <div className="flex flex-wrap gap-2">
+            <Badge variant="secondary">Module preview</Badge>
+            <DifficultyBadge difficulty={module.difficulty} />
+            <Badge variant={topic?.variant}>{topic?.label}</Badge>
+          </div>
+          <h1 className="text-[28px] leading-9 font-semibold tracking-tight md:text-[40px] md:leading-[50px]">
+            {module.title}
+          </h1>
+          <p className="text-sm leading-[23px] text-muted-foreground">
+            {module.summary}
+          </p>
+          <p className="text-sm leading-[23px] text-muted-foreground">
+            Explore the pattern with a guided code example. Individual lessons
+            and interactive exercises are coming later.
+          </p>
+        </header>
+      )}
       <article
-        className={cn("min-w-0 rounded-md border bg-card p-5", styles.prose)}
+        className={cn(
+          "min-w-0 rounded-md border bg-card p-5",
+          wide && "lg:border-0 lg:bg-transparent lg:p-0",
+          styles.prose,
+        )}
         aria-label={`${module.title} introduction and example`}
       >
         {children}

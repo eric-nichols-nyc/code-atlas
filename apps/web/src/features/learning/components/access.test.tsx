@@ -59,7 +59,7 @@ describe("authorized JavaScript sections", () => {
       "href",
       "/javascript/learn/two-pointers",
     );
-    expect(screen.getByRole("status")).toHaveTextContent("1 module");
+    expect(screen.getByRole("status")).toHaveTextContent("2 modules");
     expect(screen.queryByRole("button", { name: "Run" })).toBeNull();
   });
 });

@@ -50,8 +50,9 @@ solved status. You can pick up where you left off on another device.
 ## What works today
 
 - **Learn** has searchable, filterable module previews. Two Pointers walks through array
-  strategies with a visualization in JavaScript and Algorithms. React's Hooks section
-  covers the `useEffect` lifecycle with a six-step timer walkthrough.
+  strategies in JavaScript and Algorithms. JavaScript's Event Loop visualizes how a timer
+  waits for microtasks. React's Hooks section covers the `useEffect` lifecycle with a
+  six-step timer walkthrough.
 - **Practice** includes a CodeMirror editor, resizable panels, hints, solutions, and a
   stopwatch or countdown for the current problem visit. Light, dark, and system themes
   are available.

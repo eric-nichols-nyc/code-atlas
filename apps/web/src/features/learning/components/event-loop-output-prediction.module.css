@@ -1,0 +1,127 @@
+.exercise {
+  scroll-margin-top: 8rem;
+}
+
+.exercise:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: -2px;
+}
+
+.body {
+  padding: 9px 11px 11px;
+}
+
+.help {
+  margin: 0 0 9px;
+  color: var(--workbench-muted);
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.orders {
+  display: grid;
+  gap: 16px;
+}
+
+.orderTitle {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.list {
+  display: grid;
+  gap: 5px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: Menlo, monospace;
+  font-size: 12px;
+  counter-reset: prediction-position;
+}
+
+.list li {
+  counter-increment: prediction-position;
+}
+
+.row {
+  display: flex;
+  min-height: 34px;
+  align-items: center;
+  gap: 4px 8px;
+  padding: 4px 8px;
+  border: 1px solid var(--workbench-divider);
+  border-radius: 4px;
+  background: var(--workbench-row);
+  overflow-wrap: anywhere;
+}
+
+.row::after {
+  margin-inline-start: auto;
+  color: var(--workbench-muted);
+  font-size: 11px;
+  content: "#" counter(prediction-position);
+}
+
+.draggableItem {
+  position: relative;
+}
+
+.dragHandle {
+  width: 100%;
+  height: auto;
+  justify-content: flex-start;
+  cursor: grab;
+  font: inherit;
+  text-align: start;
+  white-space: normal;
+}
+
+.dragHandle:active {
+  cursor: grabbing;
+}
+
+.dragHandle[aria-pressed="true"] {
+  border-color: var(--ring);
+  background: var(--accent);
+}
+
+.dragHandle svg {
+  color: var(--muted-foreground);
+}
+
+.draggableItem[data-dragging="true"] .dragHandle {
+  opacity: 0.45;
+}
+
+.draggableItem[data-drop-edge]::after {
+  position: absolute;
+  inset-inline: 0;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--foreground);
+  content: "";
+  pointer-events: none;
+}
+
+.draggableItem[data-drop-edge="before"]::after {
+  top: -4px;
+}
+
+.draggableItem[data-drop-edge="after"]::after {
+  bottom: -4px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.feedback {
+  margin: 8px 0 0;
+  color: var(--foreground);
+  font-size: 13px;
+  line-height: 20px;
+}
