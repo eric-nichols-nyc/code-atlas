@@ -5,6 +5,7 @@ export const moduleOverviews: Record<
   () => Promise<{ default: ComponentType }>
 > = {
   closures: () => import("./closures/overview.mdx"),
+  "debounce-throttle": () => import("./debounce-throttle/overview.mdx"),
   "event-loop": () => import("./event-loop/overview.mdx"),
   generators: () => import("./generators/overview.mdx"),
   "heap-stack": () => import("./heap-stack/overview.mdx"),

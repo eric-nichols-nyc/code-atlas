@@ -805,6 +805,14 @@ Show the Call Stack beside the Scope Chain and Console Output. Keep captured
 bindings visible after the factory frame leaves. Label each environment by the
 returned function and identify the binding in use with text and an accent.
 
+## Debounce & Throttle visualizer
+
+Place the Timeline beside Input Script and stack Timer, Closure State, and
+Console Output in the right column. Show elapsed time, skipped inputs, and
+callback results with text. Debounce and Throttle buttons in the script header
+change the code, timer, timeline, and output together. Keep the nominal input
+schedule identical between modes.
+
 ## Route and navigation loading
 
 Files: `apps/web/src/components/route-loading.tsx`, `site-nav.tsx`, and the global,

@@ -1,0 +1,130 @@
+import { TimingVisualization } from "@/features/learning/components/timing-visualization";
+import styles from "@/features/learning/components/walkthrough-theory.module.css";
+import { timingExamples } from "./visualization";
+
+<TimingVisualization examples={timingExamples} />
+
+<div className={styles.theory}>
+
+<section id="timing-theory" className={styles.section} aria-labelledby="timing-intro" tabIndex={-1}>
+<h2 id="timing-intro">What are debounce and throttle?</h2>
+
+<div className={styles.intro}>
+<div>
+
+**Debounce** groups a burst of calls. The trailing version here waits for a
+full quiet period and then uses the latest input. That fits a search field
+where intermediate text has little value.
+
+**Throttle** limits how often a handler can run. The leading-only version
+here runs immediately when its window is open and skips inputs while the
+window is blocked. That fits a scroll indicator that should update during
+continuous movement.
+
+</div>
+<div>
+
+<aside className={styles.callout}>
+
+Both examples receive `c`, `ca`, `cat`, and `cats` at the same times. Watch
+which times move when another input arrives.
+
+</aside>
+
+[Debounce on MDN](https://developer.mozilla.org/en-US/docs/Glossary/Debounce)
+
+</div>
+</div>
+
+</section>
+
+<section className={styles.section} aria-labelledby="timing-steps">
+<h2 id="timing-steps">How the wrappers handle a burst</h2>
+
+<ol className={styles.steps}>
+  <li><strong>Create one wrapper.</strong> Its closure holds state between input events.</li>
+  <li><strong>Schedule or skip.</strong> Debounce replaces the pending timer. Leading throttle checks whether the window is open.</li>
+  <li><strong>Wait for the timer.</strong> Its delay is the earliest the callback can become eligible. Busy JavaScript can delay it further.</li>
+  <li><strong>Use the result.</strong> The debounce callback uses the latest input. The throttle timer reopens the window for the next input.</li>
+</ol>
+
+</section>
+
+<section className={styles.section} aria-labelledby="timing-mistakes">
+<h2 id="timing-mistakes">Common debounce and throttle mistakes</h2>
+
+<div className={styles.mistakes}>
+<div className={styles.card}>
+
+### Creating a wrapper on every event
+
+Each wrapper has its own timer state. Keep one wrapper per handler so it can
+cancel or gate the calls it scheduled earlier.
+
+</div>
+<div className={styles.card}>
+
+### Waiting for quiet when the UI needs live feedback
+
+A continuously firing event can keep postponing a trailing debounce. Use a
+throttle when the screen needs periodic updates during the activity.
+
+</div>
+<div className={styles.card}>
+
+### Assuming skipped input will run at the end
+
+The leading-only throttle above drops calls inside its window. Choose a
+trailing option when the handler must also receive the latest skipped input.
+
+</div>
+</div>
+
+</section>
+
+<section className={styles.section} aria-labelledby="timing-interview">
+<h2 id="timing-interview">Debounce and throttle interview questions</h2>
+
+<div className={styles.questions}>
+<div className={styles.card}>
+
+### Why does the debounced call run at 780 ms in this example?
+
+The final event arrives at 480 ms and starts a fresh 300 ms timer. In the
+prepared sequence, the callback runs as soon as that timer is eligible.
+
+</div>
+<div className={styles.card}>
+
+### Why does throttle keep its 300 ms deadline at the second input?
+
+The deadline belongs to the last accepted call. Skipped inputs leave the
+current window in place and do not extend it.
+
+</div>
+<div className={styles.card}>
+
+### What does the closure retain?
+
+Debounce keeps the pending timer ID, and the scheduled callback can read its
+input value. The throttle keeps a flag so later invocations can tell whether
+the current window is blocked.
+
+</div>
+</div>
+
+</section>
+
+<section className={styles.section} aria-labelledby="timing-related">
+<h2 id="timing-related">Related JavaScript concepts</h2>
+
+<ul className={styles.related}>
+  <li><a href="/javascript/learn/closures">Closures</a></li>
+  <li><a href="/javascript/learn/event-loop">Event Loop</a></li>
+  <li><a href="/javascript/practice/debounce">Practice debounce</a></li>
+  <li><a href="https://developer.mozilla.org/en-US/docs/Glossary/Throttle">Throttle on MDN</a></li>
+</ul>
+
+</section>
+
+</div>

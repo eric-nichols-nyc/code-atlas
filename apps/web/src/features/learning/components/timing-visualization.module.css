@@ -1,0 +1,134 @@
+.timeline,
+.output {
+  min-width: 0;
+  border-top: 1px solid var(--workbench-divider);
+}
+
+.timeline {
+  --lane-color: var(--workbench-stack);
+}
+
+.output {
+  display: flex;
+  flex-direction: column;
+}
+
+.timer {
+  --lane-color: color-mix(in oklab, #d99c3d 60%, var(--foreground));
+}
+
+.closure {
+  --lane-color: color-mix(in oklab, #9b69d9 62%, var(--foreground));
+}
+
+.closure,
+.console {
+  border-top: 1px solid var(--workbench-divider);
+}
+
+.console {
+  min-height: 120px;
+  flex: 1 0 auto;
+  background: var(--background);
+}
+
+.presets,
+.clock,
+.state > div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 8px;
+}
+
+.presets {
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.presets button[aria-pressed="true"] {
+  border-color: color-mix(
+    in oklab,
+    var(--workbench-stack) 54%,
+    var(--workbench-divider)
+  );
+  background: color-mix(in oklab, var(--workbench-stack) 18%, var(--card));
+  color: var(--foreground);
+}
+
+.clock {
+  margin-bottom: 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--workbench-divider);
+  border-radius: 5px;
+  background: var(--background);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.events,
+.state {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  font-size: 12px;
+  line-height: 19px;
+  list-style: none;
+}
+
+.events li {
+  display: grid;
+  grid-template-columns: minmax(0, auto) minmax(0, auto) minmax(0, 1fr);
+  gap: 6px 8px;
+  padding: 6px 8px;
+  border: 1px solid var(--workbench-divider);
+  border-radius: 5px;
+  background: var(--background);
+  overflow-wrap: anywhere;
+}
+
+.events li[data-current="true"] {
+  border-color: var(--lane-color);
+}
+
+.time,
+.detail,
+.state dd {
+  font-family: Menlo, monospace;
+  font-size: 12px;
+}
+
+.event {
+  color: var(--workbench-muted);
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.event[data-kind="callback"] {
+  color: color-mix(in oklab, #28a98b 62%, var(--foreground));
+}
+
+.state dd {
+  margin: 0;
+}
+
+.empty {
+  margin: 0;
+  color: var(--workbench-muted);
+  font-size: 12px;
+  line-height: 19px;
+}
+
+@container (min-width: 900px) {
+  .board {
+    --workbench-columns: minmax(0, 1.4fr) minmax(0, 1.05fr) minmax(0, 0.85fr);
+  }
+
+  .timeline,
+  .output {
+    border-top: 0;
+    border-left: 1px solid var(--workbench-divider);
+  }
+}

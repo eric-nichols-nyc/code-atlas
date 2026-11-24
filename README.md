@@ -54,8 +54,8 @@ solved status. You can pick up where you left off on another device.
   JavaScript's Event Loop visualizes how a timer
   waits for microtasks, Heap & Stack follows shared object references, and Generators &
   Iterators shows how a function can pause and resume. Closures traces captured bindings
-  after the factory returns. React's Hooks section covers the `useEffect` lifecycle with
-  a six-step timer walkthrough.
+  after the factory returns, and Debounce & Throttle compares two ways to handle an event
+  burst. React's Hooks section covers the `useEffect` lifecycle with a six-step timer walkthrough.
 - **Practice** includes a CodeMirror editor, resizable panels, hints, solutions, and a
   stopwatch or countdown for the current problem visit. Light, dark, and system themes
   are available.
