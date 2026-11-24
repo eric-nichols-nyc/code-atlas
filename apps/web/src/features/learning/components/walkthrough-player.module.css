@@ -175,6 +175,30 @@
   flex: none;
 }
 
+.panelBody {
+  min-width: 0;
+  padding: 12px;
+}
+
+.consoleLogs {
+  display: grid;
+  gap: 5px;
+  margin: 0;
+  padding: 0;
+  font-family: Menlo, monospace;
+  font-size: 12px;
+  line-height: 19px;
+  list-style: none;
+  overflow-wrap: anywhere;
+}
+
+.empty {
+  margin: 0;
+  color: var(--workbench-muted);
+  font-size: 12px;
+  line-height: 19px;
+}
+
 @media (min-width: 64rem) {
   .visualizer {
     /* Leave room for the site navigation, Back to Learn, and page gutters. */

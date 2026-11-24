@@ -8,6 +8,7 @@ export const learningTopics: readonly LearningTopic[] = [
   { id: "async", label: "Async", variant: "rose" },
   { id: "memory", label: "Memory", variant: "amber" },
   { id: "iteration", label: "Iteration", variant: "blue" },
+  { id: "scope", label: "Scope", variant: "amber" },
 ];
 
 export const javascriptLearningCatalog: readonly LearningModule[] = [
@@ -100,6 +101,26 @@ export const javascriptLearningCatalog: readonly LearningModule[] = [
         title: "Yield, resume, and return",
         summary:
           "Track local state and iterator results across successive calls to next().",
+      },
+    ],
+  },
+  {
+    id: "javascript.learn.closures",
+    slug: "closures",
+    title: "Closures",
+    summary:
+      "Follow two returned functions as each updates its own captured binding.",
+    topicId: "scope",
+    difficulty: "Medium",
+    order: 50,
+    status: "published",
+    recommended: true,
+    lessonOutlines: [
+      {
+        id: "captured-bindings",
+        title: "Captured bindings and lexical lookup",
+        summary:
+          "Track the call stack and two independent environments after the factory returns.",
       },
     ],
   },

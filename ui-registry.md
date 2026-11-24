@@ -734,7 +734,8 @@ visit-only state that survives theme/width changes and resets on remount/reload.
 
 Files: `features/learning/components/walkthrough-player-header.tsx`,
 `walkthrough-player.module.css`, `use-walkthrough-playback.ts`,
-`walkthrough-theory.module.css`, `walkthrough-source.tsx`, and `step-controls.tsx`.
+`walkthrough-theory.module.css`, `walkthrough-source.tsx`, `walkthrough-workbench.tsx`,
+and `step-controls.tsx`.
 
 Share the title, compact playback controls, step slider, source renderer,
 panel titles, and full-width theory sections. Each module provides its own
@@ -785,6 +786,12 @@ Keep the shared step explanation below the toolbar. Label each generator phase
 in text and show the paused line and saved local bindings. Order the call flow
 from the caller's invocation to the generator's action and back to the result.
 Console Output includes completed calls through the selected step.
+
+## Closures visualizer
+
+Show the Call Stack beside the Scope Chain and Console Output. Keep captured
+bindings visible after the factory frame leaves. Label each environment by the
+returned function and identify the binding in use with text and an accent.
 
 ## Route and navigation loading
 

@@ -1,0 +1,124 @@
+import { ClosuresVisualization } from "@/features/learning/components/closures-visualization";
+import styles from "@/features/learning/components/walkthrough-theory.module.css";
+import { closuresVisualization } from "./visualization";
+
+<ClosuresVisualization definition={closuresVisualization} />
+
+<div className={styles.theory}>
+
+<section id="closures-theory" className={styles.section} aria-labelledby="closures-intro" tabIndex={-1}>
+<h2 id="closures-intro">What is a closure?</h2>
+
+<div className={styles.intro}>
+<div>
+
+A **closure** is a function together with access to the bindings in its
+surrounding lexical environment. JavaScript determines that environment from
+where the function was created. If the function is still reachable after its
+outer function returns, it can keep using the bindings it captured.
+
+</div>
+<div>
+
+<aside className={styles.callout}>
+
+The desk and door functions use the same source code. Each came from a
+different `makeMeter()` call, so each accesses its own `total`.
+
+</aside>
+
+[Closures on MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Closures)
+
+</div>
+</div>
+
+</section>
+
+<section className={styles.section} aria-labelledby="closures-process">
+<h2 id="closures-process">How lexical lookup works</h2>
+
+<ol className={styles.steps}>
+  <li><strong>Call the factory.</strong> Each invocation creates a fresh parameter binding for its starting total.</li>
+  <li><strong>Create the inner function.</strong> The returned function can read names from the environment where it was created.</li>
+  <li><strong>Return from the factory.</strong> The frame leaves the call stack while the returned function retains access to the binding.</li>
+  <li><strong>Call the returned function.</strong> Its own scope supplies the amount, and the saved environment supplies the total.</li>
+</ol>
+
+</section>
+
+<section className={styles.section} aria-labelledby="closures-mistakes">
+<h2 id="closures-mistakes">Common closure mistakes</h2>
+
+<div className={styles.mistakes}>
+<div className={styles.card}>
+
+### Expecting a snapshot of a variable
+
+A later call can see changes to a captured binding. Create a separate binding
+when you need to keep a value from an earlier moment.
+
+</div>
+<div className={styles.card}>
+
+### Sharing one loop variable by accident
+
+Callbacks created in a `var` loop can all read the same final value. A loop
+declared with `let` gives each iteration its own binding.
+
+</div>
+<div className={styles.card}>
+
+### Keeping state reachable for too long
+
+A long-lived listener can keep data reachable through its closure. Remove
+the listener when its owner no longer needs it.
+
+</div>
+</div>
+
+</section>
+
+<section className={styles.section} aria-labelledby="closures-interview">
+<h2 id="closures-interview">Closure interview questions</h2>
+
+<div className={styles.questions}>
+<div className={styles.card}>
+
+### Why does the last desk call start from 12?
+
+Both desk calls use the same function and captured binding. The first call
+updated it to 12, so the last call adds 3 to that value.
+
+</div>
+<div className={styles.card}>
+
+### When do two closures share state?
+
+They share state when both access the same binding. If a factory creates both
+functions in one invocation, they can see each other's updates to a factory local.
+
+</div>
+<div className={styles.card}>
+
+### What determines which variable a callback reads?
+
+Lookup starts in the callback's local scope and follows its lexical scope chain.
+The place that invokes the callback can pass arguments to it.
+
+</div>
+</div>
+
+</section>
+
+<section className={styles.section} aria-labelledby="closures-related">
+<h2 id="closures-related">Related JavaScript concepts</h2>
+
+<ul className={styles.related}>
+  <li><a href="/javascript/learn/heap-stack">Heap &amp; Stack</a></li>
+  <li><a href="/javascript/practice/closures">Practice closures</a></li>
+  <li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Closures#closure_scope_chain">Lexical scope chain</a></li>
+</ul>
+
+</section>
+
+</div>
