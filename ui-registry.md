@@ -309,6 +309,12 @@ a primary **Run** action in the editor header. Show the execution status beside
 code overflow inside its panel and use a visit-only draft notice under the
 **Playground** heading.
 
+An **AI tutor** button beside the heading toggles the existing Practice chat.
+At 1280px and wider it opens a 320px panel to the right of the console. At
+narrower widths use the shared right Sheet and restore focus to the trigger
+on close. Keep chat state above both layouts. The composer describes when
+current code and a matching Run error accompany a question.
+
 ## Practice catalog categories
 
 Files: `apps/web/src/features/catalog/components/javascript-practice.tsx`,

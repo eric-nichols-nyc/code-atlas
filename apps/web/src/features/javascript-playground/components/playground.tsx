@@ -6,13 +6,15 @@ import {
   Clock3Icon,
   FileCode2Icon,
   PlayIcon,
+  SparklesIcon,
   TerminalIcon,
 } from "@workspace/ui/components/icons";
 import { cn } from "@workspace/ui/lib/utils";
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import type { CodeEditorSession } from "@/features/problems/components/javascript-editor";
-import { isPlaygroundResult, type PlaygroundResult } from "../run-result";
+import { isPlaygroundResult, type PlaygroundRunSnapshot } from "../run-result";
+import { PlaygroundTutor, useDockedPlaygroundTutor } from "./playground-tutor";
 
 const CodeEditor = dynamic(
   () =>
@@ -45,12 +47,12 @@ const resultLabels = {
 
 export function Playground() {
   const [source, setSource] = useState(starter);
-  const [latest, setLatest] = useState<{
-    source: string;
-    result: PlaygroundResult;
-  } | null>(null);
+  const [latest, setLatest] = useState<PlaygroundRunSnapshot | null>(null);
   const [requestError, setRequestError] = useState("");
   const [pending, setPending] = useState(false);
+  const [tutorOpen, setTutorOpen] = useState(false);
+  const tutorTrigger = useRef<HTMLButtonElement>(null);
+  const tutorDocked = useDockedPlaygroundTutor();
   const activeRun = useRef<AbortController | null>(null);
   const editorState = useRef<EditorState | null>(null);
   const editorTheme = useRef<Compartment | null>(null);
@@ -64,9 +66,11 @@ export function Playground() {
     [],
   );
 
+  const readCurrentSource = () => editorState.current?.doc.toString() ?? source;
+
   async function run() {
     if (activeRun.current) return;
-    const snapshot = editorState.current?.doc.toString() ?? source;
+    const snapshot = readCurrentSource();
     if (!snapshot.trim()) {
       setRequestError("Enter JavaScript to run.");
       return;
@@ -123,13 +127,39 @@ export function Playground() {
 
   return (
     <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col px-4 py-6 md:px-6 md:py-9">
-      <h1 className="font-semibold text-3xl tracking-tight md:text-[40px]">
-        Playground
-      </h1>
-      <p className="mt-1.5 text-muted-foreground text-sm">
-        Your draft lasts until you leave or reload.
-      </p>
-      <div className="mt-5 grid gap-3 md:mt-6 md:min-h-[30rem] md:grow md:basis-0 md:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] md:grid-rows-[minmax(0,1fr)]">
+      <header className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 className="font-semibold text-3xl tracking-tight md:text-[40px]">
+            Playground
+          </h1>
+          <p className="mt-1.5 text-muted-foreground text-sm">
+            Your draft lasts until you leave or reload.
+          </p>
+        </div>
+        <Button
+          ref={tutorTrigger}
+          type="button"
+          size="sm"
+          variant={tutorOpen ? "secondary" : "outline"}
+          className="pointer-coarse:min-h-11"
+          aria-expanded={tutorOpen}
+          aria-label={tutorOpen ? "Hide AI tutor" : "Show AI tutor"}
+          aria-controls={tutorOpen ? "playground-tutor" : undefined}
+          aria-haspopup={tutorDocked ? undefined : "dialog"}
+          onClick={() => setTutorOpen((open) => !open)}
+        >
+          <SparklesIcon aria-hidden="true" />
+          AI tutor
+        </Button>
+      </header>
+      <div
+        className={cn(
+          "mt-5 grid gap-3 md:mt-6 md:min-h-[30rem] md:grow md:basis-0 md:grid-rows-[minmax(0,1fr)]",
+          tutorOpen && tutorDocked
+            ? "md:grid-cols-[minmax(0,3fr)_minmax(0,2fr)_20rem]"
+            : "md:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]",
+        )}
+      >
         <section className="learning-panel" aria-labelledby="playground-source">
           <div className="learning-panel-header min-h-12 justify-between bg-muted/55 py-1.5">
             <h2
@@ -255,6 +285,15 @@ export function Playground() {
             </div>
           </div>
         </section>
+        <PlaygroundTutor
+          open={tutorOpen}
+          docked={tutorDocked}
+          onOpenChange={setTutorOpen}
+          trigger={tutorTrigger}
+          source={source}
+          readCurrentSource={readCurrentSource}
+          latest={latest}
+        />
       </div>
     </main>
   );

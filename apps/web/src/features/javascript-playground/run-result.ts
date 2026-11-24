@@ -2,6 +2,11 @@ import type { PlaygroundResult } from "../problems/server/script-worker";
 
 export type { PlaygroundResult };
 
+export type PlaygroundRunSnapshot = {
+  source: string;
+  result: PlaygroundResult;
+};
+
 export function isPlaygroundResult(value: unknown): value is PlaygroundResult {
   if (!value || typeof value !== "object" || !("status" in value)) return false;
   if (

@@ -61,7 +61,11 @@ export function TutorAnswer({ children }: { children: string }) {
     </div>
   );
 }
-export function ProblemTutor() {
+export function ProblemTutor({
+  contextDescription = "Your current code and this problem are included when you send.",
+}: {
+  contextDescription?: string;
+} = {}) {
   const s = useProblemTutor();
   const id = useId();
   const latest = s.turns.at(-1);
@@ -205,8 +209,7 @@ export function ProblemTutor() {
           id={`${id}-context`}
           className="text-xs leading-relaxed text-muted-foreground"
         >
-          Your current code and this problem are included when you send. Chat
-          lasts for this visit.
+          {contextDescription} Chat lasts for this visit.
         </p>
         {s.historyTrimmed && (
           <p className="text-xs text-muted-foreground">
