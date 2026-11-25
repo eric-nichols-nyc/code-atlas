@@ -1,0 +1,62 @@
+import { CodeWalkthrough } from "@/features/learning/components/code-walkthrough";
+import { TwoPointerVisualization } from "@/features/learning/components/two-pointer-visualization";
+import { twoPointersVisualization } from "./visualization";
+import { twoPointersWalkthrough } from "./walkthrough";
+
+## What the pointers track
+
+In JavaScript, a pointer in this pattern can be an index into a string or array,
+or a reference to a node in a linked list. Give each pointer a role and a rule
+for when it moves. A scan stays linear when each pointer advances through the
+input at most once and each step takes constant time.
+
+## Opposite directions
+
+Start one pointer at each end. For a palindrome such as `racecar`, compare the
+letters at those positions. A mismatch settles the question immediately. After
+a match, move both pointers inward because that pair has already been checked.
+Stop when the pointers meet or cross. A single middle letter can never cause a
+mismatch.
+
+The example checks lowercase English words as written. It takes **O(n) time**
+and **O(1) extra space**.
+
+<TwoPointerVisualization definition={twoPointersVisualization} />
+
+<CodeWalkthrough definition={twoPointersWalkthrough} />
+
+Sorted pair sums also start at opposite ends, with a different movement rule.
+If the sum is too small, advance `left`. If it is too large, move `right` back.
+Sorted order lets each move rule out a value. If you need to sort first, budget
+**O(n log n)** time for a comparison sort and check whether you need to preserve
+the original indices. The palindrome check relies on symmetry and keeps the
+original letter order.
+
+## Same direction
+
+Give the pointers separate jobs. In an in-place Move Zeroes solution, `read`
+visits every element while `write` advances only when a nonzero value is kept.
+After the scan, fill the remaining positions with zeroes. The first `write`
+positions hold the kept values in their original order.
+
+Other problems give the pointers different roles. A sliding window tracks both
+ends of an active range. In linked-list cycle detection, a slow pointer advances
+one node at a time and a fast pointer advances two. Inside a cycle, the fast
+pointer gains one node per iteration until it meets the slow pointer.
+
+## Fixed offset
+
+Sometimes the two positions move together with a constant gap. To find the
+second-to-last node in `A → B → C → D → E`, advance `fast` two links from `A`
+to `C` while `slow` stays at `A`. Then advance both one link at a time. When
+`fast` reaches `null` beyond `E`, `slow` points to `D`. The gap measures the
+distance from the end in one pass.
+
+## Choosing a movement rule
+
+Use opposite ends for symmetry or a sorted pair search, a read and write position
+to compact an array in place, or a fixed gap when the distance between positions
+matters. Before using two pointers, ask what each move lets you rule out or what
+property it keeps true. That answer tells you whether the scan can skip work.
+
+The palindrome example comes from [AlgoMaster’s Introduction to Two Pointers](https://algomaster.io/learn/dsa/two-pointers-introduction).

@@ -11,7 +11,7 @@ const noOverflow = async (page: Page) =>
     ),
   ).toBe(true);
 
-test("Algorithms discovery, copied lesson, filters, themes and pointer controls", async ({
+test("Algorithms discovery, shared palindrome lesson, filters, themes and pointer controls", async ({
   page,
 }) => {
   test.setTimeout(90000);
@@ -40,20 +40,23 @@ test("Algorithms discovery, copied lesson, filters, themes and pointer controls"
   });
   await page.getByRole("link", { name: "Two Pointers", exact: true }).click();
   const walkthrough = page.getByRole("region", {
-    name: "Find a pair in a sorted array",
+    name: "Check a palindrome in JavaScript",
     exact: true,
   });
   const visual = page.getByRole("region", {
-    name: "Watch left and right find a pair",
+    name: "Trace the pointers in racecar",
     exact: true,
   });
+  await expect(
+    page.getByRole("heading", { name: "Fixed offset" }),
+  ).toBeVisible();
   await walkthrough.getByRole("button", { name: "Next", exact: true }).focus();
   await page.keyboard.press("Enter");
   await expect(
     walkthrough.getByText("Step 2 of 6", { exact: true }),
   ).toBeVisible();
   await visual.getByRole("button", { name: "Next", exact: true }).click();
-  await expect(visual.getByText("Step 2 of 7", { exact: true })).toBeVisible();
+  await expect(visual.getByText("Step 2 of 5", { exact: true })).toBeVisible();
   await page.emulateMedia({ reducedMotion: "reduce" });
   for (const theme of ["Light", "Dark", "Brown", "System"]) {
     await page
@@ -70,7 +73,7 @@ test("Algorithms discovery, copied lesson, filters, themes and pointer controls"
         walkthrough.getByText("Step 2 of 6", { exact: true }),
       ).toBeVisible();
       await expect(
-        visual.getByText("Step 2 of 7", { exact: true }),
+        visual.getByText("Step 2 of 5", { exact: true }),
       ).toBeVisible();
     }
   }
@@ -79,7 +82,7 @@ test("Algorithms discovery, copied lesson, filters, themes and pointer controls"
     path: test.info().outputPath("algorithms-lesson-mobile.png"),
   });
   await visual.getByRole("button", { name: "Restart", exact: true }).click();
-  await expect(visual.getByText("Step 1 of 7", { exact: true })).toBeVisible();
+  await expect(visual.getByText("Step 1 of 5", { exact: true })).toBeVisible();
   await page.getByRole("link", { name: "Back to Learn", exact: true }).click();
   await expect(page).toHaveURL(/\/algorithms\/learn$/);
   await page.getByRole("searchbox", { name: "Search modules" }).fill("missing");

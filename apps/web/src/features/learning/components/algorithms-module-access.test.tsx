@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { twoPointersWalkthrough } from "@/content/algorithms/learn/two-pointers/walkthrough";
+import { twoPointersWalkthrough } from "@/content/shared/learn/two-pointers/walkthrough";
 import { CodeWalkthroughClient } from "./code-walkthrough-client";
 
 const state = vi.hoisted(() => ({ configured: true }));

@@ -10,7 +10,7 @@ export function TwoPointerVisualization({
   definition: TwoPointerVisualizationDefinition;
 }) {
   if (validateTwoPointerVisualization(definition).length)
-    return <p>Array visualization unavailable.</p>;
+    return <p>Palindrome visualization unavailable.</p>;
   return (
     <TwoPointerVisualizationClient
       key={definition.id}

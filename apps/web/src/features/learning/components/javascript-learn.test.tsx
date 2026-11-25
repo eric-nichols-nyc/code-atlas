@@ -24,7 +24,7 @@ it("searches title and summary within a category and clears without leaving it",
     ctrlKey: false,
   });
   fireEvent.change(screen.getByRole("searchbox", { name: "Search modules" }), {
-    target: { value: "  AVOID REPEATED  " },
+    target: { value: "  PALINDROME CHECK  " },
   });
   expect(screen.getByRole("link", { name: "Two Pointers" })).toBeVisible();
   fireEvent.change(screen.getByRole("searchbox", { name: "Search modules" }), {

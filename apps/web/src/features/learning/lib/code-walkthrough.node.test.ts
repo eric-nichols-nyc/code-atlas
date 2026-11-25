@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { javascriptLearningCatalog } from "@/content/javascript/learn/catalog";
-import { twoPointersWalkthrough } from "@/content/javascript/learn/two-pointers/walkthrough";
 import { learningWalkthroughs } from "@/content/javascript/learn/walkthroughs";
+import { twoPointersWalkthrough } from "@/content/shared/learn/two-pointers/walkthrough";
 import {
   type CodeWalkthroughDefinition,
   normalizeCodeSource,
@@ -20,7 +20,7 @@ const valid: CodeWalkthroughDefinition = {
 };
 
 describe("walkthrough authoring validation", () => {
-  it("publishes the original Two Pointers example with six aligned concepts", () => {
+  it("publishes the palindrome example with six aligned concepts", () => {
     expect(
       validateWalkthroughRegistry(
         learningWalkthroughs,
@@ -34,27 +34,27 @@ describe("walkthrough authoring validation", () => {
     expect(twoPointersWalkthrough.steps.map((step) => step.id)).toEqual([
       "initialize",
       "loop",
-      "sum",
-      "match",
-      "move",
-      "no-match",
+      "compare",
+      "mismatch",
+      "move-inward",
+      "complete",
     ]);
     expect(
       twoPointersWalkthrough.steps.map((step) =>
         step.lines.map((line) => sourceLines[line - 1]?.trim()),
       ),
     ).toEqual([
-      ["let left = 0;", "let right = numbers.length - 1;"],
+      ["let left = 0;", "let right = text.length - 1;"],
       ["while (left < right) {"],
-      ["const sum = numbers[left] + numbers[right];"],
-      ["if (sum === target) return [left, right];"],
-      ["if (sum < target) left += 1;", "else right -= 1;"],
-      ["return null;"],
+      ["const matches = text[left] === text[right];"],
+      ["if (!matches) return false;"],
+      ["left += 1;", "right -= 1;"],
+      ["return true;"],
     ]);
-    expect(sourceLines[15]).toBe("findPair([1, 2, 4, 7, 11], 9);");
-    expect(sourceLines[16]).toBe(
-      "// Expected result: [1, 3] — values 2 and 7.",
-    );
+    expect(sourceLines.slice(15)).toEqual([
+      'isPalindrome("racecar"); // true',
+      'isPalindrome("hello"); // false',
+    ]);
   });
   it("allows shared line references across steps and normalizes line endings", () => {
     expect(normalizeCodeSource("one\r\n\rtwo\n")).toBe("one\n\ntwo\n");

@@ -5,18 +5,13 @@
   gap: 20px;
   padding: 20px 16px 16px;
 }
-.summary {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 12px;
-}
 .positions {
+  margin: 0;
   font-family: Menlo, monospace;
   font-size: 12px;
   color: var(--muted-foreground);
 }
-.array {
+.letters {
   display: flex;
   justify-content: center;
   gap: clamp(4px, 2cqi, 16px);
@@ -24,7 +19,7 @@
   padding: 0;
   margin: 0;
 }
-.array li {
+.letters li {
   display: flex;
   min-width: 0;
   flex: 0 1 64px;
@@ -59,23 +54,22 @@
   line-height: 18px;
   color: var(--muted-foreground);
 }
-.array [data-left="true"] .value {
+.letters [data-left="true"] .value {
   border: 2px solid var(--foreground);
 }
-.array [data-right="true"] .value {
+.letters [data-right="true"]:where(:not([data-left="true"])) .value {
   border: 2px dashed var(--foreground);
 }
-.array [data-discarded="true"] .value {
+.letters [data-checked="true"] .value {
   color: var(--muted-foreground);
   background: var(--background);
-  text-decoration: line-through;
 }
-.array [data-match="true"] .value {
+.letters [data-match="true"] .value {
   background: var(--primary);
   color: var(--primary-foreground);
   border-color: var(--primary);
 }
-.equation {
+.comparison {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
@@ -85,19 +79,14 @@
   border-radius: 6px;
   background: var(--muted);
 }
-.equation strong {
+.comparison strong {
   font-family: Menlo, monospace;
   font-size: 14px;
   font-weight: 500;
 }
-.equation span {
+.comparison span {
   color: var(--muted-foreground);
   font-size: 12px;
-}
-.result {
-  margin: 0;
-  font-size: 14px;
-  font-weight: 500;
 }
 .source {
   display: flex;
