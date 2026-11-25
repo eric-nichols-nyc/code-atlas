@@ -1,0 +1,15 @@
+[data-active="true"] .number {
+  border-color: var(--primary);
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
+
+[data-moving="Out"] .number {
+  border: 2px dashed var(--muted-foreground);
+}
+
+[data-moving="In"] .number {
+  border: 2px solid var(--primary);
+  background: var(--primary);
+  color: var(--primary-foreground);
+}

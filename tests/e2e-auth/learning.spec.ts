@@ -218,7 +218,7 @@ test("learning catalog filters and opens the Two Pointers preview", async ({
     page.getByRole("tab", { name: "Arrays", exact: true }),
   ).toHaveAttribute("aria-selected", "true");
   await expect(search).toHaveValue("");
-  await expect(page.getByRole("status")).toHaveText("1 module");
+  await expect(page.getByRole("status")).toHaveText("2 modules");
   await page.getByRole("link", { name: "Two Pointers", exact: true }).focus();
   await page.keyboard.press("Enter");
   await expect(page).toHaveURL(/\/javascript\/learn\/two-pointers$/);

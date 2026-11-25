@@ -1,3 +1,4 @@
+import { slidingWindowModule } from "@/content/shared/learn/sliding-window/metadata";
 import { twoPointersModule } from "@/content/shared/learn/two-pointers/metadata";
 import type {
   LearningModule,
@@ -16,6 +17,10 @@ export const javascriptLearningCatalog: readonly LearningModule[] = [
   {
     id: "javascript.learn.two-pointers",
     ...twoPointersModule,
+  },
+  {
+    id: "javascript.learn.sliding-window",
+    ...slidingWindowModule,
   },
   {
     id: "javascript.learn.event-loop",

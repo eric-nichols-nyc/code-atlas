@@ -659,8 +659,8 @@ Last updated: 2026-11-14.
 | Controls and rows  | Practice toolbar spacing, square search/select corners, right-aligned live result count, 58px striped rows |
 | Learning labels    | Module / Difficulty / Topic / Lesson outlines; no account flag or solved column                            |
 | Preview panels     | `bg-card border rounded-md p-5`, no shadow; shared Badge and ghost small Back to Learn Button              |
-| Prose              | Existing MDX 14/23px body and muted foreground; inline code uses shared semantic tokens                    |
-| Example            | Menlo 13/24px, 16px padding, shared muted background and border, 6px radius; local horizontal scrolling    |
+| Prose              | Learn body and summaries use 18px text with 1.65 line height, and section headings use 20px                |
+| Example            | Menlo 16/26px, 16px padding, shared muted background and border, 6px radius; local horizontal scrolling    |
 | Focus and hover    | Shared controls and title-link focus ring/underline; no custom accent palette                              |
 
 Use Practice's 1920px catalog maximum, 56px desktop gutters, 280px sidebar,
@@ -691,8 +691,8 @@ Files: `features/learning/components/code-walkthrough.tsx`,
 Last updated: 2026-11-14.
 
 Embed the example inside the existing module reading panel. Use a 6px-radius
-bordered card, a 16px header, a muted code surface, and a 16px-padded explanation.
-Code uses Menlo 13/24px with decorative line numbers; preserve source whitespace
+bordered card, 16px header padding, and 18px text for descriptions and step explanations.
+Code uses Menlo 16/26px with decorative line numbers. Preserve source whitespace
 and contain horizontal scrolling within its focusable surface. Prepare syntax on
 the server and consume the existing keyword/string/number/comment theme variables.
 Active lines have a foreground leading border and semantic accent background;
@@ -709,24 +709,38 @@ theme/width changes. Describe conceptual branches without implying execution or
 saved completion. Authored source and explanations live in content, separately
 from the learning-owned renderer; content checking validates their line references.
 
-## Two Pointers visualization
+## Stepped array and string examples
 
-Files: `features/learning/components/two-pointer-visualization*.tsx`,
-`two-pointer-visualization.module.css`, `step-controls.tsx`, and shared `slider.tsx`.
-Last updated: 2026-11-24.
+Files include `features/learning/components/stepped-example.tsx`,
+`stepped-example.module.css`, and the Two Pointers and Sliding Window visualizers.
+Last updated 2026-11-25.
 
 Use the walkthrough header, card border and radius, 16px body gutters, and shared
 small Previous, Next, and Restart controls. The shared Slider scrubs the trace.
 Its visible label is Example step and its value announces the step and total.
 
-Render the word as an ordered list of indexed letter cells. The left and right
-pointers use solid and dashed outlines with visible labels. When they meet,
-show both labels above the center cell. The current matching pair uses
-primary colors and previously matched letters stay readable in muted colors.
-Keep the comparison, result, explanation, and source lines synchronized.
-The seven-letter example fits at 320px without horizontal page scrolling.
-Each instance retains its position through theme and width changes and resets
-on reload. Announce one polite, atomic explanation per step.
+Render a sequence as a labeled ordered list of indexed cells. In Two Pointers,
+use solid and dashed outlines with visible labels and show both labels where the
+pointers meet. The current match uses primary colors and previously matched
+letters stay readable in muted colors. In Sliding Window, accent the entire
+active range. Mark the outgoing value with a dashed outline and an Out label,
+and mark the incoming value with primary colors and an In label.
+
+Keep the readout, explanation, and source lines synchronized. Both examples
+fit at 320px without horizontal page scrolling. Each instance retains its
+position through theme and width changes and resets on reload. Announce one
+polite, atomic explanation per step.
+
+## Lesson reference tables and quiz
+
+Use 16px table text, alternating semantic surfaces, and an accent rule under
+column headings. Wide reference tables scroll within a focusable region.
+
+Use a muted quiz header with an accent progress meter and visible question count.
+Show one 18px question at a time and 16px answer rows with square letter badges.
+Pair color and icons with a text explanation after selection. Keep progress and
+answers when opening or closing the expanded sheet. Move focus to the question
+heading after navigation and return focus to the expand button when the sheet closes.
 
 ## Full-width walkthrough player
 

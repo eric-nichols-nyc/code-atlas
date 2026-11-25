@@ -21,6 +21,14 @@ export function normalizeCodeSource(source: string) {
   return source.replace(/\r\n?/g, "\n");
 }
 
+export function sourceForStep(source: string, step: CodeWalkthroughStep) {
+  const lines = normalizeCodeSource(source).split("\n");
+  return step.lines.map((number) => ({
+    number,
+    text: lines[number - 1] ?? "",
+  }));
+}
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }

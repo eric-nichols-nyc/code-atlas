@@ -32,6 +32,7 @@ import {
 } from "../src/content/react/learn/catalog";
 import { moduleOverviews as reactOverviews } from "../src/content/react/learn/overviews";
 import { learningWalkthroughs as reactWalkthroughs } from "../src/content/react/learn/walkthroughs";
+import { slidingWindowVisualization } from "../src/content/shared/learn/sliding-window/visualization";
 import { validatePracticeContent } from "../src/features/catalog/lib/practice-content";
 import {
   validateCodeWalkthrough,
@@ -39,6 +40,7 @@ import {
 } from "../src/features/learning/lib/code-walkthrough";
 import { validateEventLoopVisualization } from "../src/features/learning/lib/event-loop-visualization";
 import { validateLearningContent } from "../src/features/learning/lib/learn-content";
+import { validateSlidingWindowVisualization } from "../src/features/learning/lib/sliding-window-visualization";
 import { validateTwoPointerVisualization } from "../src/features/learning/lib/two-pointer-visualization";
 
 const learningSubjects = [
@@ -89,6 +91,7 @@ errors.push(
   ),
   ...validateCodeWalkthrough(generatorVisualization, "Generator visualization"),
   ...validateCodeWalkthrough(closuresVisualization, "Closures visualization"),
+  ...validateSlidingWindowVisualization(slidingWindowVisualization),
 );
 for (const subject of learningSubjects) {
   errors.push(

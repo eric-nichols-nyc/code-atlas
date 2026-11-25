@@ -1,0 +1,84 @@
+import { CodeWalkthrough } from "@/features/learning/components/code-walkthrough";
+import { LessonQuiz } from "@/features/learning/components/lesson-quiz";
+import { LessonReferenceTable } from "@/features/learning/components/lesson-reference-table";
+import { SlidingWindowVisualization } from "@/features/learning/components/sliding-window-visualization";
+import { slidingWindowQuestions } from "./quiz";
+import { windowStates, windowStrategies } from "./reference-tables";
+import { slidingWindowVisualization } from "./visualization";
+import { slidingWindowWalkthrough } from "./walkthrough";
+
+## What the window tracks
+
+A window is a contiguous range in an array or string. Its boundaries tell you
+which items it contains. Keep a running summary, such as a sum or a count of
+each character, and update it as items enter or leave the range.
+
+## Fixed-size windows
+
+Find the largest sum of three consecutive values in `[1, 3, 2, 5, 4, 7]`.
+The first window sums to `6`. The next window shares `3` and `2` with it,
+so subtract `1` and add `5` to get `10`. Each new position takes two
+updates. Track the best sum separately because it can come from any window.
+
+The function assumes the window size is a positive integer up to the length of
+the array. Recomputing every sum takes **O(n × k) time** for an array of length
+`n` and window size `k`. The rolling sum takes **O(n) time**
+and **O(1) extra space**.
+
+<SlidingWindowVisualization definition={slidingWindowVisualization} />
+
+<CodeWalkthrough definition={slidingWindowWalkthrough} />
+
+## Variable-size windows
+
+To find the longest substring with unique characters in `"abba"`, grow the
+right edge until the second `b` enters. The range is now `"abb"`. Drop
+`a` from the left, then drop the first `b` to restore uniqueness. Add the
+final `a` to get `"ba"`. The best length is `2`, reached by both
+`"ab"` and `"ba"`.
+
+Keep a count for each character so you can tell when a duplicate has left.
+Although one right step may trigger several left steps, each boundary moves
+forward at most `n` times over the whole scan. With constant-time count
+updates, the total time is **O(n)**.
+
+## When to Use Sliding Window
+
+Start with the shape of the input and how the answer changes as the boundaries move.
+
+1. **The answer is a contiguous range.** Every item from the left edge to the right edge belongs to the candidate.
+2. **The goal compares ranges.** Look for a longest, shortest, largest, or smallest property over adjacent items. An exact target can also work if it gives a predictable movement rule.
+3. **Moving an edge makes predictable progress.** For a longest valid range, grow to the right and shrink from the left to recover validity. For a shortest valid range, shrink a valid window until it stops meeting the requirement.
+4. **Neighboring ranges share work.** If a scan recalculates a sum or frequency for each overlapping range, update that state as individual values enter and leave. With constant-time updates and forward-moving edges, the scan can take linear time.
+
+<LessonReferenceTable label="Sliding window strategies" columns={["Problem type", "Edge movement", "Example"]} rows={windowStrategies} />
+
+### Limits of the pattern
+
+For exact sums with mixed signs, use prefix sums and a map of earlier totals.
+Dropping a negative value increases the sum, so extending or shrinking the
+window can move it away from the target. Fixed-size rolling sums still work with
+negative values because the window size determines every move.
+
+Use other techniques for subsequences with gaps or problems that permit
+reordering. Listing every valid range can also take quadratic time if there are
+quadratically many results, even when counting them is faster.
+
+## Choosing the Window State
+
+Choose the information you need to answer a question about the current range.
+A sum needs one total. Queries about distinct values, maxima, or medians need
+state that you can update when either edge moves.
+
+<LessonReferenceTable label="Window state by problem" columns={["Problem", "Window state"]} rows={windowStates} />
+
+For **Sliding Window Maximum**, keep a deque of candidate indices in decreasing
+value order. When a new value arrives, remove candidates from the back whose
+values are smaller or equal. The new value is at least as large and stays in the
+window longer. Remove expired indices from the front. The front now gives the
+current maximum. Each index enters once and leaves at most once, so the scan
+takes **O(n) time** and the deque holds at most **O(k)** indices.
+
+The example array and reference topics come from [AlgoMaster’s Introduction to Sliding Window](https://algomaster.io/learn/dsa/sliding-window-introduction).
+
+<LessonQuiz questions={slidingWindowQuestions} />
