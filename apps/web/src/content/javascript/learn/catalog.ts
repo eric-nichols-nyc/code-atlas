@@ -102,4 +102,24 @@ export const javascriptLearningCatalog: readonly LearningModule[] = [
       },
     ],
   },
+  {
+    id: "javascript.learn.debounce-throttle",
+    slug: "debounce-throttle",
+    title: "Debounce & Throttle",
+    summary:
+      "Compare which events run when a handler waits for quiet or limits its call rate.",
+    topicId: "async",
+    difficulty: "Easy",
+    order: 60,
+    status: "published",
+    recommended: true,
+    lessonOutlines: [
+      {
+        id: "same-burst-two-wrappers",
+        title: "One burst, two wrappers",
+        summary:
+          "Compare trailing debounce with leading throttle on a shared timeline.",
+      },
+    ],
+  },
 ];

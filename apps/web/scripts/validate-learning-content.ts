@@ -16,6 +16,7 @@ import {
   learningTopics as javascriptTopics,
 } from "../src/content/javascript/learn/catalog";
 import { closuresVisualization } from "../src/content/javascript/learn/closures/visualization";
+import { timingExamples } from "../src/content/javascript/learn/debounce-throttle/visualization";
 import { eventLoopPresets } from "../src/content/javascript/learn/event-loop/presets";
 import { generatorVisualization } from "../src/content/javascript/learn/generators/visualization";
 import { heapStackVisualization } from "../src/content/javascript/learn/heap-stack/visualization";
@@ -92,6 +93,9 @@ errors.push(
   ...validateCodeWalkthrough(generatorVisualization, "Generator visualization"),
   ...validateCodeWalkthrough(closuresVisualization, "Closures visualization"),
   ...validateSlidingWindowVisualization(slidingWindowVisualization),
+  ...timingExamples.flatMap((example) =>
+    validateCodeWalkthrough(example, "Timing visualization"),
+  ),
 );
 for (const subject of learningSubjects) {
   errors.push(

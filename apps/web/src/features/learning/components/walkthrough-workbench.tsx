@@ -19,6 +19,7 @@ export function WalkthroughWorkbench({
   activeLines,
   explanation,
   sourceLabel,
+  sourceControls,
   boardClassName,
   children,
 }: Pick<PlayerHeaderProps, "title" | "icon" | "playback"> & {
@@ -27,6 +28,7 @@ export function WalkthroughWorkbench({
   activeLines: readonly number[];
   explanation: string;
   sourceLabel: string;
+  sourceControls?: ReactNode;
   boardClassName?: string;
   children: ReactNode;
 }) {
@@ -51,11 +53,14 @@ export function WalkthroughWorkbench({
       </div>
       <div className={cn(styles.board, boardClassName)}>
         <div className={styles.source}>
-          <h2 className={styles.panelTitle}>
-            <CodeXmlIcon aria-hidden="true" />
-            Input Script
-          </h2>
+          <div className={cn(styles.panelTitle, styles.sourceHeading)}>
+            <h2>
+              <CodeXmlIcon aria-hidden="true" /> Input Script
+            </h2>
+            {sourceControls}
+          </div>
           <WalkthroughSource
+            key={sourceLabel}
             codeLines={codeLines}
             activeLines={activeLines}
             label={sourceLabel}

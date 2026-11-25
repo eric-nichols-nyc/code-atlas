@@ -501,6 +501,7 @@ for (const path of [
   "/javascript",
   "/javascript/learn",
   "/javascript/learn/closures",
+  "/javascript/learn/debounce-throttle",
   "/javascript/learn/event-loop",
   "/javascript/learn/generators",
   "/javascript/learn/heap-stack",

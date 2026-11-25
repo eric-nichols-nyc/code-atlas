@@ -14,6 +14,7 @@ const fullWidthModules = new Set([
   "heap-stack",
   "generators",
   "closures",
+  "debounce-throttle",
 ]);
 
 export default async function LearningModulePage({
