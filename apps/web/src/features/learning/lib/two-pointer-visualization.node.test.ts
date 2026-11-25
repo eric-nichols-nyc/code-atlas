@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { twoPointersExample } from "@/content/javascript/learn/two-pointers/example";
-import { twoPointersVisualization as example } from "@/content/javascript/learn/two-pointers/visualization";
-import { twoPointersWalkthrough } from "@/content/javascript/learn/two-pointers/walkthrough";
+import { twoPointersVisualization as example } from "@/content/shared/learn/two-pointers/visualization";
+import {
+  palindromeExample,
+  twoPointersWalkthrough,
+} from "@/content/shared/learn/two-pointers/walkthrough";
 import {
   sourceForFrame,
   type TwoPointerVisualizationDefinition,
@@ -9,51 +11,51 @@ import {
 } from "./two-pointer-visualization";
 
 describe("prepared Two Pointers visualization", () => {
-  it("follows the canonical sorted sample through all seven snapshots", () => {
+  it("follows the racecar trace from the outside letters to the center", () => {
     expect(validateTwoPointerVisualization(example)).toEqual([]);
-    expect(example.numbers).toBe(twoPointersExample.numbers);
-    expect(example.target).toBe(twoPointersExample.target);
+    expect(example.word).toBe(palindromeExample);
     expect(example.source).toBe(twoPointersWalkthrough.source);
     expect(
       example.frames.map(({ phase, left, right }) => [phase, left, right]),
     ).toEqual([
-      ["initialize", 0, 4],
-      ["compare", 0, 4],
-      ["move-right", 0, 3],
-      ["compare", 0, 3],
-      ["move-left", 1, 3],
-      ["compare", 1, 3],
-      ["found", 1, 3],
+      ["initialize", 0, 6],
+      ["compare", 0, 6],
+      ["compare", 1, 5],
+      ["compare", 2, 4],
+      ["complete", 3, 3],
     ]);
     expect(
       example.frames
         .filter((frame) => frame.phase === "compare")
-        .map(
-          (frame) =>
-            (example.numbers[frame.left] ?? 0) +
-            (example.numbers[frame.right] ?? 0),
-        ),
-    ).toEqual([12, 8, 9]);
+        .map(({ left, right }) => [example.word[left], example.word[right]]),
+    ).toEqual([
+      ["r", "r"],
+      ["a", "a"],
+      ["c", "c"],
+    ]);
+    const comparisonLines = [
+      "const matches = text[left] === text[right];",
+      "left += 1;",
+      "right -= 1;",
+    ];
     expect(
       example.frames.map((frame) =>
         sourceForFrame(example.source, frame).map((line) => line.text.trim()),
       ),
     ).toEqual([
-      ["let left = 0;", "let right = numbers.length - 1;"],
-      ["const sum = numbers[left] + numbers[right];"],
-      ["else right -= 1;"],
-      ["const sum = numbers[left] + numbers[right];"],
-      ["if (sum < target) left += 1;"],
-      ["const sum = numbers[left] + numbers[right];"],
-      ["if (sum === target) return [left, right];"],
+      ["let left = 0;", "let right = text.length - 1;"],
+      comparisonLines,
+      comparisonLines,
+      comparisonLines,
+      ["while (left < right) {", "return true;"],
     ]);
   });
 
   it.each([
-    { ...example, numbers: [2, 1] },
-    { ...example, numbers: [] },
-    { ...example, numbers: [1, Number.NaN] },
-    { ...example, target: Number.POSITIVE_INFINITY },
+    { ...example, word: "x" },
+    { ...example, word: "" },
+    { ...example, word: "RACECAR" },
+    { ...example, word: "racecap" },
     { ...example, frames: [] },
     {
       ...example,

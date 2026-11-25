@@ -4,14 +4,18 @@ import {
   algorithmsLearningCatalog,
   learningTopics,
 } from "@/content/algorithms/learn/catalog";
-import { twoPointersVisualization } from "@/content/algorithms/learn/two-pointers/visualization";
-import { twoPointersWalkthrough } from "@/content/algorithms/learn/two-pointers/walkthrough";
+import {
+  learningVisualizations,
+  learningWalkthroughs,
+} from "@/content/algorithms/learn/walkthroughs";
 import { javascriptLearningCatalog } from "@/content/javascript/learn/catalog";
-import { twoPointersVisualization as originalVisualization } from "@/content/javascript/learn/two-pointers/visualization";
-import { twoPointersWalkthrough as originalWalkthrough } from "@/content/javascript/learn/two-pointers/walkthrough";
+import {
+  learningVisualizations as javascriptVisualizations,
+  learningWalkthroughs as javascriptWalkthroughs,
+} from "@/content/javascript/learn/walkthroughs";
 import { validateLearningContent } from "./learn-content";
 
-it("copies the teaching data and prose with an independent Algorithms module identity", async () => {
+it("shares the lesson and keeps an independent Algorithms module identity", async () => {
   expect(algorithmsLearningCatalog[0]?.id).toBe(
     "algorithms.learn.two-pointers",
   );
@@ -19,8 +23,10 @@ it("copies the teaching data and prose with an independent Algorithms module ide
     ...algorithmsLearningCatalog[0],
     id: javascriptLearningCatalog[0]?.id,
   }).toEqual(javascriptLearningCatalog[0]);
-  expect(twoPointersWalkthrough).toEqual(originalWalkthrough);
-  expect(twoPointersVisualization).toEqual(originalVisualization);
+  expect(learningWalkthroughs[0].walkthrough).toBe(
+    javascriptWalkthroughs[0].walkthrough,
+  );
+  expect(learningVisualizations[0]).toBe(javascriptVisualizations[0]);
   const overview = (subject: string) =>
     readFile(
       new URL(
@@ -30,6 +36,9 @@ it("copies the teaching data and prose with an independent Algorithms module ide
       "utf8",
     );
   expect(await overview("algorithms")).toBe(await overview("javascript"));
+  expect(await overview("algorithms")).toContain(
+    "@/content/shared/learn/two-pointers/overview.mdx",
+  );
   expect(
     await validateLearningContent(
       algorithmsLearningCatalog,

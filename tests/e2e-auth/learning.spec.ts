@@ -241,7 +241,7 @@ test("learning catalog filters and opens the Two Pointers preview", async ({
   await expect(page).toHaveURL(/\/javascript\/learn$/);
 });
 
-test("Two Pointers array visualization moves, scrubs and survives themes and resizing", async ({
+test("Two Pointers palindrome visualization moves, scrubs and survives themes and resizing", async ({
   page,
 }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
@@ -258,11 +258,11 @@ test("Two Pointers array visualization moves, scrubs and survives themes and res
   });
   await page.goto("/javascript/learn/two-pointers");
   const visualization = page.getByRole("region", {
-    name: "Watch left and right find a pair",
+    name: "Trace the pointers in racecar",
     exact: true,
   });
   const conceptual = page.getByRole("region", {
-    name: "Find a pair in a sorted array",
+    name: "Check a palindrome in JavaScript",
     exact: true,
   });
   const next = visualization.getByRole("button", { name: "Next", exact: true });
@@ -271,54 +271,47 @@ test("Two Pointers array visualization moves, scrubs and survives themes and res
     exact: true,
   });
   const positions = [
-    [0, 4],
-    [0, 4],
-    [0, 3],
-    [0, 3],
-    [1, 3],
-    [1, 3],
-    [1, 3],
+    [0, 6],
+    [0, 6],
+    [1, 5],
+    [2, 4],
+    [3, 3],
   ];
   for (const [index, [left, right]] of positions.entries()) {
     await expect(
-      visualization.getByText(`Step ${index + 1} of 7`, { exact: true }),
+      visualization.getByText(`Step ${index + 1} of 5`, { exact: true }),
     ).toBeVisible();
     await expect(visualization.locator('[data-left="true"]')).toHaveAttribute(
-      "data-array-index",
+      "data-character-index",
       String(left),
     );
     await expect(visualization.locator('[data-right="true"]')).toHaveAttribute(
-      "data-array-index",
+      "data-character-index",
       String(right),
     );
     await expect(slider).toHaveAttribute("aria-valuenow", String(index + 1));
     await expect(
       conceptual.getByText("Step 1 of 6", { exact: true }),
     ).toBeVisible();
-    if (index === 1)
+    const letter = "racecar"[left ?? 0];
+    if (index > 0 && index < 4) {
       await expect(
-        visualization.getByText("12 > 9 · sum too large", { exact: true }),
+        visualization.getByText(`“${letter}” = “${letter}”`, { exact: true }),
       ).toBeVisible();
-    if (index === 3)
-      await expect(
-        visualization.getByText("8 < 9 · sum too small", { exact: true }),
-      ).toBeVisible();
-    if (index === 5)
-      await expect(
-        visualization.getByText("9 = 9 · target matched", { exact: true }),
-      ).toBeVisible();
-    if (index < 6) await next.press("Enter");
+      await expect(visualization.locator('[data-match="true"]')).toHaveCount(2);
+    }
+    if (index < 4) await next.press("Enter");
   }
   await expect(next).toBeDisabled();
   await expect(
-    visualization.getByText("Return [1, 3] · values 2 and 7", { exact: true }),
+    visualization.getByText("Return true", { exact: true }),
   ).toBeVisible();
-  await expect(visualization.locator('[data-match="true"]')).toHaveCount(2);
+  await expect(visualization.locator('[data-checked="true"]')).toHaveCount(6);
   await visualization
     .getByRole("button", { name: "Previous", exact: true })
     .press("Enter");
   await expect(
-    visualization.getByText("Step 6 of 7", { exact: true }),
+    visualization.getByText("Step 4 of 5", { exact: true }),
   ).toBeVisible();
   await visualization
     .getByRole("button", { name: "Restart", exact: true })
@@ -327,7 +320,7 @@ test("Two Pointers array visualization moves, scrubs and survives themes and res
     visualization.getByRole("button", { name: "Previous", exact: true }),
   ).toBeDisabled();
   await slider.press("End");
-  await expect(slider).toHaveAttribute("aria-valuenow", "7");
+  await expect(slider).toHaveAttribute("aria-valuenow", "5");
   await slider.press("Home");
   await slider.press("ArrowRight");
   await slider.press("ArrowRight");
@@ -341,18 +334,18 @@ test("Two Pointers array visualization moves, scrubs and survives themes and res
         .getByRole("menuitemradio", { name: theme, exact: true })
         .click();
       await expect(
-        visualization.getByText("Step 3 of 7", { exact: true }),
+        visualization.getByText("Step 3 of 5", { exact: true }),
       ).toBeVisible();
       await expect(
         visualization.locator('[data-right="true"]'),
-      ).toHaveAttribute("data-array-index", "3");
+      ).toHaveAttribute("data-character-index", "5");
       await noOverflow(page);
       const fits = await visualization
-        .locator("[data-array-index]")
+        .locator("[data-character-index]")
         .evaluateAll((cells) =>
           cells.every(
             (cell) =>
-              cell.getBoundingClientRect().width >= 30 &&
+              cell.getBoundingClientRect().width >= 24 &&
               cell.getBoundingClientRect().right <= innerWidth,
           ),
         );
@@ -367,19 +360,19 @@ test("Two Pointers array visualization moves, scrubs and survives themes and res
   ).toBeHidden();
   await slider.press("End");
   await visualization.screenshot({
-    path: test.info().outputPath("two-pointer-array-desktop.png"),
+    path: test.info().outputPath("two-pointer-palindrome-desktop.png"),
   });
   await page.setViewportSize({ width: 320, height: 900 });
   await visualization.screenshot({
-    path: test.info().outputPath("two-pointer-array-mobile.png"),
+    path: test.info().outputPath("two-pointer-palindrome-mobile.png"),
   });
   await page.reload();
   await expect(
-    visualization.getByText("Step 1 of 7", { exact: true }),
+    visualization.getByText("Step 1 of 5", { exact: true }),
   ).toBeVisible();
   await expect(visualization.locator('[data-right="true"]')).toHaveAttribute(
-    "data-array-index",
-    "4",
+    "data-character-index",
+    "6",
   );
   expect(writes).toEqual([]);
   expect(
@@ -404,7 +397,7 @@ test("guided walkthrough supports six steps, keyboard, restart and visit-only st
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/javascript/learn/two-pointers");
   const walkthrough = page.getByRole("region", {
-    name: "Find a pair in a sorted array",
+    name: "Check a palindrome in JavaScript",
     exact: true,
   });
   const source = walkthrough.getByRole("region", {
@@ -448,7 +441,7 @@ test("guided walkthrough supports six steps, keyboard, restart and visit-only st
   }
   await expect(next).toBeDisabled();
   await expect(walkthrough.locator('[aria-live="polite"]')).toContainText(
-    "alternative no-match outcome",
+    "the pointers meet at e",
   );
   await expect(page).toHaveURL(/\/javascript\/learn\/two-pointers$/);
   await previous.press("Enter");
@@ -483,7 +476,7 @@ test("guided walkthrough preserves its step through themes and responsive layout
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto("/javascript/learn/two-pointers");
   const walkthrough = page.getByRole("region", {
-    name: "Find a pair in a sorted array",
+    name: "Check a palindrome in JavaScript",
     exact: true,
   });
   const source = walkthrough.getByRole("region", {
@@ -587,7 +580,7 @@ test("learning preview direct access, themes, responsive state and unavailable m
     await noOverflow(page);
     await page.getByRole("link", { name: "Two Pointers", exact: true }).click();
     await noOverflow(page);
-    await expect(page.locator("pre")).toContainText("function findPair");
+    await expect(page.locator("pre")).toContainText("function isPalindrome");
     await page
       .getByRole("link", { name: "Back to Learn", exact: true })
       .click();

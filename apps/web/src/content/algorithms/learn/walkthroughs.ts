@@ -1,5 +1,5 @@
-import { twoPointersVisualization } from "./two-pointers/visualization";
-import { twoPointersWalkthrough } from "./two-pointers/walkthrough";
+import { twoPointersVisualization } from "@/content/shared/learn/two-pointers/visualization";
+import { twoPointersWalkthrough } from "@/content/shared/learn/two-pointers/walkthrough";
 
 export const learningVisualizations = [twoPointersVisualization] as const;
 

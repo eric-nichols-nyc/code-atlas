@@ -1,7 +1,7 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { twoPointersWalkthrough } from "@/content/javascript/learn/two-pointers/walkthrough";
+import { twoPointersWalkthrough } from "@/content/shared/learn/two-pointers/walkthrough";
 
 const state = vi.hoisted(() => ({ failHighlighting: false }));
 vi.mock("@lezer/highlight", async (importOriginal) => {
@@ -52,10 +52,10 @@ describe("server walkthrough presentation", () => {
     });
     expect(prepared.codeLines.flatMap((line) => line.tokens)).toContainEqual({
       text: "0",
-      offset: 50,
+      offset: twoPointersWalkthrough.source.indexOf("0;"),
       role: "number",
     });
-    expect(prepared.codeLines.at(-1)?.tokens[0]?.role).toBe("comment");
+    expect(prepared.codeLines.at(-1)?.tokens.at(-1)?.role).toBe("comment");
   });
 
   it("retains plain source and guidance if optional syntax coloring fails", () => {
@@ -109,7 +109,7 @@ describe("server walkthrough presentation", () => {
       expect(html).toContain("Guided walkthrough unavailable.");
       expect(html).not.toContain("<button");
       expect(html).not.toContain("Step 1 of");
-      if (definition) expect(html).toContain("function findPair");
+      if (definition) expect(html).toContain("function isPalindrome");
     },
   );
 });

@@ -5,12 +5,7 @@ import {
 
 export type TwoPointerFrame = {
   readonly id: string;
-  readonly phase:
-    | "initialize"
-    | "compare"
-    | "move-right"
-    | "move-left"
-    | "found";
+  readonly phase: "initialize" | "compare" | "complete";
   readonly left: number;
   readonly right: number;
   readonly lines: readonly number[];
@@ -20,14 +15,12 @@ export type TwoPointerFrame = {
 export type TwoPointerVisualizationDefinition = {
   readonly id: string;
   readonly title: string;
-  readonly numbers: readonly number[];
-  readonly target: number;
+  readonly word: string;
   readonly source: string;
   readonly frames: readonly [TwoPointerFrame, ...TwoPointerFrame[]];
 };
 
-// This validates trusted, prepared snapshots of an inward sorted-array search.
-// It never parses or executes JavaScript, and supports 2–50 finite sorted values.
+// Check the prepared palindrome trace against the letters at each pointer.
 export function validateTwoPointerVisualization(
   definition: TwoPointerVisualizationDefinition,
 ) {
@@ -35,50 +28,37 @@ export function validateTwoPointerVisualization(
     { ...definition, steps: definition.frames },
     "Visualization",
   );
-  const { numbers, target, frames } = definition;
+  const { word, frames } = definition;
   const label = `Visualization ${definition.id}`;
-  if (
-    numbers.length < 2 ||
-    numbers.length > 50 ||
-    !numbers.every(
-      (value, index) =>
-        Number.isFinite(value) &&
-        (index === 0 || value >= (numbers[index - 1] ?? value)),
-    ) ||
-    !Number.isFinite(target)
-  )
+  if (!/^[a-z]{2,}$/.test(word))
     return [
       ...errors,
-      `${label}: requires 2–50 finite sorted values and a finite target.`,
+      `${label}: requires at least two lowercase English letters.`,
     ];
   let left = 0;
-  let right = numbers.length - 1;
+  let right = word.length - 1;
   let expectedPhase: TwoPointerFrame["phase"] | undefined = "initialize";
   for (const frame of frames) {
     const context = `${label}, frame ${frame.id}`;
-    if (frame.left !== left || frame.right !== right || left >= right)
-      errors.push(`${context}: pointer positions do not follow the search.`);
-    const sum = (numbers[left] ?? 0) + (numbers[right] ?? 0);
+    if (frame.left !== left || frame.right !== right)
+      errors.push(
+        `${context}: pointer positions do not follow the palindrome check.`,
+      );
     if (frame.phase !== expectedPhase)
       errors.push(`${context}: invalid phase ordering.`);
-    expectedPhase =
-      frame.phase === "compare"
-        ? sum === target
-          ? "found"
-          : sum < target
-            ? "move-left"
-            : "move-right"
-        : frame.phase === "found"
-          ? undefined
-          : "compare";
-    // The comparison frame determines the pointer position shown by its next frame.
-    if (frame.phase === "compare" && sum !== target) {
-      if (sum < target) left += 1;
-      else right -= 1;
+
+    if (frame.phase === "initialize") {
+      expectedPhase = "compare";
+    } else if (frame.phase === "compare" && word[left] === word[right]) {
+      left += 1;
+      right -= 1;
+      expectedPhase = left < right ? "compare" : "complete";
+    } else {
+      expectedPhase = undefined;
     }
   }
-  if (frames.at(-1)?.phase !== "found")
-    errors.push(`${label}: the prepared example must end at a matching pair.`);
+  if (expectedPhase !== undefined)
+    errors.push(`${label}: the prepared example must reach a result.`);
   return errors;
 }
 

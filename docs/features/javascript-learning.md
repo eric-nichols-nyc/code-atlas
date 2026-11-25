@@ -1,42 +1,33 @@
 # JavaScript learning
 
-**Outcome:** Browse JavaScript learning modules using the Practice catalog pattern,
-then open a Two Pointers preview with a guided JavaScript example. The individual
-lesson layout remains open.
+## Two Pointers lesson refresh
 
-**Scope:** `/javascript/learn` has Recommended/Arrays categories, search, difficulty,
-module counts, and Module/Difficulty/Topic/Lesson outlines columns. The single Easy
-Two Pointers module opens `/javascript/learn/two-pointers`: introduction, original
-sorted-array JavaScript example with six manual explanation steps and Back to
-Learn. The bottom lesson-outline section is removed. Previous/Next/Restart
-synchronize readable numbered source and explanations. Position belongs to the
-mounted example, resets on reload, and survives theme/width changes. Both pages
-verify Neon Auth independently. Existing Practice routes and progress remain separate.
+The JavaScript and Algorithms Learn catalogs open the same Two Pointers lesson
+under their existing module IDs and URLs. The previous sorted-pair example is
+replaced by a JavaScript palindrome check using `racecar`. The lesson introduces
+opposite-direction, same-direction, and fixed-offset scans in the Code Atlas
+reading layout. [AlgoMaster’s introduction](https://algomaster.io/learn/dsa/two-pointers-introduction)
 
-The Two Pointers example also includes a separate prepared array visualization.
-Seven frames show initialization, three comparisons, right/left movements, and the
-matching pair. Each frame includes source references, pointer indices, and an
-explanation. Previous/Next/Restart and a step slider control the same visit-only
-position; the conceptual code walkthrough keeps its independent six steps.
+- The five visual steps show the pointers starting at `(0, 6)`, comparing
+  `r/r`, `a/a`, and `c/c`, and meeting at `(3, 3)` with a result of `true`.
+- The six code steps explain initialization, comparisons, early exit for
+  `hello`, inward movement, and the successful return.
+- Previous, Next, Restart, and the visualization slider preserve independent
+  visit-only state. Check keyboard navigation, theme and width changes, reload,
+  and a 320px viewport. Each subject keeps its own Learn navigation and access
+  boundary.
+- Shared metadata, prose, source, and prepared snapshots live in
+  `content/shared/learn/two-pointers`. Each subject registers the overview and
+  walkthrough under its own catalog. Content validation checks source references
+  and the complete palindrome trace.
 
-**Later:** Individual lessons and their layout, code execution, exercises, generated visualizations, AI/notes,
-learning bookmarks/completion, persistence, additional modules, and Algorithms.
+Lint, typecheck, content validation, the web production build, and all 797
+Vitest tests passed. The signed-in Chromium run passed six lesson journeys and
+the dedicated learner sign-in. It covered both subject routes, stepping,
+keyboard scrubbing, all four themes, and visit-only state. Desktop and 320px
+browser captures show the centered pointers and local code scrolling.
 
-**Acceptance:** Filters intersect and clear without changing category; counts use
-published metadata; invalid slugs have a way back; setup/rejected sessions withhold
-content; keyboard, narrow screens, and all shared themes work without page overflow.
-The preview has no lesson links, runner, or claims of saved completion. The guided
-example starts at Step 1 of 6, stops at both boundaries, supports keyboard/restart,
-announces explanations, and contains code overflow locally at 320px. Alternative
-branches are explained as concepts rather than presented as an execution trace.
-Invalid walkthrough data retains surrounding prose and available source; content
-validation prevents publishing invalid step references.
-The array visualization must show `(left, right)` as `(0, 4) → (0, 3) → (1, 3)`,
-compare `12 > 9`, `8 < 9`, then `9 = 9`, and finish with indices `[1, 3]`.
-Backward, restart, and slider scrubbing reproduce the same snapshots. State survives
-theme/width changes, resets on reload, and fits 320px with text pointer labels.
-These are prepared teaching snapshots of the fixed sorted sample, without execution,
-autoplay, learner inputs, or account writes.
+## Original rollout and verification
 
 **Array visualization improvement — 2026-11-14:**
 

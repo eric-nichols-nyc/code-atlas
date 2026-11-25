@@ -1,6 +1,6 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { twoPointersWalkthrough } from "@/content/javascript/learn/two-pointers/walkthrough";
+import { twoPointersWalkthrough } from "@/content/shared/learn/two-pointers/walkthrough";
 import type { PreparedWalkthrough } from "../lib/code-walkthrough";
 import { CodeWalkthroughClient } from "./code-walkthrough-client";
 
@@ -100,7 +100,7 @@ describe("guided code walkthrough", () => {
       `${walkthrough.title} JavaScript source`,
     );
     expect(source).toHaveAttribute("tabindex", "0");
-    expect(source).toHaveTextContent("function findPair");
+    expect(source).toHaveTextContent("function isPalindrome");
     const announcement = container.querySelector('[aria-live="polite"]');
     expect(announcement).toHaveAttribute("aria-atomic", "true");
     expect(announcement).toHaveTextContent("Step 1 of 6");

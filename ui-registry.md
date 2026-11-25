@@ -709,26 +709,24 @@ theme/width changes. Describe conceptual branches without implying execution or
 saved completion. Authored source and explanations live in content, separately
 from the learning-owned renderer; content checking validates their line references.
 
-## Prepared array visualizations
+## Two Pointers visualization
 
 Files: `features/learning/components/two-pointer-visualization*.tsx`,
 `two-pointer-visualization.module.css`, `step-controls.tsx`, and shared `slider.tsx`.
-Last updated: 2026-11-14.
+Last updated: 2026-11-24.
 
-Keep prepared sample runs separate from conceptual code explanations, using the
-same walkthrough header, card border/radius, 16px body gutters, and shared small
-Previous/Next/Restart controls. A shared semantic Slider provides deterministic
-scrubbing with a visible Example step label and accessible Step n of total value.
-Slider thumbs retain identity as values change and use existing Radix dependencies.
+Use the walkthrough header, card border and radius, 16px body gutters, and shared
+small Previous, Next, and Restart controls. The shared Slider scrubs the trace.
+Its visible label is Example step and its value announces the step and total.
 
-Render array cells as an accessible ordered list with value/index/pointer labels.
-Use neutral semantic surfaces: left has a solid outline, right a dashed outline,
-both have explicit text/arrows, discarded values are struck through but readable,
-and a matching pair uses primary/primary-foreground. The five-cell example fits
-320px without horizontal page scrolling. Keep the comparison, narrative, source
-references, and result synchronized with the selected snapshot. Announce one polite
-atomic explanation per step. No autoplay or motion is needed. Each instance owns
-visit-only state that survives theme/width changes and resets on remount/reload.
+Render the word as an ordered list of indexed letter cells. The left and right
+pointers use solid and dashed outlines with visible labels. When they meet,
+show both labels above the center cell. The current matching pair uses
+primary colors and previously matched letters stay readable in muted colors.
+Keep the comparison, result, explanation, and source lines synchronized.
+The seven-letter example fits at 320px without horizontal page scrolling.
+Each instance retains its position through theme and width changes and resets
+on reload. Announce one polite, atomic explanation per step.
 
 ## Full-width walkthrough player
 
