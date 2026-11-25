@@ -658,10 +658,10 @@ A project license has not yet been selected.
 
 ## README screenshots
 
-The images in [docs/images](images) were captured through browser automation from the
-running local application on November 10, 2026. They show the public landing page,
-the signed-in catalog, and the Fibonacci Generator workspace with existing saved code.
-No Run, Submit, or flag actions were used to prepare these captures.
+The browser captures in [docs/images](images) show the public landing page, the
+signed-in catalog, and the Sleep workspace. The November 25, 2026 workspace capture
+shows Notes open on the right with an unsaved sample draft. Capturing the workspace
+used the dedicated development learner and left its account data intact.
 
 Refresh the images after significant UI changes. Use the rendered application, wait
 for account data and the editor to finish loading, and save browser screenshots to
