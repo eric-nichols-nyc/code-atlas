@@ -83,7 +83,6 @@ function ProblemWorkspace({
             >
               <TabsTrigger value="problem">Problem</TabsTrigger>
               <TabsTrigger value="solution">Solution</TabsTrigger>
-              <TabsTrigger value="notes">Notes</TabsTrigger>
             </TabsList>
           </div>
           <TabsContent value="problem" className="min-h-0 overflow-y-auto">
@@ -92,14 +91,12 @@ function ProblemWorkspace({
           <TabsContent value="solution" className="min-h-0 overflow-y-auto">
             <SolutionPanel />
           </TabsContent>
-          <TabsContent value="notes" className="min-h-0 overflow-y-auto p-3">
-            <ProblemNotes />
-          </TabsContent>
         </Tabs>
       }
       code={<CodePanel />}
       output={<ResultPanel />}
       tutor={<ProblemTutor />}
+      notes={<ProblemNotes />}
     />
   );
 }

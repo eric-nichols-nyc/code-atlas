@@ -86,17 +86,22 @@ test("tutor requests only on Send, captures fresh code, survives panels, and end
     page.getByText("Code changed since this question."),
   ).toBeVisible();
   await question(page).fill("draft while waiting");
-  await page.getByRole("tab", { name: "Notes", exact: true }).click();
+  await page.getByRole("button", { name: "Show Notes", exact: true }).click();
   await expect(
     page.getByRole("textbox", { name: "Your notes", exact: true }),
   ).toBeVisible();
+  await expect(question(page)).toHaveCount(0);
   await page.setViewportSize({ width: 390, height: 844 });
-  await expect(question(page)).toHaveValue("draft while waiting");
+  const notesDrawer = page.getByRole("dialog", { name: "Notes", exact: true });
   await expect(
-    page.getByRole("button", { name: "Stop reply", exact: true }),
+    notesDrawer.getByRole("form", { name: "Problem notes" }),
   ).toBeVisible();
   expect(requests).toHaveLength(1);
   releaseFirst();
+  await notesDrawer
+    .getByRole("button", { name: "Show AI tutor", exact: true })
+    .click();
+  await expect(question(page)).toHaveValue("draft while waiting");
   await expect(
     page.getByRole("status").filter({ hasText: "Tutor reply complete." }),
   ).toBeVisible();

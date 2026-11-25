@@ -21,7 +21,7 @@ export function ResizableWorkspace({
   lesson,
   code,
   output,
-  tutor,
+  toolsPanel,
   preferences,
   width,
   height,
@@ -31,7 +31,7 @@ export function ResizableWorkspace({
   lesson: ReactNode;
   code: ReactNode;
   output?: ReactNode;
-  tutor?: ReactNode;
+  toolsPanel?: ReactNode;
   preferences: LayoutPreferences;
   width: number;
   height: number;
@@ -43,8 +43,8 @@ export function ResizableWorkspace({
   const capture = useRef<{ left: number; right: number } | null>(null);
   const desired = useRef(preferences);
   desired.current = preferences;
-  const hasTutor = Boolean(tutor);
-  const fitted = fitLayout(preferences, width, height, hasTutor);
+  const hasToolsPanel = Boolean(toolsPanel);
+  const fitted = fitLayout(preferences, width, height, hasToolsPanel);
   useImperativeHandle(
     apiRef,
     () => ({
@@ -75,24 +75,24 @@ export function ResizableWorkspace({
       },
       width,
       height,
-      hasTutor,
+      hasToolsPanel,
     );
     let frame = 0;
     let attempts = 0;
     const apply = () => {
       if (
         !left.current?.getSize().inPixels ||
-        (hasTutor && !right.current?.getSize().inPixels)
+        (hasToolsPanel && !right.current?.getSize().inPixels)
       ) {
         if (attempts++ < 12) frame = requestAnimationFrame(apply);
         return;
       }
       left.current.resize(`${p.lessonWidthPx}px`);
-      if (hasTutor) right.current?.resize(`${p.lastTutorWidthPx}px`);
+      if (hasToolsPanel) right.current?.resize(`${p.lastTutorWidthPx}px`);
     };
     frame = requestAnimationFrame(apply);
     return () => cancelAnimationFrame(frame);
-  }, [hasTutor, width, height]);
+  }, [hasToolsPanel, width, height]);
   return (
     <ResizablePanelGroup
       id="learning-columns"
@@ -114,7 +114,7 @@ export function ResizableWorkspace({
         panelRef={left}
         defaultSize={`${fitted.lessonWidthPx}px`}
         minSize="280px"
-        maxSize={`${Math.min(440, width - 490 - (tutor ? 266 : 0))}px`}
+        maxSize={`${Math.min(440, width - 490 - (hasToolsPanel ? 266 : 0))}px`}
         groupResizeBehavior="preserve-pixel-size"
       >
         {lesson}
@@ -147,18 +147,21 @@ export function ResizableWorkspace({
           code
         )}
       </ResizablePanel>
-      {tutor && (
+      {toolsPanel && (
         <>
-          <ResizableHandle withHandle aria-label="Resize code and tutor" />
+          <ResizableHandle
+            withHandle
+            aria-label="Resize code and workspace tools"
+          />
           <ResizablePanel
-            id="tutor"
+            id="tools"
             panelRef={right}
             defaultSize={`${fitted.lastTutorWidthPx}px`}
             minSize="256px"
             maxSize="360px"
             groupResizeBehavior="preserve-pixel-size"
           >
-            {tutor}
+            {toolsPanel}
           </ResizablePanel>
         </>
       )}

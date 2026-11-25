@@ -1,26 +1,41 @@
 "use client";
 import { Button } from "@workspace/ui/components/button";
-import { ArrowLeftIcon, SparklesIcon } from "@workspace/ui/components/icons";
+import {
+  ArrowLeftIcon,
+  NotebookPenIcon,
+  SparklesIcon,
+  XIcon,
+} from "@workspace/ui/components/icons";
 import {
   Sheet,
+  SheetClose,
   SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTitle,
 } from "@workspace/ui/components/sheet";
 import Link from "next/link";
-import { type ReactNode, useRef, useState } from "react";
+import { type ReactNode, useId, useRef, useState } from "react";
 import { WorkspaceTimer } from "../../workspace-timer/components/workspace-timer";
 import { useWorkspaceLayout } from "../hooks/use-workspace-layout";
 import {
   ResizableWorkspace,
   type WorkspaceHandle,
 } from "./resizable-workspace";
+
+const toolOrder = ["tutor", "notes"] as const;
+type ToolName = (typeof toolOrder)[number];
+const tools = {
+  tutor: { title: "AI tutor", icon: SparklesIcon },
+  notes: { title: "Notes", icon: NotebookPenIcon },
+};
+
 export function LearningWorkspace({
   lesson,
   code,
   output,
   tutor,
+  notes,
   backHref = "/javascript/practice",
   subjectTitle = "JavaScript",
 }: {
@@ -28,19 +43,52 @@ export function LearningWorkspace({
   code: ReactNode;
   output?: ReactNode;
   tutor: ReactNode;
+  notes: ReactNode;
   backHref?: string;
   subjectTitle?: string;
 }) {
   const layout = useWorkspaceLayout();
-  const [tutorOpen, setTutorOpen] = useState(false);
-  const toolTrigger = useRef<HTMLButtonElement>(null);
-  const api = useRef<WorkspaceHandle>(null);
-  const docked = layout.mode === "wide";
-  const toggleTutor = (trigger: HTMLButtonElement) => {
-    api.current?.capture();
-    toolTrigger.current = trigger;
-    setTutorOpen(!tutorOpen);
+  const [tool, setTool] = useState<{ name: ToolName; open: boolean }>({
+    name: "tutor",
+    open: false,
+  });
+  const toolbarButtons = {
+    tutor: useRef<HTMLButtonElement>(null),
+    notes: useRef<HTMLButtonElement>(null),
   };
+  const drawerTrigger = useRef<HTMLButtonElement>(null);
+  const api = useRef<WorkspaceHandle>(null);
+  const panelId = useId();
+  const docked = layout.mode === "wide";
+  const showingNotes = tool.name === "notes";
+  const toolTitle = tools[tool.name].title;
+  const toolContent = showingNotes ? notes : tutor;
+  const renderToolButtons = (inDrawer: boolean) =>
+    toolOrder.map((name) => {
+      const { title, icon: Icon } = tools[name];
+      const expanded = tool.open && tool.name === name;
+      const label = `${expanded ? "Hide" : "Show"} ${title}`;
+      return (
+        <Button
+          key={name}
+          ref={inDrawer ? undefined : toolbarButtons[name]}
+          type="button"
+          variant={expanded ? "secondary" : "outline"}
+          size={inDrawer ? "icon-sm" : "icon"}
+          aria-label={label}
+          title={label}
+          aria-expanded={expanded}
+          aria-controls={panelId}
+          onClick={() => {
+            if (docked && (!tool.open || expanded)) api.current?.capture();
+            setTool({ name, open: !expanded });
+          }}
+        >
+          <Icon aria-hidden="true" />
+        </Button>
+      );
+    });
+
   return (
     <main
       className="min-w-0 flex-1"
@@ -60,18 +108,9 @@ export function LearningWorkspace({
         </nav>
         <div className="flex min-w-0 flex-wrap items-center gap-2">
           <WorkspaceTimer />
-          <Button
-            type="button"
-            variant={tutorOpen ? "secondary" : "outline"}
-            size="icon"
-            aria-label={tutorOpen ? "Hide AI tutor" : "Show AI tutor"}
-            title={tutorOpen ? "Hide AI tutor" : "Show AI tutor"}
-            aria-expanded={tutorOpen}
-            aria-controls="lesson-tutor"
-            onClick={(event) => toggleTutor(event.currentTarget)}
-          >
-            <SparklesIcon aria-hidden="true" />
-          </Button>
+          <div className="flex items-center gap-2">
+            {renderToolButtons(false)}
+          </div>
         </div>
       </header>
       <div
@@ -96,20 +135,28 @@ export function LearningWorkspace({
             lesson={lesson}
             code={code}
             output={output}
-            tutor={
-              docked && tutorOpen ? (
+            toolsPanel={
+              docked && tool.open ? (
                 <section
-                  id="lesson-tutor"
+                  id={panelId}
                   className="learning-panel"
-                  aria-labelledby="lesson-tutor-title"
+                  aria-labelledby={`${panelId}-title`}
                 >
                   <h2
-                    id="lesson-tutor-title"
+                    id={`${panelId}-title`}
                     className="learning-panel-header font-medium"
                   >
-                    AI tutor
+                    {toolTitle}
                   </h2>
-                  <div className="min-h-0 flex-1 overflow-hidden">{tutor}</div>
+                  <div
+                    className={
+                      showingNotes
+                        ? "min-h-0 flex-1 overflow-y-auto p-3"
+                        : "min-h-0 flex-1 overflow-hidden"
+                    }
+                  >
+                    {toolContent}
+                  </div>
                 </section>
               ) : undefined
             }
@@ -121,20 +168,56 @@ export function LearningWorkspace({
         )}
       </div>
       {!docked && (
-        <Sheet open={tutorOpen} onOpenChange={(open) => setTutorOpen(open)}>
+        <Sheet
+          open={tool.open}
+          onOpenChange={(open) => setTool({ ...tool, open })}
+        >
           <SheetContent
-            id="lesson-tutor"
+            id={panelId}
             side="right"
+            showCloseButton={false}
+            onOpenAutoFocus={() => {
+              drawerTrigger.current = toolbarButtons[tool.name].current;
+            }}
             onCloseAutoFocus={(event) => {
               event.preventDefault();
-              toolTrigger.current?.focus();
+              drawerTrigger.current?.focus();
             }}
           >
             <SheetHeader>
-              <SheetTitle>AI tutor</SheetTitle>
-              <SheetDescription>Ask about your current code.</SheetDescription>
+              <div className="flex items-center justify-between gap-2">
+                <SheetTitle>{toolTitle}</SheetTitle>
+                <div className="flex items-center gap-2">
+                  {renderToolButtons(true)}
+                  <SheetClose asChild>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon-sm"
+                      aria-label="Close"
+                    >
+                      <XIcon aria-hidden="true" />
+                    </Button>
+                  </SheetClose>
+                </div>
+              </div>
+              <SheetDescription
+                className={showingNotes ? "sr-only" : undefined}
+              >
+                {showingNotes
+                  ? "View and edit your private notes for this problem."
+                  : "Ask about your current code."}
+              </SheetDescription>
             </SheetHeader>
-            <div className="min-h-0 flex-1 px-4 pb-4">{tutor}</div>
+            <div
+              className={
+                showingNotes
+                  ? "min-h-0 flex-1 overflow-y-auto px-4 pb-4"
+                  : "min-h-0 flex-1 px-4 pb-4"
+              }
+            >
+              {toolContent}
+            </div>
           </SheetContent>
         </Sheet>
       )}

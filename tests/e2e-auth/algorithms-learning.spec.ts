@@ -155,12 +155,9 @@ test("Anagram edited Run, private Submit, saved code, flags and private notes", 
     await page.getByRole("textbox", { name: "t =", exact: true }).fill("");
     await page.getByRole("button", { name: "Run", exact: true }).click();
     await expect(page.getByTestId("execution-verdict")).toHaveText("Accepted");
-    await expect(
-      page.getByText('s = "", t = ""', { exact: true }),
-    ).toBeVisible();
-    await expect(
-      page.getByText("false", { exact: true }).first(),
-    ).toBeVisible();
+    const editedCase = page.getByRole("tabpanel", { name: "Case 1 · Passed" });
+    await expect(editedCase.getByText('""', { exact: true })).toHaveCount(2);
+    await expect(editedCase.getByText("true", { exact: true })).toHaveCount(2);
     await page.getByRole("button", { name: "Submit", exact: true }).click();
     await expect(page.getByTestId("execution-verdict")).toHaveText("Accepted");
     await expect
@@ -170,7 +167,7 @@ test("Anagram edited Run, private Submit, saved code, flags and private notes", 
       )
       .not.toBeNull();
     await expect(page.getByText(/^Saved to account ·/)).toBeVisible();
-    await page.getByRole("tab", { name: "Notes", exact: true }).click();
+    await page.getByRole("button", { name: "Show Notes", exact: true }).click();
     const noteEditor = page.getByRole("textbox", {
       name: "Your notes",
       exact: true,
@@ -197,8 +194,9 @@ test("Anagram edited Run, private Submit, saved code, flags and private notes", 
     await expect(editor).toHaveText(validAnagramProblem.solution, {
       useInnerText: true,
     });
-    await page.getByRole("tab", { name: "Notes", exact: true }).click();
+    await page.getByRole("button", { name: "Show Notes", exact: true }).click();
     await expect(noteEditor).toContainText("two forward pointers");
+    await page.getByRole("button", { name: "Hide Notes", exact: true }).click();
     await page.getByRole("tab", { name: "Problem", exact: true }).click();
     await page.setViewportSize({ width: 320, height: 900 });
     await noOverflow(page);
@@ -283,10 +281,11 @@ test("Algorithms workspace preserves drafts through themes, tools and narrow lay
   await expect(
     page.getByRole("textbox", { name: "t =", exact: true }),
   ).toBeFocused();
-  await page.getByRole("tab", { name: "Notes", exact: true }).click();
+  await page.getByRole("button", { name: "Show Notes", exact: true }).click();
   await expect(
     page.getByRole("textbox", { name: "Your notes", exact: true }),
   ).toBeVisible();
+  await page.getByRole("button", { name: "Hide Notes", exact: true }).click();
   await page.getByRole("tab", { name: "Problem", exact: true }).click();
   // A second tab changes the existing theme preference without leaving the draft.
   const themePage = await context.newPage();

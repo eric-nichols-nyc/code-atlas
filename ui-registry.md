@@ -231,16 +231,16 @@ Last updated: 2026-11-09. Implemented in `apps/web/src/features/learning/`, `fea
 | Subject catalog          | Flat rows; fixed ordinal/action slots; title and concise topic tag on one line |
 | Unavailable lesson       | Coming soon text and clock icon; no dead navigation or paywall-style lock      |
 
-The coding workspace puts Problem, Solution, and Notes tabs on the left, editable JavaScript above Testcase/Test Result/Feedback in the center, and the optional AI tutor on the right. The visualization and multiple-choice checkpoint are removed. All three splitters resize; closing the tools panel releases its column. Mobile uses a reading flow and drawers. Preserve source, editor selection/undo, cases and results above responsive branches.
+The coding workspace puts Problem and Solution tabs on the left, editable JavaScript above Testcase/Test Result/Feedback in the center, and AI tutor or Notes in the optional right panel. The visualization and multiple-choice checkpoint are removed. All three splitters resize. Closing the tools panel releases its column. Mobile uses a reading flow and a right drawer. Preserve source, editor selection/undo, cases and results above responsive branches.
 
 Shared learning panels use `learning-panel` (`bg-card`, `border`, `rounded-md`, no shadow),42px headers and16–20px inner padding. Problem headings use24/32px; prose14/23px. CodeMirror uses Menlo13/24px, semantic light/dark syntax roles and local assets. Default Tab exits the editor; Mod-Enter runs. Lazy editor loading reserves its space. Show Saved to account only after a successful database write/read; ordinary typing is Unsaved edits and latest verdicts remain session results.
 
-The Problem tab shows the continuous problem description and is selected by default. Solution is the second tab, with authored code and an explanation; Notes is third. Hints use shared Accordion rows in Problem; Testcase/Test Result retain shared line Tabs. Cases use shared Buttons and labeled numeric Input. Verdicts are server results with text labels, bounded diagnostics and explicit stale-code warnings. Hidden cases never expose private values/logs. Tutor uses the question-triggered chat described below; Notes uses the private note editor described below. Counter (Closures), Filter Elements from Array (Arrays), Debounce and Sleep (Async) are published practice problems. Learn has a module catalog and read-only Two Pointers preview; guided lessons remain future work.
+The Problem tab shows the continuous problem description and is selected by default. Solution is the second tab, with authored code and an explanation. Hints use shared Accordion rows in Problem. Testcase/Test Result retain shared line Tabs. Cases use shared Buttons and labeled numeric Input. Verdicts are server results with text labels, bounded diagnostics and explicit stale-code warnings. Hidden cases never expose private values/logs. Tutor uses the question-triggered chat described below. Notes uses the private note editor described below. Counter (Closures), Filter Elements from Array (Arrays), Debounce and Sleep (Async) are published practice problems. Learn has a module catalog and read-only Two Pointers preview; guided lessons remain future work.
 
 Practice color accents updated 2026-11-20, using the
 [AlgoMaster solution workspace](https://algomaster.io/practice/dsa/contains-duplicate-ii/solution?list=am-300)
 as a reference. Shared `TabsList variant="line" tone="accent"` makes selected
-Problem/Solution/Notes and output tabs use green text and an underline. Selected cases
+Problem/Solution and output tabs use green text and an underline. Selected cases
 and Run use the `success` Button variant; Evaluate uses `warning`, and Submit
 uses `info`. Run/Submit include decorative Play/Send icons alongside their
 labels. Problem inline code uses `interactive` text over an 8% green tint;
@@ -395,22 +395,23 @@ and interactive content width.
 
 Files: `apps/web/src/components/site-nav.tsx` and
 `apps/web/src/features/learning/components/learning-workspace.tsx`.
-Last updated: 2026-11-09. Reference: TraceCode binary-search workspace.
+Last updated: 2026-11-25. Reference: TraceCode binary-search workspace.
 
 | Property          | Pattern                                                                                              |
 | ----------------- | ---------------------------------------------------------------------------------------------------- |
 | Global navigation | Omitted on individual JavaScript problem routes; retained on catalog and Learn pages                 |
 | Back action       | Shared ghost Button, small size, decorative ArrowLeft icon and a real link to `/javascript/practice` |
 | Workspace toolbar | Existing background/border, `px-3 py-2`, wrapping controls with `gap-2`; no brand or subject links   |
-| Tools             | Back link with AI tutor icon; editor header owns its icon controls                                   |
+| Tools             | Timer, AI tutor, and Notes icons in the right toolbar group                                          |
 
 Keep authentication and theme providers mounted. The compact toolbar participates in
 workspace height measurement, allowing panes to use the space released by the global
 header. Back always returns to Practice, including after directly opening a problem.
-The AI tutor uses a shared icon Button with Sparkles. Clicking the icon toggles
-the docked panel or mobile drawer. Use a visible
-active state, accessible Show/Hide names and titles, and `aria-expanded`. Closing
-the mobile drawer restores focus to the icon that opened it.
+Use shared icon Buttons with Sparkles for AI tutor and NotebookPen for Notes.
+Selecting either opens its content in the same docked panel or right drawer and
+keeps the panel size when switching tools. The icons appear together in the drawer
+header as well. Use a visible active state, accessible Show/Hide names and titles,
+and `aria-expanded`. Closing the drawer restores focus to the icon that opened it.
 
 ## Problem help and editor controls
 
@@ -429,7 +430,7 @@ Files: `packages/ui/src/components/accordion.tsx`,
 | Execution actions    | Evaluate, Run and Submit stay beneath the editor; no Reset layout action                         |
 
 Keep hint expansion and the selected tab above adaptive branches. Solution is its
-own scrollable tab between Problem and Notes, with 20px padding, an 18px semibold
+own scrollable tab beside Problem, with 20px padding, an 18px semibold
 heading, a bordered rounded-md code block, and 14px muted explanation text. Code
 overflow stays inside the block; no additional reveal control is needed. Keep the
 latest real result in Test Result. Reset code is
@@ -569,20 +570,20 @@ show an accepted/saved state without the server response.
 
 Files: `features/problems/components/problem-notes.tsx`, `problem-notes-editor.tsx`,
 `state/problem-notes.tsx`, and `problem-experience.tsx`.
-Last updated: 2026-11-20.
+Last updated: 2026-11-25.
 
-Use shared line Tabs in the 42px problem pane header, ordered Problem, Solution,
-then Notes. The notes body uses 12px padding, FieldGroup/Field/FieldTitle,
+Use a Notes heading in the 42px docked panel header and as the narrow-screen
+Sheet title. The docked notes body uses 12px padding, FieldGroup/Field/FieldTitle,
 a bordered rounded-md editor, and shared small Buttons. Load BlockNote on demand.
 Use its slash menu and selection toolbar for block insertion and rich-text
 formatting. Use the workspace card colors for the editor and the current theme
 for BlockNote controls. Keep long links wrapped and the note pane scrollable.
 
-Keep notes state and the selected tab above responsive layout branches. Show Loading your notes, No saved notes
+Keep notes state and the selected tool above responsive layout branches. Show Loading your notes, No saved notes
 yet, Unsaved changes, Saving, Saved with the confirmed account timestamp, or Not saved
 to account. Use status text, inline FieldError, and explicit Retry loading/saving
 notes or Sign in. A failed initial read blocks editing. Preserve later typing when
-a save completes, and preserve drafts when switching tabs or resizing. Display the draft
+a save completes, and preserve drafts when switching tools or resizing. Display the draft
 lifetime near Save: unsaved changes end when leaving/reloading the problem. Notes
 Save, Reset code, progress, and Run/Submit have independent effects.
 
