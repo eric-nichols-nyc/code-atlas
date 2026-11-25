@@ -86,13 +86,18 @@ test("Evaluate captures unsaved source, preserves results and notes, and keeps e
       .getByRole("region", { name: "Test cases and results" })
       .getByRole("tab"),
   ).toHaveCount(3);
-  await page.getByRole("tab", { name: "Notes", exact: true }).click();
+  await page.getByRole("button", { name: "Show Notes", exact: true }).click();
   const noteEditor = page.getByRole("textbox", {
     name: "Your notes",
     exact: true,
   });
   await expect(noteEditor).toBeVisible();
   await noteEditor.fill("unsaved evaluation takeaway");
+  const codeWithDrawerOpen = page.getByRole("textbox", {
+    name: "JavaScript solution",
+    exact: true,
+    includeHidden: true,
+  });
   for (const width of [1440, 390, 320]) {
     await page.setViewportSize({ width, height: 960 });
     await expect(page.getByTestId("evaluation-score")).toBeVisible();
@@ -101,8 +106,10 @@ test("Evaluate captures unsaved source, preserves results and notes, and keeps e
         () => document.documentElement.scrollWidth <= innerWidth,
       ),
     ).toBe(true);
-    await expect(editor).toContainText(source);
-    await expect(editor).toContainText("// edited during evaluation");
+    await expect(codeWithDrawerOpen).toContainText(source);
+    await expect(codeWithDrawerOpen).toContainText(
+      "// edited during evaluation",
+    );
     await expect(noteEditor).toContainText("unsaved evaluation takeaway");
   }
   await page.setViewportSize({ width: 1440, height: 960 });

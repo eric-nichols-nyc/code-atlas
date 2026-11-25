@@ -34,9 +34,9 @@ export function fitLayout(
   p: LayoutPreferences,
   width: number,
   height: number,
-  tutor: boolean,
+  hasToolsPanel: boolean,
 ): LayoutPreferences {
-  const maxLesson = Math.min(440, width - 480 - 10 - (tutor ? 266 : 0));
+  const maxLesson = Math.min(440, width - 480 - 10 - (hasToolsPanel ? 266 : 0));
   const lesson = Math.max(280, Math.min(p.lessonWidthPx, maxLesson));
   const right = Math.max(
     256,

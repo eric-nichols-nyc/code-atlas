@@ -1,20 +1,24 @@
 # Personal problem notes
 
 **Outcome:** Keep one private formatted note per account and published practice problem.
-**First review:** Open Sleep → Notes, write a takeaway with a list/code block/link,
-select Save, reload, and see the confirmed account note restored.
+**First review:** Open Sleep, select the Notes icon beside AI tutor, and write a
+takeaway. Switch to AI tutor and back to check the draft, then save and reload.
 
 ## Scope and decisions
 
-- Place Notes after Problem and Solution in the problem pane tab list. Problem
-  opens by default; Solution contains the authored code and explanation.
-  Use BlockNote with a slash menu for headings, quotes, lists, checklists, and code
-  blocks. Rich-text formatting and links remain available. Load the editor on demand.
+- Move Notes from the problem tabs to the right-side tools panel. Put its icon
+  immediately after AI tutor in the workspace toolbar. Selecting either tool
+  displays only that tool in the docked panel or narrow-screen drawer. Include
+  both icons in the modal drawer so switching is available while it is open.
+- Keep Problem and Solution in the left pane, with Problem selected by default.
+  Notes uses BlockNote with a slash menu for headings, quotes, lists, checklists,
+  and code blocks. Rich-text formatting and links remain available. Load on demand.
 - Explicit Save persists a validated versioned document through authenticated Next.js
   GET/PUT `/api/problems/{problemId}/notes` and a separate Prisma user/problem model.
   Ownership comes only from the verified Neon identity. Notes never enter public
   content, progress payloads, judging, or tutor context.
-- Drafts survive switching between Problem, Solution, and Notes, resizing, and theme changes in the current session.
+- Notes drafts and tutor conversations survive switching tools, closing the panel,
+  resizing, and theme changes in the current session.
   Unsaved changes end on navigation/reload; confirmed saves follow the account.
   Concurrent sessions use last successful database write wins.
 - Failed initial reads block editing until retry. Failed saves preserve edits. Late
@@ -25,12 +29,31 @@ select Save, reload, and see the confirmed account note restored.
 
 ## Acceptance and implementation
 
+- [x] Verify icon order, exclusive tool switching, and preserved panel width in
+  the desktop workspace.
+- [x] Verify tool switching inside the drawer, keyboard dismissal and focus
+  restoration, and draft and chat retention across tool and layout changes.
+
+### Original Notes acceptance
+
 - [x] Validate formatted documents, links, operation count, and byte bounds.
 - [x] Add an additive migration and owner-scoped services/API.
 - [x] Deliver real rich-text Save/reload/clear with safe failure recovery.
 - [x] Preserve notes, code, inputs, hints, and results across workspace transitions.
 - [x] Verify keyboard/focus, narrow layouts, web, and online Electron behavior.
 - [x] Run repository checks and separate credential-free and signed-in results.
+
+## Right-side tools panel verification (2026-11-25)
+
+- Lint, typecheck, the credential-free production build, and all 802 repository
+  tests passed. All 73 public production browser checks passed.
+- The targeted signed-in Chromium run passed 13 checks plus sign-in setup. It
+  verified desktop icon order and panel width, keyboard switching and focus
+  restoration in the drawer, and retained notes, tutor drafts, and replies across
+  switches and resizing. Save, reload, and recovery used the dedicated development
+  account. Tutor replies in the switching test used deterministic streams.
+- Direct Chromium review confirmed the desktop panel layout and that the Notes
+  drawer and BlockNote slash menu work at 320 px.
 
 ## Problem pane tabs — 2026-11-19
 

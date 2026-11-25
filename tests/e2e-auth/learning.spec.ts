@@ -657,7 +657,7 @@ test("source/results survive resize and tools", async ({ page }) => {
 
 const notesApi = "/api/problems/javascript.sleep/notes";
 async function openNotes(page: Page) {
-  await page.getByRole("tab", { name: "Notes", exact: true }).click();
+  await page.getByRole("button", { name: "Show Notes", exact: true }).click();
   await expect(page.getByRole("textbox", { name: "Your notes" })).toBeVisible({
     timeout: 20000,
   });
@@ -745,7 +745,6 @@ test("private formatted notes save, reload, survive tools/layout, and clear inde
     await page
       .getByRole("textbox", { name: "JavaScript solution" })
       .fill("// In-session code remains intact");
-    await openNotes(page);
     await editor.fill("Unsaved note preserved across layouts");
     await page
       .getByRole("button", { name: "Change theme", exact: true })
@@ -753,6 +752,38 @@ test("private formatted notes save, reload, survive tools/layout, and clear inde
     await page
       .getByRole("menuitemradio", { name: "Light", exact: true })
       .click();
+    const notesHeading = page.getByRole("heading", {
+      name: "Notes",
+      exact: true,
+    });
+    const notesBounds = await notesHeading.boundingBox();
+    expect(notesBounds?.x).toBeGreaterThan(1000);
+    const showTutor = page.getByRole("button", {
+      name: "Show AI tutor",
+      exact: true,
+    });
+    const hideNotes = page.getByRole("button", {
+      name: "Hide Notes",
+      exact: true,
+    });
+    await expect(
+      showTutor.locator("xpath=following-sibling::button[1]"),
+    ).toHaveAccessibleName("Hide Notes");
+    await expect(hideNotes).toHaveAttribute("aria-expanded", "true");
+    await showTutor.click();
+    await expect(editor).toHaveCount(0);
+    await expect(
+      page.getByRole("textbox", { name: "Your question" }),
+    ).toBeVisible();
+    await expect
+      .poll(() =>
+        page
+          .getByRole("heading", { name: "AI tutor", exact: true })
+          .boundingBox(),
+      )
+      .toEqual(notesBounds);
+    await openNotes(page);
+    await expect(editor).toHaveText("Unsaved note preserved across layouts");
     for (const width of [320, 390, 768, 1024, 1440]) {
       await page.setViewportSize({ width, height: 900 });
       await expect(editor).toHaveText("Unsaved note preserved across layouts");
@@ -769,6 +800,28 @@ test("private formatted notes save, reload, survive tools/layout, and clear inde
       await expect(editor).toHaveCount(1);
     }
     await page.setViewportSize({ width: 390, height: 844 });
+    const drawer = page.getByRole("dialog", { name: "Notes", exact: true });
+    await drawer
+      .getByRole("button", { name: "Show AI tutor", exact: true })
+      .press("Enter");
+    const tutorDrawer = page.getByRole("dialog", {
+      name: "AI tutor",
+      exact: true,
+    });
+    await expect(
+      tutorDrawer.getByRole("textbox", { name: "Your question" }),
+    ).toBeVisible();
+    await expect(editor).toHaveCount(0);
+    await tutorDrawer
+      .getByRole("button", { name: "Show Notes", exact: true })
+      .press("Enter");
+    await expect(editor).toHaveText("Unsaved note preserved across layouts");
+    await drawer
+      .getByRole("button", { name: "Hide Notes", exact: true })
+      .press("Escape");
+    await expect(
+      page.getByRole("button", { name: "Show Notes", exact: true }),
+    ).toBeFocused();
     await problemTab.click();
     await expect(
       page.getByRole("button", { name: "Hint 1", exact: true }),
@@ -825,7 +878,7 @@ test("notes load/save failures retain the draft and support explicit recovery", 
     } else await route.continue();
   });
   try {
-    await page.getByRole("tab", { name: "Notes", exact: true }).click();
+    await page.getByRole("button", { name: "Show Notes", exact: true }).click();
     const form = page.getByRole("form", { name: "Problem notes" });
     await expect(
       form.getByRole("button", { name: "Save", exact: true }),
