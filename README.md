@@ -11,9 +11,10 @@ Prisma, and Turborepo.
 
 ## Preview
 
-The coding workspace brings the problem, editor, and test cases together in resizable panels.
+The Practice workspace puts the problem and solution on the left, the editor and test cases
+in the center, and Notes or AI Tutor in a resizable panel on the right.
 
-![Fibonacci Generator workspace with a JavaScript editor, editable test cases, and the AI tutor](docs/images/coding-workspace.jpg)
+![Sleep practice workspace with a JavaScript editor, editable test cases, and Notes open on the right](docs/images/coding-workspace.jpg)
 
 <details>
 <summary>View the practice catalog and landing page</summary>
@@ -49,26 +50,30 @@ solved status. You can pick up where you left off on another device.
 
 ## What works today
 
-- **Learn** has searchable, filterable module previews. JavaScript and Algorithms both
-  offer a palindrome trace in Two Pointers and a running-sum trace in Sliding Window.
-  JavaScript's Event Loop visualizes how a timer
-  waits for microtasks, Heap & Stack follows shared object references, and Generators &
-  Iterators shows how a function can pause and resume. Closures traces captured bindings
-  after the factory returns, and Debounce & Throttle compares two ways to handle an event
-  burst. React's Hooks section covers the `useEffect` lifecycle with a six-step timer walkthrough.
-- **Practice** includes a CodeMirror editor, resizable panels, hints, solutions, and a
-  stopwatch or countdown for the current problem visit. Light, dark, and system themes
-  are available.
+- **Learn** offers searchable, filterable catalogs with interactive visualizations and code
+  walkthroughs.
+  - **JavaScript and Algorithms** share a Two Pointers palindrome trace and a Sliding Window
+    lesson with a running-sum walkthrough, reference tables, and a 10-question quiz.
+  - **JavaScript** also covers Event Loop, Heap & Stack, Generators & Iterators, Closures,
+    and Debounce & Throttle. The timing visualizer compares trailing debounce and leading
+    throttle on the same event timeline.
+  - **React** walks through the `useEffect` lifecycle with a six-step timer example.
+- **Practice** includes a CodeMirror editor, hints in Problem, a separate Solution tab,
+  and a stopwatch or countdown for the current visit. Appearance options are Light, Dark,
+  Brown, and System.
 - **JavaScript Playground** runs a standalone script and shows console output, errors,
   and time limits. The draft, output, and tutor chat last for the current visit. See the
   [Playground guide](docs/features/javascript-playground.md).
-- **AI Tutor** uses your current unsaved code and the workspace context. Press Enter to
-  send or Shift+Enter for a new line. The conversation lasts for the current visit.
+- **AI Tutor** uses your current unsaved code and workspace context in Practice and
+  JavaScript Playground. Press Enter to send or Shift+Enter for a new line. The
+  conversation lasts for the current visit.
 - **Evaluate** provides a scored review of correctness, efficiency, code quality, and edge
   cases in the Feedback tab. It reviews a snapshot without executing it. Feedback lasts
   for the current visit.
-- **Notes** stores private, formatted takeaways with your account when you select Save.
-  Unsaved notes last until you leave or reload the problem.
+- **Notes** opens from the notebook icon immediately to the right of AI Tutor in Practice.
+  The icons switch the same right panel or mobile drawer between tools. Select Save to
+  keep private, formatted notes in your account. Drafts survive tool switches and last
+  until you leave or reload the problem.
 - **React Practice** is a development-only pilot. The Stale Closure Counter exercise has a
   TypeScript/JSX editor, a browser preview updated by Submit, a console, and the tutor.
   See the [React pilot scope and execution limits](docs/features/react-sandbox.md).
@@ -210,8 +215,8 @@ pnpm desktop:dev
 ```
 
 This starts the local web server when needed and opens Electron. The desktop app uses the
-same backend as the website, with a separate email-and-password sign-in session. Google
-sign-in is available in the browser version.
+same backend as the website and has its own email sign-in session. Browser sign-in also
+supports Google when the provider is enabled.
 
 `pnpm desktop:package:local` creates an unsigned Mac app in `apps/desktop/release/`.
 Keep `pnpm dev` running when opening that local app. For other computers, package with
@@ -233,10 +238,12 @@ requests targeting `main` and pushes to `main`. Biome handles linting and format
 Vitest covers unit and integration behavior.
 
 `pnpm test:e2e` runs the production Playwright smoke suite after a credential-free
-build. It uses port 3000 by default. Set `PLAYWRIGHT_PORT` to use another free port.
-Optional authenticated suites use a dedicated Neon Auth development test user. Run
-`pnpm test:e2e:auth` for browser checks or `pnpm test:e2e:desktop:auth` to check
-Run/Submit and progress after restarting Electron. See the [verification instructions](docs/development.md#verification)
+build. Install Chromium with `pnpm exec playwright install chromium` if needed. The
+suite uses port 3000 by default. Set `PLAYWRIGHT_PORT` to use another free port.
+Optional authenticated suites use a dedicated Neon Auth development test user.
+Run `pnpm test:e2e:auth` for browser checks, `pnpm test:e2e:react` for the React Practice
+pilot, or `pnpm test:e2e:desktop:auth` to check Run/Submit and account progress after
+restarting Electron. See the [verification instructions](docs/development.md#verification)
 and [full command list](docs/development.md#commands).
 
 Use `pnpm analyze` for interactive Turbopack bundle inspection, or
@@ -246,9 +253,8 @@ snapshots and graph exports. Analysis is separate from the normal build and CI.
 
 ## What's next
 
-Individual Learn lessons, additional JavaScript and Algorithms challenges, saved tutor history,
-note media embeds and uploads, submission history, hosted deployment, and signed desktop
-distribution are planned.
+Future work includes more Learn modules and Practice challenges, saved tutor history,
+note media and uploads, submission history, hosted deployment, and signed desktop distribution.
 
 ## Documentation
 
