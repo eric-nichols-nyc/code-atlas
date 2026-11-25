@@ -1,0 +1,59 @@
+.scroll {
+  margin-block: 1.25rem;
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.scroll:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 3px;
+}
+
+.table {
+  width: 100%;
+  table-layout: fixed;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.table[data-wide="true"] {
+  min-width: 28rem;
+}
+
+.table :is(th, td) {
+  padding: 0.65rem clamp(0.5rem, 2vw, 1rem);
+  text-align: left;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+
+.table thead th {
+  border-bottom: 2px solid var(--interactive);
+  background: var(--accent);
+  font-weight: 650;
+}
+
+.table thead th:first-child {
+  width: 38%;
+}
+
+.table[data-wide="true"] thead th:first-child {
+  width: 26%;
+}
+
+.table tbody th {
+  font-weight: 600;
+}
+
+.table tbody td {
+  color: var(--muted-foreground);
+}
+
+.table tbody tr:nth-child(even) {
+  background: var(--muted);
+}
+
+.table tbody tr + tr {
+  border-top: 1px solid var(--border);
+}

@@ -4,8 +4,8 @@ import {
   palindromeExample,
   twoPointersWalkthrough,
 } from "@/content/shared/learn/two-pointers/walkthrough";
+import { sourceForStep } from "./code-walkthrough";
 import {
-  sourceForFrame,
   type TwoPointerVisualizationDefinition,
   validateTwoPointerVisualization,
 } from "./two-pointer-visualization";
@@ -40,7 +40,7 @@ describe("prepared Two Pointers visualization", () => {
     ];
     expect(
       example.frames.map((frame) =>
-        sourceForFrame(example.source, frame).map((line) => line.text.trim()),
+        sourceForStep(example.source, frame).map((line) => line.text.trim()),
       ),
     ).toEqual([
       ["let left = 0;", "let right = text.length - 1;"],

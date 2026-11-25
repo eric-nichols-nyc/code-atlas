@@ -27,12 +27,16 @@ it("uses the Algorithms learning title and destination with working filters", ()
     "href",
     "/algorithms/learn/two-pointers",
   );
+  expect(screen.getByRole("link", { name: "Sliding Window" })).toHaveAttribute(
+    "href",
+    "/algorithms/learn/sliding-window",
+  );
   fireEvent.change(screen.getByRole("searchbox"), {
     target: { value: "missing" },
   });
   expect(screen.getByRole("status")).toHaveTextContent("0 modules");
   fireEvent.click(screen.getByRole("button", { name: "Clear search" }));
-  expect(screen.getByRole("status")).toHaveTextContent("1 module");
+  expect(screen.getByRole("status")).toHaveTextContent("2 modules");
 });
 it("lists only Algorithms problems and uses the supplied Two Pointers category", () => {
   render(

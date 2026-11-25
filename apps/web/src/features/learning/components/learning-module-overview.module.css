@@ -1,3 +1,33 @@
+.summary,
+.prose > :is(p, ul, ol, blockquote) {
+  font-size: 1.125rem;
+  line-height: 1.65;
+}
+
+.prose > :is(h2, h3) {
+  font-size: 1.25rem;
+  line-height: 1.4;
+}
+
+.prose > h3 {
+  margin-block: 1.5rem 0.75rem;
+  font-weight: 700;
+}
+
+.prose > ol {
+  margin-bottom: 1rem;
+  padding-inline-start: 1.5em;
+  list-style: decimal;
+}
+
+.prose > ol > li + li {
+  margin-top: 0.5em;
+}
+
+.prose > :is(p, ul, ol, blockquote) code {
+  font-size: 0.95em;
+}
+
 .prose pre:not([data-walkthrough-code]) {
   max-width: 100%;
   overflow-x: auto;
@@ -8,8 +38,8 @@
   background: var(--muted);
   color: var(--foreground);
   font-family: Menlo, monospace;
-  font-size: 13px;
-  line-height: 24px;
+  font-size: 1rem;
+  line-height: 1.625;
 }
 
 .prose pre:not([data-walkthrough-code]) code {

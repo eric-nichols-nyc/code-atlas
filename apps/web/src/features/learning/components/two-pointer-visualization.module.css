@@ -1,113 +1,15 @@
-.body {
-  display: flex;
-  min-width: 0;
-  flex-direction: column;
-  gap: 20px;
-  padding: 20px 16px 16px;
-}
-.positions {
-  margin: 0;
-  font-family: Menlo, monospace;
-  font-size: 12px;
-  color: var(--muted-foreground);
-}
-.letters {
-  display: flex;
-  justify-content: center;
-  gap: clamp(4px, 2cqi, 16px);
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-.letters li {
-  display: flex;
-  min-width: 0;
-  flex: 0 1 64px;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 6px;
-  text-align: center;
-}
-.pointer {
-  height: 20px;
-  font-size: 11px;
-  line-height: 20px;
-  font-weight: 600;
-  color: var(--foreground);
-  white-space: nowrap;
-}
-.value {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 44px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background: var(--muted);
-  font-family: Menlo, monospace;
-  font-size: 20px;
-  font-weight: 500;
-}
-.index {
-  font-family: Menlo, monospace;
-  font-size: 11px;
-  line-height: 18px;
-  color: var(--muted-foreground);
-}
-.letters [data-left="true"] .value {
+[data-left="true"] .letter {
   border: 2px solid var(--foreground);
 }
-.letters [data-right="true"]:where(:not([data-left="true"])) .value {
+[data-right="true"]:where(:not([data-left="true"])) .letter {
   border: 2px dashed var(--foreground);
 }
-.letters [data-checked="true"] .value {
+[data-checked="true"] .letter {
   color: var(--muted-foreground);
   background: var(--background);
 }
-.letters [data-match="true"] .value {
+[data-match="true"] .letter {
   background: var(--primary);
   color: var(--primary-foreground);
   border-color: var(--primary);
-}
-.comparison {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 12px;
-  border-radius: 6px;
-  background: var(--muted);
-}
-.comparison strong {
-  font-family: Menlo, monospace;
-  font-size: 14px;
-  font-weight: 500;
-}
-.comparison span {
-  color: var(--muted-foreground);
-  font-size: 12px;
-}
-.source {
-  display: flex;
-  min-width: 0;
-  flex-direction: column;
-  gap: 8px;
-}
-.source > div {
-  display: flex;
-  min-width: 0;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 8px;
-}
-.source span {
-  color: var(--muted-foreground);
-  font-size: 12px;
-}
-.source code {
-  min-width: 0;
-  font-family: Menlo, monospace;
-  font-size: 12px;
-  overflow-wrap: anywhere;
 }

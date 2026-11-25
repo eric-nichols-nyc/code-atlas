@@ -1,15 +1,12 @@
 import {
-  normalizeCodeSource,
+  type CodeWalkthroughStep,
   validateCodeWalkthrough,
 } from "./code-walkthrough";
 
-export type TwoPointerFrame = {
-  readonly id: string;
+export type TwoPointerFrame = CodeWalkthroughStep & {
   readonly phase: "initialize" | "compare" | "complete";
   readonly left: number;
   readonly right: number;
-  readonly lines: readonly number[];
-  readonly explanation: string;
 };
 
 export type TwoPointerVisualizationDefinition = {
@@ -60,12 +57,4 @@ export function validateTwoPointerVisualization(
   if (expectedPhase !== undefined)
     errors.push(`${label}: the prepared example must reach a result.`);
   return errors;
-}
-
-export function sourceForFrame(source: string, frame: TwoPointerFrame) {
-  const lines = normalizeCodeSource(source).split("\n");
-  return frame.lines.map((number) => ({
-    number,
-    text: lines[number - 1] ?? "",
-  }));
 }

@@ -49,8 +49,9 @@ solved status. You can pick up where you left off on another device.
 
 ## What works today
 
-- **Learn** has searchable, filterable module previews. Two Pointers traces a palindrome
-  check in JavaScript and Algorithms. JavaScript's Event Loop visualizes how a timer
+- **Learn** has searchable, filterable module previews. JavaScript and Algorithms both
+  offer a palindrome trace in Two Pointers and a running-sum trace in Sliding Window.
+  JavaScript's Event Loop visualizes how a timer
   waits for microtasks, Heap & Stack follows shared object references, and Generators &
   Iterators shows how a function can pause and resume. Closures traces captured bindings
   after the factory returns. React's Hooks section covers the `useEffect` lifecycle with

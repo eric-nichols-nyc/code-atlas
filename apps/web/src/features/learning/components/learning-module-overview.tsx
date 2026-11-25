@@ -48,10 +48,10 @@ export function LearningModuleOverview({
           <h1 className="text-[28px] leading-9 font-semibold tracking-tight md:text-[40px] md:leading-[50px]">
             {module.title}
           </h1>
-          <p className="text-sm leading-[23px] text-muted-foreground">
+          <p className={cn(styles.summary, "text-muted-foreground")}>
             {module.summary}
           </p>
-          <p className="text-sm leading-[23px] text-muted-foreground">
+          <p className={cn(styles.summary, "text-muted-foreground")}>
             Explore the pattern with a guided code example. Individual lessons
             and interactive exercises are coming later.
           </p>

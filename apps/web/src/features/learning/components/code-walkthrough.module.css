@@ -14,22 +14,22 @@
 }
 
 .eyebrow {
-  font-size: 12px;
+  font-size: 0.875rem;
   font-weight: 500;
   color: var(--muted-foreground);
 }
 
 .title {
   margin: 4px 0 0;
-  font-size: 16px;
-  line-height: 24px;
+  font-size: 1.25rem;
+  line-height: 1.4;
   font-weight: 600;
 }
 
 .description {
   margin: 8px 0 0;
-  font-size: 14px;
-  line-height: 23px;
+  font-size: 1.125rem;
+  line-height: 1.65;
   color: var(--muted-foreground);
 }
 
@@ -49,8 +49,8 @@
   background: var(--muted);
   color: var(--foreground);
   font-family: Menlo, monospace;
-  font-size: 13px;
-  line-height: 24px;
+  font-size: 1rem;
+  line-height: 1.625;
   tab-size: 2;
 }
 
@@ -73,7 +73,7 @@
 
 .line {
   display: flex;
-  min-height: 24px;
+  min-height: 1lh;
   padding-right: 16px;
   border-left: 3px solid transparent;
 }
@@ -106,16 +106,16 @@
 
 .stepCount {
   margin: 0;
-  font-size: 12px;
-  line-height: 20px;
+  font-size: 0.875rem;
+  line-height: 1.5;
   font-weight: 500;
   color: var(--muted-foreground);
 }
 
 .stepText {
   margin: 8px 0 0;
-  font-size: 14px;
-  line-height: 23px;
+  font-size: 1.125rem;
+  line-height: 1.65;
   color: var(--foreground);
 }
 
@@ -141,6 +141,9 @@
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+}
+.controls button {
+  font-size: 1rem;
 }
 .restart {
   margin-left: auto;

@@ -1,0 +1,100 @@
+.body {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px 16px 16px;
+}
+.positions {
+  margin: 0;
+  font-family: Menlo, monospace;
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+}
+.cells {
+  display: flex;
+  justify-content: center;
+  gap: clamp(4px, 2cqi, 16px);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.cells li {
+  display: flex;
+  min-width: 0;
+  flex: 0 1 64px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  text-align: center;
+}
+.marker {
+  display: flex;
+  justify-content: center;
+  height: 20px;
+  font-size: 0.875rem;
+  line-height: 20px;
+  font-weight: 600;
+  color: var(--foreground);
+  white-space: nowrap;
+}
+.value {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--muted);
+  font-family: Menlo, monospace;
+  font-size: 1.375rem;
+  font-weight: 500;
+}
+.index {
+  font-family: Menlo, monospace;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--muted-foreground);
+}
+.readout {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 6px;
+  background: var(--muted);
+}
+.readout strong {
+  font-family: Menlo, monospace;
+  font-size: 1.125rem;
+  font-weight: 500;
+}
+.readout span {
+  color: var(--muted-foreground);
+  font-size: 1rem;
+}
+.source {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 8px;
+}
+.source > div {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+}
+.source span {
+  color: var(--muted-foreground);
+  font-size: 0.875rem;
+}
+.source code {
+  min-width: 0;
+  font-family: Menlo, monospace;
+  font-size: 1rem;
+  overflow-wrap: anywhere;
+}
